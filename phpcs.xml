@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<ruleset name="Laravel Events">
+    <description>PHP_CodeSniffer. Style conflicts: Pint wins (run pint first).</description>
+
+    <file>src</file>
+    <file>tests</file>
+
+    <rule ref="PSR12">
+        <!-- Pint/Laravel: no space around concatenation (.) -->
+        <exclude name="PSR12.Operators.OperatorSpacing"/>
+        <!-- Pint: single-line closure/class body, brace position -->
+        <exclude name="PSR12.Functions.ReturnTypeDeclaration"/>
+        <exclude name="PSR12.Classes.OpeningBraceSpace"/>
+        <exclude name="PSR12.Classes.ClosingBrace"/>
+        <exclude name="Squiz.WhiteSpace.ScopeClosingBrace"/>
+        <exclude name="PSR2.Methods.FunctionClosingBrace"/>
+        <exclude name="PSR2.Methods.MethodDeclaration"/>
+        <!-- PHPUnit test_* method names (snake_case) -->
+        <exclude name="PSR1.Methods.CamelCapsMethodName"/>
+        <!-- Pint: single-line constructor body -->
+        <exclude name="Squiz.Functions.MultiLineFunctionDeclaration"/>
+        <!-- Pint: new Foo without parentheses -->
+        <exclude name="PSR12.Classes.ClassInstantiation"/>
+    </rule>
+
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="120"/>
+        </properties>
+    </rule>
+</ruleset>

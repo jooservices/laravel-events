@@ -1,0 +1,10 @@
+{
+    "preset": "laravel",
+    "paths": [
+        "src",
+        "tests"
+    ],
+    "exclude": [
+        "vendor"
+    ]
+}

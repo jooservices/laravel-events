@@ -1,0 +1,19 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    paths:
+        - src
+        - tests
+    level: 5
+    ignoreErrors:
+        # Mockery: MockInterface passed where concrete type expected
+        - '~Parameter #\d+ .+ expects .+, Mockery\\(MockInterface|LegacyMockInterface) given\.~'
+        # Mockery expectation fluent API
+        - '~Call to an undefined method Mockery\\.*~'
+        # Anonymous event in tests: aggregateId() return type
+        - '~never returns null so it can be removed from the return type~'
+        # env() in tests is acceptable (config not cached)
+        -
+            message: '~Called .env. outside of the config directory~'
+            path: tests/*
