@@ -4,4 +4,8 @@ composer.lock
 /build/
 .env
 .env.local
+.env.*.local
 .vscode/
+.idea/
+*.log
+.DS_Store

@@ -5,13 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Carbon:** Event time (`occurredAt`) and StoredEvent `occurred_at` use Carbon (`\Carbon\CarbonInterface`) instead of `\DateTimeInterface`.
+- **HasEventSourcingDefaults** trait: default `occurredAt(): null` and `metadata(): []` so events need only implement `payload()` and `aggregateId()`.
+- **DefaultsToUpdatedAction** trait: default `getAction(): 'updated'` for `HasLogAction` so log events need not implement `getAction()` when action is always updated.
+
+### Changed
+
+- `EventService::storeEvent()` now accepts `?\Carbon\CarbonInterface $occurredAt` (was `?\DateTimeInterface`).
+- **Documentation:** Updated `./docs` (api, code-structure, configuration, event-log, event-sourcing, installation, samples).
+
 ## [1.0.0] - 2026-03-09
 
 ### Added
 
 - **Event Sourcing:** Persist domain events (payload + aggregate id) to MongoDB collection `stored_events`.
   - `EventSourcingInterface` with `payload()` and `aggregateId()`.
-  - Optional `occurredAt()` and `metadata()` on events.
+  - Optional `occurredAt()` and `metadata()` on events (Carbon).
   - `EventSourcingSubscriber` listening for `EventSourcingInterface`.
 - **Event Log (Audit):** Persist model change events (prev/changed/diff) to MongoDB collection `event_logs`.
   - `LoggableModelInterface` with `getLoggableType()`, `getLoggableId()`, `getPrev()`, `getChanged()`.

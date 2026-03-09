@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace JooServices\LaravelEvents;
 
+use Carbon\CarbonInterface;
 use JooServices\LaravelEvents\EventLog\Models\EventLogEntry;
 use JooServices\LaravelEvents\EventSourcing\Models\StoredEvent;
 
@@ -18,6 +19,7 @@ class EventService
      * Store dispatched event payload (EventSourcing).
      *
      * @param  int|string|null  $userId  Authorized user id (int or string/UUID); null when guest.
+     * @param  CarbonInterface|null  $occurredAt  Event time (Carbon); null uses document created_at.
      * @param  array<string, mixed>  $metadata  Merged with config context_provider when storing.
      */
     public function storeEvent(
@@ -25,7 +27,7 @@ class EventService
         array $payload,
         ?string $aggregateId = null,
         int|string|null $userId = null,
-        ?\DateTimeInterface $occurredAt = null,
+        ?CarbonInterface $occurredAt = null,
         array $metadata = [],
     ): StoredEvent {
         $metadata = array_merge($this->getContext(), $metadata);

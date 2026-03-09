@@ -17,3 +17,7 @@ parameters:
         -
             message: '~Called .env. outside of the config directory~'
             path: tests/*
+        # Public API traits (used by consumer code, not in-package)
+        -
+            message: '~Trait .+ is used zero times and is not analysed\.~'
+            path: src/*/Concerns/*.php

@@ -22,7 +22,7 @@ interface LoggableModelInterface
 
 ### HasLogAction (optional)
 
-When implemented, the stored `action` is taken from your event. Otherwise the subscriber uses `"updated"`.
+When implemented, the stored `action` is taken from your event. Otherwise the subscriber uses `"updated"`. Use the `DefaultsToUpdatedAction` trait when the action is always `updated`.
 
 ```php
 namespace JooServices\LaravelEvents\EventLog\Contracts;
@@ -35,15 +35,18 @@ interface HasLogAction
 
 ## Implementing an Event
 
-Example: log when an order is updated.
+Example: log when an order is updated, using `DefaultsToUpdatedAction` so you don't implement `getAction()`.
 
 ```php
 use App\Models\Order;
+use JooServices\LaravelEvents\EventLog\Concerns\DefaultsToUpdatedAction;
 use JooServices\LaravelEvents\EventLog\Contracts\LoggableModelInterface;
 use JooServices\LaravelEvents\EventLog\Contracts\HasLogAction;
 
 class OrderUpdated implements LoggableModelInterface, HasLogAction
 {
+    use DefaultsToUpdatedAction;
+
     public function __construct(
         public Order $model,
         public array $prev,
@@ -68,15 +71,10 @@ class OrderUpdated implements LoggableModelInterface, HasLogAction
     {
         return $this->model->getAttributes();
     }
-
-    public function getAction(): string
-    {
-        return 'updated';
-    }
 }
 ```
 
-For creates, pass an empty `prev` and `getAction(): 'created'`.
+For creates, pass an empty `prev` and override `getAction()` to return `'created'` (or omit the trait and implement `getAction()` yourself).
 
 ## Stored Document Shape (MongoDB)
 

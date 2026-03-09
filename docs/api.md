@@ -14,7 +14,7 @@ public function storeEvent(
     array $payload,
     ?string $aggregateId = null,
     int|string|null $userId = null,
-    ?\DateTimeInterface $occurredAt = null,
+    ?\Carbon\CarbonInterface $occurredAt = null,
     array $metadata = [],
 ): StoredEvent
 ```
@@ -25,7 +25,7 @@ public function storeEvent(
 | `$payload` | Payload array to store |
 | `$aggregateId` | Optional aggregate identifier |
 | `$userId` | User id (int or string); null uses `auth()->id()` |
-| `$occurredAt` | Optional event time; null uses document creation time |
+| `$occurredAt` | Optional event time (Carbon); null uses document creation time |
 | `$metadata` | Merged with config `context_provider` |
 
 **Returns:** `StoredEvent` model instance.
@@ -70,7 +70,7 @@ public function logChange(
 
 - `payload(): array`
 - `aggregateId(): ?string`  
-Optional: `occurredAt(): ?\DateTimeInterface`, `metadata(): array`
+Optional: `occurredAt(): ?\Carbon\CarbonInterface`, `metadata(): array`. Use trait `HasEventSourcingDefaults` for defaults.
 
 ### LoggableModelInterface
 
@@ -81,7 +81,7 @@ Optional: `occurredAt(): ?\DateTimeInterface`, `metadata(): array`
 
 ### HasLogAction
 
-- `getAction(): string` — e.g. `created`, `updated`, `deleted`, `restored`
+- `getAction(): string` — e.g. `created`, `updated`, `deleted`, `restored`. Use trait `DefaultsToUpdatedAction` for default `'updated'`.
 
 ---
 
@@ -105,7 +105,7 @@ php artisan events:install-indexes --drop [--force]
 
 ### StoredEvent
 
-MongoDB Eloquent model. Connection and collection from config. Fillable: `event_class`, `aggregate_id`, `payload`, `metadata`, `user_id`, `occurred_at`. Casts: `payload`/`metadata` => array, `occurred_at` => datetime.
+MongoDB Eloquent model. Connection and collection from config. Fillable: `event_class`, `aggregate_id`, `payload`, `metadata`, `user_id`, `occurred_at`. Casts: `payload`/`metadata` => array, `occurred_at` => datetime (Carbon).
 
 ### EventLogEntry
 

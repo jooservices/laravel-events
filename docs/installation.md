@@ -30,7 +30,6 @@ composer require jooservices/laravel-events
 3. **Environment variables** (optional)
 
    ```env
-   EVENTS_MONGO_CONNECTION=mongodb
    MONGODB_URI=mongodb://127.0.0.1:27017
    MONGODB_DATABASE=your_db
    EVENTS_EVENTSOURCING_ENABLED=true

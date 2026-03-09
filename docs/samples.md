@@ -1,10 +1,39 @@
 # Samples
 
-## Event Sourcing: Order Events
+## Event Sourcing: minimal with defaults trait
+
+Implement only `payload()` and `aggregateId()` by using `HasEventSourcingDefaults`:
 
 ```php
 namespace App\Events;
 
+use JooServices\LaravelEvents\EventSourcing\Concerns\HasEventSourcingDefaults;
+use JooServices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
+
+class OrderCreated implements EventSourcingInterface
+{
+    use HasEventSourcingDefaults;
+
+    public function __construct(public string $orderId, public float $total) {}
+
+    public function payload(): array
+    {
+        return ['order_id' => $this->orderId, 'total' => $this->total];
+    }
+
+    public function aggregateId(): ?string
+    {
+        return $this->orderId;
+    }
+}
+```
+
+## Event Sourcing: with occurredAt (Carbon)
+
+```php
+namespace App\Events;
+
+use Carbon\CarbonInterface;
 use JooServices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
 
 class OrderCreated implements EventSourcingInterface
@@ -12,7 +41,7 @@ class OrderCreated implements EventSourcingInterface
     public function __construct(
         public string $orderId,
         public float $total,
-        public ?\DateTimeInterface $occurredAt = null,
+        public ?CarbonInterface $occurredAt = null,
     ) {}
 
     public function payload(): array
@@ -28,7 +57,7 @@ class OrderCreated implements EventSourcingInterface
         return $this->orderId;
     }
 
-    public function occurredAt(): ?\DateTimeInterface
+    public function occurredAt(): ?CarbonInterface
     {
         return $this->occurredAt;
     }
@@ -46,22 +75,23 @@ $stored = \JooServices\LaravelEvents\EventSourcing\Models\StoredEvent::on('mongo
     ->get();
 ```
 
-## Event Log: Model Change Audit
+## Event Log: default "updated" action trait
+
+When the action is always `updated`, use `DefaultsToUpdatedAction` so you don't implement `getAction()`:
 
 ```php
 namespace App\Events;
 
 use App\Models\Order;
+use JooServices\LaravelEvents\EventLog\Concerns\DefaultsToUpdatedAction;
 use JooServices\LaravelEvents\EventLog\Contracts\HasLogAction;
 use JooServices\LaravelEvents\EventLog\Contracts\LoggableModelInterface;
 
 class OrderAuditEvent implements LoggableModelInterface, HasLogAction
 {
-    public function __construct(
-        public Order $order,
-        public array $prev,
-        public string $action = 'updated',
-    ) {}
+    use DefaultsToUpdatedAction;
+
+    public function __construct(public Order $order, public array $prev) {}
 
     public function getLoggableType(): string
     {
@@ -82,20 +112,19 @@ class OrderAuditEvent implements LoggableModelInterface, HasLogAction
     {
         return $this->order->getAttributes();
     }
-
-    public function getAction(): string
-    {
-        return $this->action;
-    }
 }
 ```
+
+## Event Log: custom action (created/updated/deleted)
+
+Override `getAction()` or omit the trait when the action varies (e.g. pass `'created'` or `'deleted'`).
 
 In a controller or observer:
 
 ```php
 $prev = $order->getOriginal();
 $order->update($request->validated());
-event(new OrderAuditEvent($order, $prev, 'updated'));
+event(new OrderAuditEvent($order, $prev));
 ```
 
 ## Using EventService Directly

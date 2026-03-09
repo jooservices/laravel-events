@@ -10,6 +10,8 @@ laravel-events/
 │   ├── Console/
 │   │   └── InstallIndexesCommand.php
 │   ├── EventLog/
+│   │   ├── Concerns/
+│   │   │   └── DefaultsToUpdatedAction.php
 │   │   ├── Contracts/
 │   │   │   ├── HasLogAction.php
 │   │   │   └── LoggableModelInterface.php
@@ -17,6 +19,8 @@ laravel-events/
 │   │   └── Models/
 │   │       └── EventLogEntry.php
 │   ├── EventSourcing/
+│   │   ├── Concerns/
+│   │   │   └── HasEventSourcingDefaults.php
 │   │   ├── Contracts/
 │   │   │   └── EventSourcingInterface.php
 │   │   ├── EventSourcingSubscriber.php
@@ -40,9 +44,11 @@ laravel-events/
 | `JooServices\LaravelEvents` | Service provider, EventService |
 | `JooServices\LaravelEvents\Console` | Artisan commands (indexes) |
 | `JooServices\LaravelEvents\EventSourcing` | EventSourcing subscriber and contract |
+| `JooServices\LaravelEvents\EventSourcing\Concerns` | HasEventSourcingDefaults trait (optional occurredAt/metadata) |
 | `JooServices\LaravelEvents\EventSourcing\Contracts` | EventSourcingInterface |
 | `JooServices\LaravelEvents\EventSourcing\Models` | StoredEvent MongoDB model |
 | `JooServices\LaravelEvents\EventLog` | EventLog subscriber |
+| `JooServices\LaravelEvents\EventLog\Concerns` | DefaultsToUpdatedAction trait (default getAction) |
 | `JooServices\LaravelEvents\EventLog\Contracts` | LoggableModelInterface, HasLogAction |
 | `JooServices\LaravelEvents\EventLog\Models` | EventLogEntry MongoDB model |
 | `JooServices\LaravelEvents\Support` | DiffHelper utility |

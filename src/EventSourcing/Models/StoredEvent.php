@@ -12,7 +12,7 @@ use MongoDB\Laravel\Eloquent\Model;
  * @property array $payload
  * @property array $metadata
  * @property int|string|null $user_id
- * @property \DateTimeInterface|null $occurred_at
+ * @property \Carbon\Carbon|null $occurred_at
  */
 class StoredEvent extends Model
 {

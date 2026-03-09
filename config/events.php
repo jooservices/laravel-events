@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'connection' => env('EVENTS_MONGO_CONNECTION', 'mongodb'),
+    'connection' => 'mongodb',
 
     /*
     |--------------------------------------------------------------------------

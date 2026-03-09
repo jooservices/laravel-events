@@ -35,7 +35,6 @@ php artisan vendor:publish --tag=laravel-events-config
 ### Environment
 
 ```env
-EVENTS_MONGO_CONNECTION=mongodb
 MONGODB_URI=mongodb://127.0.0.1:27017
 MONGODB_DATABASE=your_db
 EVENTS_EVENTSOURCING_ENABLED=true
@@ -79,25 +78,27 @@ class OrderCreated implements EventSourcingInterface
 event(new OrderCreated('ORD-001', [['sku' => 'X', 'qty' => 2]]));
 ```
 
-Events are stored in the `stored_events` collection. Optional: `occurredAt(): ?\DateTimeInterface`, `metadata(): array`.
+Events are stored in the `stored_events` collection. Optional: `occurredAt(): ?\Carbon\CarbonInterface`, `metadata(): array`. Use the `HasEventSourcingDefaults` trait to implement only `payload()` and `aggregateId()`.
 
 ### Event Log (Audit)
 
-Implement `LoggableModelInterface` (and optionally `HasLogAction`) and dispatch with prev/changed state:
+Implement `LoggableModelInterface` (and optionally `HasLogAction`) and dispatch with prev/changed state. Use the `DefaultsToUpdatedAction` trait when the action is always `updated`:
 
 ```php
+use JooServices\LaravelEvents\EventLog\Concerns\DefaultsToUpdatedAction;
 use JooServices\LaravelEvents\EventLog\Contracts\LoggableModelInterface;
 use JooServices\LaravelEvents\EventLog\Contracts\HasLogAction;
 
 class OrderUpdated implements LoggableModelInterface, HasLogAction
 {
+    use DefaultsToUpdatedAction;
+
     public function __construct(public Order $model, public array $prev) {}
 
     public function getLoggableType(): string { return $this->model->getMorphClass(); }
     public function getLoggableId(): string { return (string) $this->model->getKey(); }
     public function getPrev(): array { return $this->prev; }
     public function getChanged(): array { return $this->model->getAttributes(); }
-    public function getAction(): string { return 'updated'; }
 }
 ```
 

@@ -14,7 +14,7 @@ the file is `config/events.php`.
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| `connection` | string | `env('EVENTS_MONGO_CONNECTION', 'mongodb')` | MongoDB connection name from `config/database.php` |
+| `connection` | string | `'mongodb'` | MongoDB connection name from `config/database.php` |
 | `context_provider` | callable\|null | `null` | Callable returning an array merged into EventSourcing `metadata` and EventLog `meta` (e.g. request_id, ip, channel) |
 | `eventsourcing.enabled` | bool | `true` | Enable EventSourcing subscriber |
 | `eventsourcing.collection` | string | `stored_events` | MongoDB collection for stored events |
@@ -27,7 +27,6 @@ the file is `config/events.php`.
 
 | Variable | Used as | Example |
 |----------|---------|---------|
-| `EVENTS_MONGO_CONNECTION` | `connection` | `mongodb` |
 | `EVENTS_EVENTSOURCING_ENABLED` | `eventsourcing.enabled` | `true` |
 | `EVENTS_STORED_EVENTS_COLLECTION` | `eventsourcing.collection` | `stored_events` |
 | `EVENTS_EVENTSOURCING_TTL_DAYS` | `eventsourcing.ttl_days` | `90` or empty |

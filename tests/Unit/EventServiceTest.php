@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace JooServices\LaravelEvents\Tests\Unit;
 
+use Carbon\Carbon;
 use JooServices\LaravelEvents\EventLog\Models\EventLogEntry;
 use JooServices\LaravelEvents\EventService;
 use JooServices\LaravelEvents\EventSourcing\Models\StoredEvent;
@@ -180,7 +181,7 @@ class EventServiceTest extends TestCase
 
     public function test_store_event_stores_occurred_at_and_metadata(): void
     {
-        $occurredAt = new \DateTimeImmutable('2025-01-15 12:00:00');
+        $occurredAt = Carbon::parse('2025-01-15 12:00:00');
         $metadata = ['request_id' => 'req-123', 'channel' => 'api'];
 
         $storedEventModel = Mockery::mock(StoredEvent::class)->makePartial();

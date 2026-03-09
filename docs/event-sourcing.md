@@ -18,12 +18,39 @@ interface EventSourcingInterface
 
 Optional methods on your event (detected via `method_exists`):
 
-- **occurredAt(): ?\DateTimeInterface** — Event time; when null or not implemented, `created_at` is used.
+- **occurredAt(): ?\Carbon\CarbonInterface** — Event time; when null or not implemented, `created_at` is used.
 - **metadata(): array** — Extra metadata merged with `config('events.context_provider')` when storing.
 
-## Implementing an Event
+## Using the defaults trait
+
+Use `HasEventSourcingDefaults` so you only implement `payload()` and `aggregateId()`. Override `occurredAt()` or `metadata()` when needed.
 
 ```php
+use JooServices\LaravelEvents\EventSourcing\Concerns\HasEventSourcingDefaults;
+use JooServices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
+
+class OrderCreated implements EventSourcingInterface
+{
+    use HasEventSourcingDefaults;
+
+    public function __construct(public string $orderId, public array $items) {}
+
+    public function payload(): array
+    {
+        return ['order_id' => $this->orderId, 'items' => $this->items];
+    }
+
+    public function aggregateId(): ?string
+    {
+        return $this->orderId;
+    }
+}
+```
+
+## Implementing an Event (with optional methods)
+
+```php
+use Carbon\CarbonInterface;
 use JooServices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
 
 class OrderCreated implements EventSourcingInterface
@@ -31,7 +58,7 @@ class OrderCreated implements EventSourcingInterface
     public function __construct(
         public string $orderId,
         public array $items,
-        public ?\DateTimeInterface $occurredAt = null,
+        public ?CarbonInterface $occurredAt = null,
     ) {}
 
     public function payload(): array
@@ -47,7 +74,7 @@ class OrderCreated implements EventSourcingInterface
         return $this->orderId;
     }
 
-    public function occurredAt(): ?\DateTimeInterface
+    public function occurredAt(): ?CarbonInterface
     {
         return $this->occurredAt;
     }
