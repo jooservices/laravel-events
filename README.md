@@ -1,6 +1,14 @@
 # Laravel Events
 
-EventSourcing and EventLog for Laravel with **MongoDB** storage. Store domain event payloads by aggregate and/or model change audit trails (prev/changed/diff) via Laravel's event dispatcher.
+[![CI](https://github.com/jooservices/laravel-events/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/jooservices/laravel-events/actions/workflows/ci.yml)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/jooservices/laravel-events/badge)](https://securityscorecards.dev/viewer/?uri=github.com/jooservices/laravel-events)
+[![PHP Version](https://img.shields.io/badge/PHP-8.5%2B-blue.svg)](https://www.php.net/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Packagist Version](https://img.shields.io/packagist/v/jooservices/laravel-events)](https://packagist.org/packages/jooservices/laravel-events)
+
+Lightweight Event Sourcing and Event Log persistence for Laravel with **MongoDB** storage. Store domain event payloads by aggregate and/or model change audit trails (prev/changed/diff) via Laravel's native event dispatcher.
+
+Package name: `jooservices/laravel-events`
 
 - **Laravel 12** · **PHP 8.5+**
 - **MongoDB** via [mongodb/laravel-mongodb](https://github.com/mongodb/laravel-mongodb)
@@ -11,10 +19,31 @@ EventSourcing and EventLog for Laravel with **MongoDB** storage. Store domain ev
 
 This package adds two persistence features on top of Laravel's event system:
 
-1. **Event Sourcing** — Events implementing `EventSourcingInterface` are stored in a `stored_events` MongoDB collection (payload, aggregate id, metadata, user, time). Use for event replay, analytics, or audit by aggregate.
+1. **Event Sourcing** — Events implementing `EventSourcingInterface` are stored in a `stored_events` MongoDB collection (payload, aggregate id, metadata, user, time). Use for aggregate history, replay-oriented records, or audit by aggregate.
 2. **Event Log** — Events implementing `LoggableModelInterface` are stored in an `event_logs` collection with previous/changed state and a per-field diff. Use for audit trails and compliance.
 
 You dispatch events as usual; package subscribers persist them to MongoDB. No custom bus or queue required.
+
+## Scope
+
+Use this package when you need a reusable Laravel-standard base library for persisting event records or audit logs.
+
+This package does **not**:
+
+- replace Laravel's event dispatcher
+- provide a projection/read-model framework
+- provide a business analytics or reporting layer
+- provide a full query/data-access toolkit
+- provide AI agents, AI data fetching, or an AI runtime
+
+## When to Use
+
+| Need | Use |
+|------|-----|
+| Persist domain events by aggregate for historical inspection or replay-aware workflows | Event Sourcing |
+| Persist model/entity changes with previous/current values and field diff | Event Log |
+| Need both domain history and field-level audit | Use both, with separate focused events |
+| Need dashboards, projections, analytics, or AI retrieval | Build that in the application layer |
 
 ---
 
@@ -80,6 +109,8 @@ event(new OrderCreated('ORD-001', [['sku' => 'X', 'qty' => 2]]));
 
 Events are stored in the `stored_events` collection. Optional: `occurredAt(): ?\Carbon\CarbonInterface`, `metadata(): array`. Use the `HasEventSourcingDefaults` trait to implement only `payload()` and `aggregateId()`.
 
+Recommended metadata keys include `request_id`, `correlation_id`, `causation_id`, `source`, `channel`, `reason_code`, `schema_version`, `event_version`, and optional `tenant_id`. The `EventMetadata` helper exposes constants and small factory methods for those conventions.
+
 ### Event Log (Audit)
 
 Implement `LoggableModelInterface` (and optionally `HasLogAction`) and dispatch with prev/changed state. Use the `DefaultsToUpdatedAction` trait when the action is always `updated`:
@@ -104,6 +135,8 @@ class OrderUpdated implements LoggableModelInterface, HasLogAction
 
 Changes are stored in `event_logs` with a computed diff. Query by `entity_type` + `entity_id`.
 
+Recommended action names are available from `JooServices\LaravelEvents\EventLog\EventLogAction`: `created`, `updated`, `deleted`, `restored`, `status_changed`, `corrected`, `synchronized`, and `imported`.
+
 ---
 
 ## Documentation
@@ -117,8 +150,13 @@ Full documentation is in the **`./docs`** folder:
 | [Code structure](docs/code-structure.md) | Package layout and namespaces |
 | [Installation](docs/installation.md) | Requirements and setup |
 | [Configuration](docs/configuration.md) | Config and context provider |
+| [Decision Guide](docs/decision-guide.md) | Event Sourcing vs Event Log |
 | [Event Sourcing](docs/event-sourcing.md) | Stored events and aggregates |
 | [Event Log](docs/event-log.md) | Audit trail and diff |
+| [Metadata](docs/metadata.md) | Metadata keys, versioning, corrections |
+| [Operations](docs/operations.md) | Indexes, query patterns, retention, production safety |
+| [AI Integration](docs/ai-integration.md) | Optional app-layer AI export examples |
+| [Development](docs/development.md) | Composer commands, CI, release, and contributor workflow |
 | [Samples](docs/samples.md) | Complete code examples |
 | [API Reference](docs/api.md) | EventService, interfaces, commands |
 
@@ -128,11 +166,64 @@ Full documentation is in the **`./docs`** folder:
 
 ```bash
 composer test
-composer lint   # Pint, PHPStan, PHPMD, PHPCS
+composer test:coverage
+composer lint       # Pint, PHPCS, PHPStan
+composer lint:all   # lint + PHPMD
+composer lint:fix
+composer check      # lint:all + test
 ```
+
+## Git Hooks
+
+Composer installs Git hooks automatically on dependency install and update:
+
+```bash
+composer install
+composer update
+```
+
+The hooks are managed by CaptainHook and enforce:
+
+- `commit-msg`: Conventional Commits, for example `fix: Correct event metadata merge`
+- `pre-commit`: PHP syntax linting, staged secret scanning with gitleaks, Pint, PHPCS, PHPStan, and PHPMD
+- `pre-push`: gitleaks history scan when available, then `composer test`
+
+If hooks need to be reinstalled manually:
+
+```bash
+vendor/bin/captainhook install --force --skip-existing
+```
+
+Install `gitleaks` locally to pass the pre-commit secret scan:
+
+```bash
+brew install gitleaks
+```
+
+## AI Contributor Support
+
+AI contributor guidance is intentionally documentation-only:
+
+- [AGENTS.md](AGENTS.md)
+- [CLAUDE.md](CLAUDE.md)
+- [Optional AI Integration](docs/ai-integration.md)
+
+The package does not include AI runtime code, AI data fetching, authorization, redaction, or tool execution.
+
+## GitHub Actions
+
+Configured workflows:
+
+- `CI`: Composer audit, Pint, PHPCS, PHPStan, PHPMD, PHPUnit coverage with a MongoDB service, and non-blocking dependency review for pull requests
+- `Release`: validate version tags, create GitHub releases, and trigger Packagist updates
+- `PR Labeler`: apply labels based on changed files
+- `Semantic PR Title`: enforce Conventional Commit-style PR titles
+- `OpenSSF Scorecard`: publish security posture results as SARIF
+
+Coverage is archived as a workflow artifact. A Codecov badge is intentionally not shown because Codecov upload is not configured for this repository.
 
 ---
 
 ## License
 
-MIT
+This project is licensed under the [MIT License](LICENSE).

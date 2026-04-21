@@ -4,6 +4,8 @@
 
 Events that implement `LoggableModelInterface` are persisted to the **event_logs** MongoDB collection. Each document stores entity type/id, action, previous state (`prev`), changed state (`changed`), and a per-field diff (`diff`). Use this for audit trails and compliance.
 
+For choosing between Event Log and Event Sourcing, see the [Decision Guide](./decision-guide.md).
+
 ## Interfaces
 
 ### LoggableModelInterface
@@ -33,15 +35,28 @@ interface HasLogAction
 }
 ```
 
+Recommended action constants are available in `JooServices\LaravelEvents\EventLog\EventLogAction`.
+
+| Action | Use for |
+|--------|---------|
+| `created` | New entity or record |
+| `updated` | General field update |
+| `deleted` | Delete or soft delete |
+| `restored` | Restore after soft delete |
+| `status_changed` | State machine/status transition |
+| `corrected` | Correction to an earlier record |
+| `synchronized` | External sync changed local state |
+| `imported` | Imported data created/changed state |
+
 ## Implementing an Event
 
 Example: log when an order is updated, using `DefaultsToUpdatedAction` so you don't implement `getAction()`.
 
 ```php
 use App\Models\Order;
-use JooServices\LaravelEvents\EventLog\Concerns\DefaultsToUpdatedAction;
-use JooServices\LaravelEvents\EventLog\Contracts\LoggableModelInterface;
 use JooServices\LaravelEvents\EventLog\Contracts\HasLogAction;
+use JooServices\LaravelEvents\EventLog\Contracts\LoggableModelInterface;
+use JooServices\LaravelEvents\EventLog\Concerns\DefaultsToUpdatedAction;
 
 class OrderUpdated implements LoggableModelInterface, HasLogAction
 {
@@ -76,6 +91,8 @@ class OrderUpdated implements LoggableModelInterface, HasLogAction
 
 For creates, pass an empty `prev` and override `getAction()` to return `'created'` (or omit the trait and implement `getAction()` yourself).
 
+For corrections or reversions, use the `corrected` action and metadata keys such as `correction_of`, `supersedes_event_id`, or `correction_reason` when calling `EventService` directly. Subscriber-driven log events currently provide user metadata automatically; richer correction metadata can be added by storing through `EventService::logChange()`.
+
 ## Stored Document Shape (MongoDB)
 
 - `entity_type`, `entity_id`: from getLoggableType/getLoggableId
@@ -98,6 +115,8 @@ $history = EventLogEntry::on(config('events.connection'))
     ->orderByDesc('created_at')
     ->get();
 ```
+
+Run `php artisan events:install-indexes` to create entity/action chronological indexes for common audit queries.
 
 ## Disabling Event Log
 

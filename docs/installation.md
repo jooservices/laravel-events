@@ -35,7 +35,7 @@ composer require jooservices/laravel-events
    EVENTS_EVENTSOURCING_ENABLED=true
    EVENTS_EVENT_LOG_ENABLED=true
    EVENTS_STORED_EVENTS_COLLECTION=stored_events
-   EVENTS_STORED_LOGS_COLLECTION=event_logs
+   EVENTS_EVENT_LOGS_COLLECTION=event_logs
    EVENTS_EVENTSOURCING_TTL_DAYS=
    EVENTS_EVENT_LOG_TTL_DAYS=
    ```
@@ -48,8 +48,8 @@ Create recommended indexes (and optional TTL) for both collections:
 php artisan events:install-indexes
 ```
 
-- **stored_events:** `aggregate_id`, `event_class`, `user_id`, `created_at` (plus optional TTL)
-- **event_logs:** `(entity_type, entity_id)`, `action`, `user_id`, `created_at` (plus optional TTL)
+- **stored_events:** `aggregate_id`, `aggregate_id + created_at`, `event_class`, `event_class + created_at`, `user_id`, `created_at` (plus optional TTL)
+- **event_logs:** `(entity_type, entity_id)`, `(entity_type, entity_id, created_at)`, `action`, `action + created_at`, `user_id`, `created_at` (plus optional TTL)
 
 To drop indexes (data is not deleted):
 

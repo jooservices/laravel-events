@@ -2,7 +2,9 @@
 
 ## Concept
 
-Events that implement `EventSourcingInterface` are persisted to the **stored_events** MongoDB collection. Each document stores the event class, aggregate id, payload, metadata, user id, and optional occurred-at time. Use this for event replay, analytics, or audit by aggregate.
+Events that implement `EventSourcingInterface` are persisted to the **stored_events** MongoDB collection. Each document stores the event class, aggregate id, payload, metadata, user id, and optional occurred-at time. Use this for aggregate history, replay-aware workflows, or audit by aggregate.
+
+For choosing between Event Sourcing and Event Log, see the [Decision Guide](./decision-guide.md).
 
 ## Interface
 
@@ -52,6 +54,7 @@ class OrderCreated implements EventSourcingInterface
 ```php
 use Carbon\CarbonInterface;
 use JooServices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
+use JooServices\LaravelEvents\Support\EventMetadata;
 
 class OrderCreated implements EventSourcingInterface
 {
@@ -81,7 +84,10 @@ class OrderCreated implements EventSourcingInterface
 
     public function metadata(): array
     {
-        return ['channel' => 'api'];
+        return EventMetadata::merge(
+            EventMetadata::source(source: 'orders', channel: 'api'),
+            EventMetadata::version(schemaVersion: 1),
+        );
     }
 }
 ```
@@ -104,6 +110,12 @@ event(new OrderCreated('ORD-001', [['sku' => 'X', 'qty' => 2]]));
 - `occurred_at`: from `occurredAt()` or null
 - `created_at`: set by MongoDB/Eloquent
 
+## Versioning Guidance
+
+Include `schema_version` in metadata when payload fields may evolve. Include `event_version` when the event's business meaning changes. Keep payload changes additive where possible and keep historical event class names readable by your application.
+
+This package does not include an upcaster framework. Replay and schema transformation belong in the application layer that consumes stored events.
+
 ## Querying by Aggregate
 
 Use the same MongoDB connection and collection (e.g. `StoredEvent` model or raw collection). Example:
@@ -116,6 +128,8 @@ $events = StoredEvent::on(config('events.connection'))
     ->orderBy('created_at')
     ->get();
 ```
+
+Run `php artisan events:install-indexes` to create aggregate and chronological indexes for this query pattern.
 
 ## Disabling Event Sourcing
 

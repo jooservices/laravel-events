@@ -15,6 +15,7 @@ laravel-events/
 │   │   ├── Contracts/
 │   │   │   ├── HasLogAction.php
 │   │   │   └── LoggableModelInterface.php
+│   │   ├── EventLogAction.php
 │   │   ├── EventLogSubscriber.php
 │   │   └── Models/
 │   │       └── EventLogEntry.php
@@ -29,7 +30,8 @@ laravel-events/
 │   ├── EventsServiceProvider.php
 │   ├── EventService.php
 │   └── Support/
-│       └── DiffHelper.php
+│       ├── DiffHelper.php
+│       └── EventMetadata.php
 ├── tests/
 │   ├── Integration/
 │   ├── Unit/
@@ -47,11 +49,11 @@ laravel-events/
 | `JooServices\LaravelEvents\EventSourcing\Concerns` | HasEventSourcingDefaults trait (optional occurredAt/metadata) |
 | `JooServices\LaravelEvents\EventSourcing\Contracts` | EventSourcingInterface |
 | `JooServices\LaravelEvents\EventSourcing\Models` | StoredEvent MongoDB model |
-| `JooServices\LaravelEvents\EventLog` | EventLog subscriber |
+| `JooServices\LaravelEvents\EventLog` | EventLog subscriber and action taxonomy |
 | `JooServices\LaravelEvents\EventLog\Concerns` | DefaultsToUpdatedAction trait (default getAction) |
 | `JooServices\LaravelEvents\EventLog\Contracts` | LoggableModelInterface, HasLogAction |
 | `JooServices\LaravelEvents\EventLog\Models` | EventLogEntry MongoDB model |
-| `JooServices\LaravelEvents\Support` | DiffHelper utility |
+| `JooServices\LaravelEvents\Support` | DiffHelper and metadata convention helpers |
 
 ## Key Types
 
@@ -62,6 +64,8 @@ laravel-events/
 | **EventSourcingSubscriber** | Listens for `EventSourcingInterface`; calls EventService::storeEvent |
 | **EventLogSubscriber** | Listens for `LoggableModelInterface`; builds diff via DiffHelper; calls EventService::logChange |
 | **DiffHelper** | Computes per-field diff (old/new) between prev and current arrays |
+| **EventMetadata** | Constants and small helpers for metadata conventions |
+| **EventLogAction** | Constants for recommended event log action taxonomy |
 | **StoredEvent / EventLogEntry** | MongoDB Eloquent models (connection/collection from config) |
 
 ## Dependency Flow

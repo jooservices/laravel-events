@@ -26,7 +26,7 @@ public function storeEvent(
 | `$aggregateId` | Optional aggregate identifier |
 | `$userId` | User id (int or string); null uses `auth()->id()` |
 | `$occurredAt` | Optional event time (Carbon); null uses document creation time |
-| `$metadata` | Merged with config `context_provider` |
+| `$metadata` | Merged with config `context_provider`; see `EventMetadata` conventions |
 
 **Returns:** `StoredEvent` model instance.
 
@@ -53,7 +53,7 @@ public function logChange(
 |-----------|-------------|
 | `$entityType` | Entity type (e.g. morph type) |
 | `$entityId` | Entity id |
-| `$action` | e.g. `created`, `updated`, `deleted`, `restored` |
+| `$action` | e.g. `created`, `updated`, `deleted`, `restored`, `status_changed`, `corrected` |
 | `$prev` | Previous attributes |
 | `$changed` | Current/changed attributes |
 | `$diff` | Per-field diff e.g. `['field' => ['old' => x, 'new' => y]]` |
@@ -83,6 +83,33 @@ Optional: `occurredAt(): ?\Carbon\CarbonInterface`, `metadata(): array`. Use tra
 
 - `getAction(): string` — e.g. `created`, `updated`, `deleted`, `restored`. Use trait `DefaultsToUpdatedAction` for default `'updated'`.
 
+### EventLogAction
+
+Constants for recommended action names:
+
+- `CREATED`
+- `UPDATED`
+- `DELETED`
+- `RESTORED`
+- `STATUS_CHANGED`
+- `CORRECTED`
+- `SYNCHRONIZED`
+- `IMPORTED`
+
+`EventLogAction::all()` returns the full list.
+
+### EventMetadata
+
+Constants and helpers for metadata conventions:
+
+- trace keys: `request_id`, `correlation_id`, `causation_id`
+- source keys: `source`, `channel`, `reason_code`
+- version keys: `schema_version`, `event_version`
+- optional tenancy key: `tenant_id`
+- correction keys: `reverted_event_id`, `supersedes_event_id`, `correction_of`, `correction_reason`
+
+Helpers: `trace()`, `source()`, `version()`, `tenant()`, `correction()`, `merge()`, `withoutNulls()`.
+
 ---
 
 ## Console Commands
@@ -96,7 +123,7 @@ php artisan events:install-indexes
 php artisan events:install-indexes --drop [--force]
 ```
 
-- **Create:** Adds indexes for aggregate_id, event_class, user_id, created_at (stored_events); entity_type+entity_id, action, user_id, created_at (event_logs). If TTL is configured, creates TTL index on `created_at`.
+- **Create:** Adds indexes for aggregate_id, aggregate_id+created_at, event_class, event_class+created_at, user_id, created_at (stored_events); entity_type+entity_id, entity_type+entity_id+created_at, action, action+created_at, user_id, created_at (event_logs). If TTL is configured, creates TTL index on `created_at`.
 - **Drop:** `--drop` drops indexes (data is not deleted). `--force` skips confirmation.
 
 ---

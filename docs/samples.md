@@ -35,6 +35,7 @@ namespace App\Events;
 
 use Carbon\CarbonInterface;
 use JooServices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
+use JooServices\LaravelEvents\Support\EventMetadata;
 
 class OrderCreated implements EventSourcingInterface
 {
@@ -60,6 +61,14 @@ class OrderCreated implements EventSourcingInterface
     public function occurredAt(): ?CarbonInterface
     {
         return $this->occurredAt;
+    }
+
+    public function metadata(): array
+    {
+        return EventMetadata::merge(
+            EventMetadata::source('orders', 'api'),
+            EventMetadata::version(schemaVersion: 1),
+        );
     }
 }
 ```
@@ -119,6 +128,15 @@ class OrderAuditEvent implements LoggableModelInterface, HasLogAction
 
 Override `getAction()` or omit the trait when the action varies (e.g. pass `'created'` or `'deleted'`).
 
+```php
+use JooServices\LaravelEvents\EventLog\EventLogAction;
+
+public function getAction(): string
+{
+    return EventLogAction::STATUS_CHANGED;
+}
+```
+
 In a controller or observer:
 
 ```php
@@ -166,5 +184,18 @@ config([
         }
         return $ctx;
     },
+]);
+```
+
+Or use the metadata helper for standard keys:
+
+```php
+use JooServices\LaravelEvents\Support\EventMetadata;
+
+config([
+    'events.context_provider' => fn () => EventMetadata::merge(
+        EventMetadata::trace(request()->header('X-Request-ID')),
+        EventMetadata::source(config('app.name'), app()->runningInConsole() ? 'cli' : 'web'),
+    ),
 ]);
 ```
