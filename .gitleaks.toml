@@ -1,0 +1,33 @@
+title = "JOOservices Laravel Events Gitleaks Configuration"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Allowlisted files and placeholder patterns for package tests and documentation"
+
+paths = [
+  '''^\.gitleaks\.toml$''',
+  '''^vendor/''',
+  '''^build/''',
+  '''composer\.lock$''',
+  '''\.txt$''',
+]
+
+regexes = [
+  '''example[_-]?key''',
+  '''fake[_-]?secret''',
+  '''dummy[_-]?token''',
+  '''test[_-]?password''',
+  '''YOUR[_-]?API[_-]?KEY''',
+  '''REPLACE[_-]?ME''',
+  '''CHANGEME''',
+  '''mongodb://127\.0\.0\.1:27017''',
+  '''base64:2fl\+Ktvk6xkwL2L3e4MN8qYQbOwc8dQHlqjMlTjqTME=''',
+]
+
+stopwords = [
+  '''example''',
+  '''sample''',
+  '''placeholder''',
+]
