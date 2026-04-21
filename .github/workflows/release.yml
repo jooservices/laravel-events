@@ -1,0 +1,94 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  discussions: write
+
+env:
+  PHP_VERSION: '8.5'
+  MONGODB_URI: mongodb://127.0.0.1:27017
+  MONGODB_DATABASE: laravel_events_test
+
+jobs:
+  validate:
+    name: Validate Release
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: mbstring, json, mongodb
+          coverage: none
+
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v4
+
+      - name: Run security and linting
+        run: |
+          composer audit
+          composer lint:all
+
+      - name: Run tests
+        run: composer test
+
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [validate]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Generate Changelog
+        id: changelog
+        uses: metcalfc/changelog-generator@v4.7.0
+        with:
+          myToken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          body: ${{ steps.changelog.outputs.changelog }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          discussion_category_name: Releases
+
+  publish:
+    name: Publish to Packagist
+    runs-on: ubuntu-latest
+    needs: [release]
+    if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-')
+    steps:
+      - name: Trigger Packagist Update
+        run: |
+          curl -XPOST -H'content-type:application/json' \
+            'https://packagist.org/api/update-package?username=${{ secrets.PACKAGIST_USERNAME }}' \
+            -d'{"repository":{"url":"https://packagist.org/packages/jooservices/laravel-events"},"api_token":"${{ secrets.PACKAGIST_TOKEN }}"}'

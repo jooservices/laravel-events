@@ -1,0 +1,122 @@
+name: CI
+
+on:
+  push:
+    branches: [master, develop]
+  pull_request:
+    branches: [master, develop]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PHP_VERSION: '8.5'
+  MONGODB_URI: mongodb://127.0.0.1:27017
+  MONGODB_DATABASE: laravel_events_test
+
+jobs:
+  security:
+    name: Security Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6.0.2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: mbstring, json, mongodb
+          coverage: none
+
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v4
+
+      - name: Run Composer Audit
+        run: composer audit
+
+  lint:
+    name: Lint - ${{ matrix.tool.name }}
+    runs-on: ubuntu-latest
+    needs: [security]
+    strategy:
+      fail-fast: false
+      matrix:
+        tool:
+          - name: Pint
+            command: lint:pint
+          - name: PHPCS
+            command: lint:phpcs
+          - name: PHPStan
+            command: lint:phpstan
+          - name: PHPMD
+            command: lint:phpmd
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6.0.2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: mbstring, json, mongodb
+          coverage: none
+
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v4
+
+      - name: Run ${{ matrix.tool.name }}
+        run: composer ${{ matrix.tool.command }}
+
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    needs: [security]
+    if: github.event_name == 'pull_request'
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6.0.2
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+
+  tests:
+    name: Tests & Coverage
+    runs-on: ubuntu-latest
+    needs: [lint]
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6.0.2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: mbstring, json, mongodb
+          coverage: pcov
+
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v4
+
+      - name: Run tests with coverage
+        run: composer test:coverage
+
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-report
+          path: |
+            build/coverage/
+          retention-days: 30

@@ -1,0 +1,34 @@
+# Automatically label PRs based on changed files.
+
+'tests':
+  - changed-files:
+    - any-glob-to-any-file: 'tests/**/*'
+
+'documentation':
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**.md'
+      - 'docs/**/*'
+
+'dependencies':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'composer.json'
+      - 'composer.lock'
+
+'ci/cd':
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/**/*'
+
+'configuration':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'config/**/*'
+      - '**.xml'
+      - '**.neon'
+      - '.editorconfig'
+
+'source':
+  - changed-files:
+    - any-glob-to-any-file: 'src/**/*'
