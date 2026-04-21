@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace JooServices\LaravelEvents\Tests\Unit\EventSourcing;
 
 use Illuminate\Events\Dispatcher;
+use Illuminate\Foundation\Auth\User;
 use JooServices\LaravelEvents\EventService;
 use JooServices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
 use JooServices\LaravelEvents\EventSourcing\EventSourcingSubscriber;
@@ -78,7 +79,7 @@ class EventSourcingSubscriberTest extends TestCase
 
     public function test_persist_event_passes_logged_in_user_id(): void
     {
-        $user = new \Illuminate\Foundation\Auth\User;
+        $user = new User;
         $user->id = 5;
         $this->actingAs($user);
 

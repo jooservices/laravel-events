@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace JooServices\LaravelEvents\EventSourcing\Models;
 
+use Carbon\Carbon;
 use MongoDB\Laravel\Eloquent\Model;
 
 /**
@@ -12,7 +13,7 @@ use MongoDB\Laravel\Eloquent\Model;
  * @property array $payload
  * @property array $metadata
  * @property int|string|null $user_id
- * @property \Carbon\Carbon|null $occurred_at
+ * @property Carbon|null $occurred_at
  */
 class StoredEvent extends Model
 {

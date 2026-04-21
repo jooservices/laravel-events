@@ -8,8 +8,9 @@ return [
     | Context provider for request metadata
     |--------------------------------------------------------------------------
     | Callable (e.g. closure or invokable class) that returns an array merged
-    | into metadata (EventSourcing) and meta (EventLog). Useful for request_id,
-    | ip, user_agent, channel (web, api, queue, cron). Return [] to disable.
+    | into metadata (EventSourcing) and meta (EventLog). Recommended keys:
+    | request_id, correlation_id, causation_id, source, channel, reason_code,
+    | schema_version, tenant_id. Return [] to disable.
     */
     'context_provider' => null,
 

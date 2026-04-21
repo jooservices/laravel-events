@@ -14,7 +14,7 @@ class InstallIndexesCommand extends Command
                             {--drop : Drop indexes instead of creating them}
                             {--force : Skip confirmation when dropping}';
 
-    protected $description = 'Create (or drop) MongoDB indexes for stored_events and event_logs collections.';
+    protected $description = 'Create (or drop) recommended MongoDB indexes for Laravel event persistence collections.';
 
     public function handle(): int
     {
@@ -49,7 +49,9 @@ class InstallIndexesCommand extends Command
         $collection = $connection->getCollection($collectionName);
 
         $collection->createIndex(['aggregate_id' => 1]);
+        $collection->createIndex(['aggregate_id' => 1, 'created_at' => 1]);
         $collection->createIndex(['event_class' => 1]);
+        $collection->createIndex(['event_class' => 1, 'created_at' => 1]);
         $collection->createIndex(['user_id' => 1]);
 
         $ttlDays = config('events.eventsourcing.ttl_days');
@@ -71,7 +73,9 @@ class InstallIndexesCommand extends Command
         $collection = $connection->getCollection($collectionName);
 
         $collection->createIndex(['entity_type' => 1, 'entity_id' => 1]);
+        $collection->createIndex(['entity_type' => 1, 'entity_id' => 1, 'created_at' => -1]);
         $collection->createIndex(['action' => 1]);
+        $collection->createIndex(['action' => 1, 'created_at' => -1]);
         $collection->createIndex(['user_id' => 1]);
 
         $ttlDays = config('events.event_log.ttl_days');

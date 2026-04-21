@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace JooServices\LaravelEvents\Tests\Unit\EventLog;
 
+use Illuminate\Foundation\Auth\User;
 use JooServices\LaravelEvents\EventLog\Contracts\HasLogAction;
 use JooServices\LaravelEvents\EventLog\Contracts\LoggableModelInterface;
 use JooServices\LaravelEvents\EventLog\EventLogSubscriber;
@@ -113,14 +114,14 @@ class EventLogSubscriberTest extends TestCase
                 ['user_id' => null]
             );
 
-        $subscriber = new EventLogSubscriber($eventService, new \JooServices\LaravelEvents\Support\DiffHelper);
+        $subscriber = new EventLogSubscriber($eventService, new DiffHelper);
         $subscriber->logModelChange($event);
         $this->addToAssertionCount(1);
     }
 
     public function test_log_model_change_passes_logged_in_user_id(): void
     {
-        $user = new \Illuminate\Foundation\Auth\User;
+        $user = new User;
         $user->id = 33;
         $this->actingAs($user);
 
@@ -160,7 +161,7 @@ class EventLogSubscriberTest extends TestCase
                 ['user_id' => 33]
             );
 
-        $subscriber = new EventLogSubscriber($eventService, new \JooServices\LaravelEvents\Support\DiffHelper);
+        $subscriber = new EventLogSubscriber($eventService, new DiffHelper);
         $subscriber->logModelChange($event);
         $this->addToAssertionCount(1);
     }

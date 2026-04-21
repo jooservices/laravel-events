@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace JooServices\LaravelEvents\Tests\Integration;
 
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Event;
 use JooServices\LaravelEvents\EventLog\Contracts\LoggableModelInterface;
 use JooServices\LaravelEvents\EventLog\Models\EventLogEntry;
@@ -124,7 +125,7 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
 
     public function test_event_sourcing_stores_user_id_when_logged_in(): void
     {
-        $user = new \Illuminate\Foundation\Auth\User;
+        $user = new User;
         $user->id = 100;
         $this->actingAs($user);
 
@@ -150,7 +151,7 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
 
     public function test_event_log_stores_user_id_when_logged_in(): void
     {
-        $user = new \Illuminate\Foundation\Auth\User;
+        $user = new User;
         $user->id = 200;
         $this->actingAs($user);
 

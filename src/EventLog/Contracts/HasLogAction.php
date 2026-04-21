@@ -8,7 +8,8 @@ namespace JooServices\LaravelEvents\EventLog\Contracts;
  * Optional interface for loggable events that specify the action.
  * When not implemented, the subscriber uses "updated".
  *
- * Use: created, updated, deleted, restored
+ * Recommended taxonomy: created, updated, deleted, restored, status_changed,
+ * corrected, synchronized, imported.
  */
 interface HasLogAction
 {
