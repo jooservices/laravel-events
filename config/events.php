@@ -14,6 +14,31 @@ return [
     */
     'context_provider' => null,
 
+    'redaction' => [
+        'enabled' => env('EVENTS_REDACTION_ENABLED', true),
+        'keys' => [
+            'password',
+            'password_confirmation',
+            'token',
+            'access_token',
+            'refresh_token',
+            'secret',
+            'api_key',
+            'authorization',
+            'cookie',
+        ],
+        'replacement' => '[REDACTED]',
+    ],
+
+    'retention' => [
+        'stored_events_days' => env('EVENTS_STORED_EVENTS_RETENTION_DAYS')
+            ? (int) env('EVENTS_STORED_EVENTS_RETENTION_DAYS')
+            : null,
+        'event_logs_days' => env('EVENTS_EVENT_LOGS_RETENTION_DAYS')
+            ? (int) env('EVENTS_EVENT_LOGS_RETENTION_DAYS')
+            : null,
+    ],
+
     'eventsourcing' => [
         'enabled' => env('EVENTS_EVENTSOURCING_ENABLED', true),
         /** MongoDB collection name for stored events */

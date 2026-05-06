@@ -56,9 +56,7 @@ features are not copied into this package.
 - Composer tooling does not include PHP-CS-Fixer. DTO has it, but this package
   currently uses Pint plus PHPCS for style. Adding PHP-CS-Fixer should be
   evaluated carefully to avoid conflicting formatters.
-- Query DTOs, typed record DTOs, redaction, retention TTL support, query
-  services, bulk record support, and optional model observer helper are not
-  implemented.
+- Optional model observer helper is not implemented.
 - Root README and docs do not yet cover all current and planned package
   quality gates, branch workflow, redaction, retention, query APIs, or
   maintenance notes.
@@ -84,7 +82,8 @@ features are not copied into this package.
 - Codecov, Sonar, Codacy, or Fortify integration will only be added when the
   repository has safe optional configuration or required secrets. CI must not
   contain fake success or guaranteed-failing secret-dependent steps.
-- Optional model observer helpers will be deferred if they create hidden magic,
-  global observation, or app-specific assumptions.
+- Optional model observer helpers are deferred because they risk hidden model
+  observation, app-specific assumptions, and scope creep unless designed as a
+  separate small opt-in feature.
 - PHP-CS-Fixer will be deferred unless it can be configured as a non-conflicting
   secondary style check under Pint's primary formatting authority.

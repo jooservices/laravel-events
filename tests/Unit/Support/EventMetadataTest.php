@@ -46,4 +46,28 @@ class EventMetadataTest extends TestCase
             ['ignored' => null],
         ));
     }
+
+    public function test_make_builds_optional_metadata(): void
+    {
+        $metadata = EventMetadata::make()
+            ->correlationId('corr-1')
+            ->causationId('cmd-1')
+            ->requestId('req-1')
+            ->source('orders', 'api')
+            ->schemaVersion(1)
+            ->eventVersion(2)
+            ->tenantId('tenant-1')
+            ->toArray();
+
+        $this->assertSame([
+            'correlation_id' => 'corr-1',
+            'causation_id' => 'cmd-1',
+            'request_id' => 'req-1',
+            'source' => 'orders',
+            'channel' => 'api',
+            'schema_version' => 1,
+            'event_version' => 2,
+            'tenant_id' => 'tenant-1',
+        ], $metadata);
+    }
 }

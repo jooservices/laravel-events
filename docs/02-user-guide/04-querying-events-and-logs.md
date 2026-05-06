@@ -1,27 +1,21 @@
 # Querying events and logs
 
-Current package versions expose MongoDB Eloquent models for direct queries:
+The package exposes lightweight query services for common lookup patterns:
 
 ```php
-use JooServices\LaravelEvents\EventSourcing\Models\StoredEvent;
+use JooServices\LaravelEvents\Query\StoredEventQueryService;
 
-$events = StoredEvent::query()
-    ->where('aggregate_id', $orderId)
-    ->orderBy('created_at')
-    ->get();
+$events = app(StoredEventQueryService::class)->byAggregate('orders', $orderId);
+$recent = app(StoredEventQueryService::class)->latest(50);
+$correlated = app(StoredEventQueryService::class)->byCorrelationId('corr-123');
 ```
 
 ```php
-use JooServices\LaravelEvents\EventLog\Models\EventLogEntry;
+use JooServices\LaravelEvents\Query\EventLogQueryService;
 
-$logs = EventLogEntry::query()
-    ->where('entity_type', 'orders')
-    ->where('entity_id', $orderId)
-    ->orderByDesc('created_at')
-    ->limit(50)
-    ->get();
+$logs = app(EventLogQueryService::class)->byEntity('orders', $orderId);
+$caused = app(EventLogQueryService::class)->byCausationId('cmd-123');
 ```
 
-Lightweight query services are planned for this pass. Until they are
-implemented, use the models directly and keep application-specific reporting
-queries in the application layer.
+Query services return typed data records. Keep dashboards, reporting, and
+application-specific analytics in the application layer.

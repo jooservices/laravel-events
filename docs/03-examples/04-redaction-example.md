@@ -1,6 +1,6 @@
 # Redaction example
 
-Redaction is planned for this pass. The intended configuration shape is:
+Configure recursive redaction:
 
 ```php
 'redaction' => [
@@ -19,4 +19,10 @@ Redaction is planned for this pass. The intended configuration shape is:
 ],
 ```
 
-Do not send secrets to event payloads while redaction is not yet implemented.
+Then dispatch normally:
+
+```php
+event(new OrderCreated('ORD-1', ['password' => 'secret']));
+```
+
+The persisted payload stores `password` as `[REDACTED]`.

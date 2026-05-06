@@ -1,8 +1,15 @@
 # Bulk record example
 
-Bulk record APIs are planned for this pass only if they fit the current
-architecture cleanly.
+Use `EventService` for explicit batch writes:
 
-Until then, dispatch events normally or call `EventService` one record at a
-time. Applications that need high-volume batch ingestion should measure MongoDB
-write behavior and avoid bypassing package validation or normalization.
+```php
+use JooServices\LaravelEvents\Data\StoredEventData;
+use JooServices\LaravelEvents\EventService;
+
+app(EventService::class)->recordManyStoredEvents([
+    new StoredEventData('OrderImported', ['order_id' => 'ORD-1'], 'ORD-1'),
+    new StoredEventData('OrderImported', ['order_id' => 'ORD-2'], 'ORD-2'),
+]);
+```
+
+Each item is normalized and redacted before MongoDB batch insert.

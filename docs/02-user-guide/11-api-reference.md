@@ -64,6 +64,49 @@ public function logChange(
 
 ---
 
+### recordManyStoredEvents
+
+```php
+public function recordManyStoredEvents(iterable $events): void
+```
+
+Accepts `StoredEventData` instances or arrays using persisted field names.
+Records are normalized, redacted, timestamped, and batch inserted.
+
+### recordManyEventLogs
+
+```php
+public function recordManyEventLogs(iterable $logs): void
+```
+
+Accepts `EventLogData` instances or arrays using persisted field names. Records
+are normalized, redacted, timestamped, and batch inserted.
+
+---
+
+## Query Services
+
+### StoredEventQueryService
+
+- `byAggregate(string $aggregateType, string $aggregateId, int $limit = 50)`
+- `byEventName(string $eventName, int $limit = 50)`
+- `byCorrelationId(string $correlationId, int $limit = 50)`
+- `byCausationId(string $causationId, int $limit = 50)`
+- `between(DateTimeInterface $from, DateTimeInterface $to, int $limit = 50)`
+- `latest(int $limit = 50)`
+
+### EventLogQueryService
+
+- `byEntity(string $entityType, string $entityId, int $limit = 50)`
+- `byCorrelationId(string $correlationId, int $limit = 50)`
+- `byCausationId(string $causationId, int $limit = 50)`
+- `between(DateTimeInterface $from, DateTimeInterface $to, int $limit = 50)`
+- `latest(int $limit = 50)`
+
+Limits must be between 1 and 500.
+
+---
+
 ## Interfaces
 
 ### EventSourcingInterface

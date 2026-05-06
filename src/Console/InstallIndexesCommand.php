@@ -52,9 +52,11 @@ class InstallIndexesCommand extends Command
         $collection->createIndex(['aggregate_id' => 1, 'created_at' => 1]);
         $collection->createIndex(['event_class' => 1]);
         $collection->createIndex(['event_class' => 1, 'created_at' => 1]);
+        $collection->createIndex(['metadata.correlation_id' => 1]);
+        $collection->createIndex(['metadata.causation_id' => 1]);
         $collection->createIndex(['user_id' => 1]);
 
-        $ttlDays = config('events.eventsourcing.ttl_days');
+        $ttlDays = config('events.retention.stored_events_days', config('events.eventsourcing.ttl_days'));
         if ($ttlDays !== null && $ttlDays > 0) {
             $collection->createIndex(
                 ['created_at' => 1],
@@ -76,9 +78,11 @@ class InstallIndexesCommand extends Command
         $collection->createIndex(['entity_type' => 1, 'entity_id' => 1, 'created_at' => -1]);
         $collection->createIndex(['action' => 1]);
         $collection->createIndex(['action' => 1, 'created_at' => -1]);
+        $collection->createIndex(['meta.correlation_id' => 1]);
+        $collection->createIndex(['meta.causation_id' => 1]);
         $collection->createIndex(['user_id' => 1]);
 
-        $ttlDays = config('events.event_log.ttl_days');
+        $ttlDays = config('events.retention.event_logs_days', config('events.event_log.ttl_days'));
         if ($ttlDays !== null && $ttlDays > 0) {
             $collection->createIndex(
                 ['created_at' => 1],

@@ -5,6 +5,8 @@ Configure TTL retention with:
 ```env
 EVENTS_EVENTSOURCING_TTL_DAYS=
 EVENTS_EVENT_LOG_TTL_DAYS=365
+EVENTS_STORED_EVENTS_RETENTION_DAYS=
+EVENTS_EVENT_LOGS_RETENTION_DAYS=365
 ```
 
 `null` or an empty value means no TTL index is created. A positive integer

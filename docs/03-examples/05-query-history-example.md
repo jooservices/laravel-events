@@ -1,28 +1,17 @@
 # Query history example
 
-Current direct model query:
+Query by aggregate:
 
 ```php
-use JooServices\LaravelEvents\EventSourcing\Models\StoredEvent;
+use JooServices\LaravelEvents\Query\StoredEventQueryService;
 
-$history = StoredEvent::query()
-    ->where('aggregate_id', 'ORD-001')
-    ->orderBy('created_at')
-    ->get();
+$history = app(StoredEventQueryService::class)->byAggregate('orders', 'ORD-001');
 ```
 
-Current audit query:
+Query audit history:
 
 ```php
-use JooServices\LaravelEvents\EventLog\Models\EventLogEntry;
+use JooServices\LaravelEvents\Query\EventLogQueryService;
 
-$audit = EventLogEntry::query()
-    ->where('entity_type', 'orders')
-    ->where('entity_id', 'ORD-001')
-    ->orderByDesc('created_at')
-    ->limit(50)
-    ->get();
+$audit = app(EventLogQueryService::class)->byEntity('orders', 'ORD-001');
 ```
-
-Query services are planned for this pass and will be documented here after
-implementation.

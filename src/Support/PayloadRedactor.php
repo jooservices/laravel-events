@@ -1,0 +1,49 @@
+<?php
+
+declare(strict_types=1);
+
+namespace JooServices\LaravelEvents\Support;
+
+final class PayloadRedactor
+{
+    /**
+     * @param  array<string, mixed>  $values
+     * @return array<string, mixed>
+     */
+    public function redact(array $values): array
+    {
+        if (! config('events.redaction.enabled', true)) {
+            return $values;
+        }
+
+        $keys = array_map(
+            static fn (string $key): string => strtolower($key),
+            array_filter(config('events.redaction.keys', []), 'is_string')
+        );
+        $replacement = config('events.redaction.replacement', '[REDACTED]');
+
+        return $this->redactArray($values, $keys, is_scalar($replacement) ? $replacement : '[REDACTED]');
+    }
+
+    /**
+     * @param  array<mixed>  $values
+     * @param  list<string>  $keys
+     * @return array<mixed>
+     */
+    private function redactArray(array $values, array $keys, mixed $replacement): array
+    {
+        foreach ($values as $key => $value) {
+            if (is_string($key) && in_array(strtolower($key), $keys, true)) {
+                $values[$key] = $replacement;
+
+                continue;
+            }
+
+            if (is_array($value)) {
+                $values[$key] = $this->redactArray($value, $keys, $replacement);
+            }
+        }
+
+        return $values;
+    }
+}
