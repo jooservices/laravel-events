@@ -57,4 +57,4 @@ To drop indexes (data is not deleted):
 php artisan events:install-indexes --drop [--force]
 ```
 
-See [Configuration](./configuration.md) for TTL and context provider.
+See [Configuration](02-configuration.md) for TTL and context provider.

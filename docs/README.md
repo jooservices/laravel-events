@@ -1,37 +1,75 @@
-# Laravel Events — Documentation
+# Laravel Events documentation
 
-Documentation for the **Laravel Events** package: lightweight Event Sourcing and Event Log persistence with MongoDB.
+Documentation for `jooservices/laravel-events`, a Laravel 12 package for
+MongoDB-backed event sourcing records and audit event logs.
 
-## Documentation Index
+## Reading order
 
-| Document | Description |
-|----------|-------------|
-| [Architecture](./architecture.md) | System design, data flow, and component diagrams |
-| [Code Structure](./code-structure.md) | Package layout, namespaces, and file organization |
-| [Installation](./installation.md) | Requirements, Composer, and Laravel setup |
-| [Configuration](./configuration.md) | Config reference, environment variables, and context provider |
-| [Decision Guide](./decision-guide.md) | When to use Event Sourcing, Event Log, or both |
-| [Event Sourcing](./event-sourcing.md) | Storing event payloads, aggregates, and querying |
-| [Event Log (Audit)](./event-log.md) | Model change audit trail, prev/changed/diff |
-| [Metadata, Versioning, and Corrections](./metadata.md) | Recommended metadata keys and schema evolution conventions |
-| [Operations](./operations.md) | Indexes, query patterns, retention, and production safety |
-| [Optional AI Integration](./ai-integration.md) | App-layer export/manifest stubs only |
-| [Development](./development.md) | Composer commands, CI/CD, release, and contributor workflow |
-| [Samples](./samples.md) | Complete code samples and integration examples |
-| [API Reference](./api.md) | EventService, interfaces, and console commands |
+1. [Architecture](00-architecture/01-project-overview.md)
+2. [Getting started](01-getting-started/01-installation.md)
+3. [User guide](02-user-guide/01-event-sourcing.md)
+4. [Examples](03-examples/01-basic-domain-event.md)
+5. [Development](04-development/01-setup.md)
+6. [Maintenance](05-maintenance/01-risks-legacy-and-gaps.md)
 
-## Quick Links
+## Architecture
 
-- **Getting started:** [Installation](./installation.md) → [Decision Guide](./decision-guide.md)
-- **Configuration:** [Configuration](./configuration.md)
-- **Examples:** [Samples](./samples.md)
-- **Contributing:** [Development](./development.md), [AGENTS.md](../AGENTS.md)
+- [Project overview](00-architecture/01-project-overview.md)
+- [Repository structure](00-architecture/02-repository-structure.md)
+- [Tech stack](00-architecture/03-tech-stack.md)
+- [Package boundaries](00-architecture/04-package-boundaries.md)
+- [Data flow](00-architecture/05-data-flow.md)
+- [Storage model](00-architecture/06-storage-model.md)
 
-## Package Overview
+## Getting started
 
-- **EventSourcing:** Persist domain events (payload + aggregate id) to MongoDB for aggregate history, replay-aware workflows, or audit.
-- **EventLog:** Persist model change events (prev/changed/diff) to MongoDB for audit trails and compliance.
+- [Installation](01-getting-started/01-installation.md)
+- [Configuration](01-getting-started/02-configuration.md)
+- [Publish assets](01-getting-started/03-publish-assets.md)
+- [First event](01-getting-started/04-first-event.md)
+- [Index installation](01-getting-started/05-index-installation.md)
 
-Both features use Laravel's event dispatcher; you dispatch events, and the package subscribers persist them to MongoDB.
+## User guide
 
-The package does not replace Laravel events, provide projections/read models, add analytics/reporting, or run AI integrations.
+- [Event sourcing](02-user-guide/01-event-sourcing.md)
+- [Event log](02-user-guide/02-event-log.md)
+- [Metadata, correlation, and causation](02-user-guide/03-metadata-correlation-causation.md)
+- [Querying events and logs](02-user-guide/04-querying-events-and-logs.md)
+- [Payload redaction](02-user-guide/05-payload-redaction.md)
+- [Retention and TTL](02-user-guide/06-retention-and-ttl.md)
+- [Configuration reference](02-user-guide/07-configuration-reference.md)
+- [Operations](02-user-guide/08-operations.md)
+- [Troubleshooting](02-user-guide/09-troubleshooting.md)
+- [Best practices](02-user-guide/10-best-practices.md)
+- [API reference](02-user-guide/11-api-reference.md)
+
+## Examples
+
+- [Basic domain event](03-examples/01-basic-domain-event.md)
+- [Audit log for model change](03-examples/02-audit-log-for-model-change.md)
+- [Correlation id flow](03-examples/03-correlation-id-flow.md)
+- [Redaction example](03-examples/04-redaction-example.md)
+- [Query history example](03-examples/05-query-history-example.md)
+- [Bulk record example](03-examples/06-bulk-record-example.md)
+
+## Development
+
+- [Setup](04-development/01-setup.md)
+- [Coding standards](04-development/02-coding-standards.md)
+- [Linting standards](04-development/03-linting-standards.md)
+- [Testing](04-development/04-testing.md)
+- [MongoDB integration tests](04-development/05-mongodb-integration-tests.md)
+- [Code quality](04-development/06-code-quality.md)
+- [CI/CD](04-development/07-ci-cd.md)
+- [Release process](04-development/08-release-process.md)
+- [Contributing](04-development/09-contributing.md)
+- [AI skills](04-development/10-ai-skills.md)
+- [Secret scanning](04-development/11-secret-scanning.md)
+- [Ignore files](04-development/12-ignore-files.md)
+- [Optional AI integration](04-development/13-optional-ai-integration.md)
+
+## Maintenance
+
+- [Risks, legacy, and gaps](05-maintenance/01-risks-legacy-and-gaps.md)
+- [Docs changelog](05-maintenance/02-docs-changelog.md)
+- [DTO comparison audit](05-maintenance/03-repo-audit-dto-comparison.md)

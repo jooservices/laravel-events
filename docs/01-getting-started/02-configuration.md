@@ -58,4 +58,4 @@ config([
 
 Return `[]` or set to `null` to disable.
 
-See [Metadata, Versioning, and Corrections](./metadata.md) for recommended keys.
+See [Metadata, Versioning, and Corrections](../02-user-guide/03-metadata-correlation-causation.md) for recommended keys.

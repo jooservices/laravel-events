@@ -146,19 +146,19 @@ Full documentation is in the **`./docs`** folder:
 | Document | Description |
 |----------|-------------|
 | [docs/README.md](docs/README.md) | Documentation index |
-| [Architecture](docs/architecture.md) | Design, data flow, diagrams |
-| [Code structure](docs/code-structure.md) | Package layout and namespaces |
-| [Installation](docs/installation.md) | Requirements and setup |
-| [Configuration](docs/configuration.md) | Config and context provider |
-| [Decision Guide](docs/decision-guide.md) | Event Sourcing vs Event Log |
-| [Event Sourcing](docs/event-sourcing.md) | Stored events and aggregates |
-| [Event Log](docs/event-log.md) | Audit trail and diff |
-| [Metadata](docs/metadata.md) | Metadata keys, versioning, corrections |
-| [Operations](docs/operations.md) | Indexes, query patterns, retention, production safety |
-| [AI Integration](docs/ai-integration.md) | Optional app-layer AI export examples |
-| [Development](docs/development.md) | Composer commands, CI, release, and contributor workflow |
-| [Samples](docs/samples.md) | Complete code examples |
-| [API Reference](docs/api.md) | EventService, interfaces, commands |
+| [Architecture](docs/00-architecture/01-project-overview.md) | Design, data flow, diagrams |
+| [Code structure](docs/00-architecture/02-repository-structure.md) | Package layout and namespaces |
+| [Installation](docs/01-getting-started/01-installation.md) | Requirements and setup |
+| [Configuration](docs/01-getting-started/02-configuration.md) | Config and context provider |
+| [Decision Guide](docs/02-user-guide/10-best-practices.md) | Event Sourcing vs Event Log |
+| [Event Sourcing](docs/02-user-guide/01-event-sourcing.md) | Stored events and aggregates |
+| [Event Log](docs/02-user-guide/02-event-log.md) | Audit trail and diff |
+| [Metadata](docs/02-user-guide/03-metadata-correlation-causation.md) | Metadata keys, versioning, corrections |
+| [Operations](docs/02-user-guide/08-operations.md) | Indexes, query patterns, retention, production safety |
+| [AI Integration](docs/04-development/13-optional-ai-integration.md) | Optional app-layer AI export examples |
+| [Development](docs/04-development/01-setup.md) | Composer commands, CI, release, and contributor workflow |
+| [Samples](docs/03-examples/01-basic-domain-event.md) | Complete code examples |
+| [API Reference](docs/02-user-guide/11-api-reference.md) | EventService, interfaces, commands |
 
 ---
 
@@ -206,7 +206,7 @@ AI contributor guidance is intentionally documentation-only:
 
 - [AGENTS.md](AGENTS.md)
 - [CLAUDE.md](CLAUDE.md)
-- [Optional AI Integration](docs/ai-integration.md)
+- [Optional AI Integration](docs/04-development/13-optional-ai-integration.md)
 
 The package does not include AI runtime code, AI data fetching, authorization, redaction, or tool execution.
 

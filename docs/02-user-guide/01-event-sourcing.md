@@ -4,7 +4,7 @@
 
 Events that implement `EventSourcingInterface` are persisted to the **stored_events** MongoDB collection. Each document stores the event class, aggregate id, payload, metadata, user id, and optional occurred-at time. Use this for aggregate history, replay-aware workflows, or audit by aggregate.
 
-For choosing between Event Sourcing and Event Log, see the [Decision Guide](./decision-guide.md).
+For choosing between Event Sourcing and Event Log, see the [Decision Guide](10-best-practices.md).
 
 ## Interface
 

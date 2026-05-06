@@ -41,7 +41,7 @@ Those commands run:
 captainhook install --force --skip-existing
 ```
 
-The hook configuration lives in [`captainhook.json`](../captainhook.json).
+The hook configuration lives in [`captainhook.json`](../../captainhook.json).
 
 | Hook | Gate |
 |------|------|
@@ -123,4 +123,4 @@ These DTO repository features were reviewed but not copied now:
 
 ## AI Contributor Guidance
 
-Use [AGENTS.md](../AGENTS.md) as the canonical source for AI and human contributor rules. AI support is limited to contributor guidance and app-layer documentation; package runtime code must stay focused on Laravel events and MongoDB persistence.
+Use [AGENTS.md](../../AGENTS.md) as the canonical source for AI and human contributor rules. AI support is limited to contributor guidance and app-layer documentation; package runtime code must stay focused on Laravel events and MongoDB persistence.

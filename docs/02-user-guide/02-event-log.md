@@ -4,7 +4,7 @@
 
 Events that implement `LoggableModelInterface` are persisted to the **event_logs** MongoDB collection. Each document stores entity type/id, action, previous state (`prev`), changed state (`changed`), and a per-field diff (`diff`). Use this for audit trails and compliance.
 
-For choosing between Event Log and Event Sourcing, see the [Decision Guide](./decision-guide.md).
+For choosing between Event Log and Event Sourcing, see the [Decision Guide](10-best-practices.md).
 
 ## Interfaces
 
