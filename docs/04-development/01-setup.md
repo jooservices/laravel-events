@@ -22,6 +22,8 @@ composer lint:pint:fix
 composer lint:phpcs
 composer lint:phpstan
 composer lint:phpmd
+composer lint:cs
+composer lint:cs:fix
 ```
 
 Legacy aliases such as `composer phpstan`, `composer phpcs`, and `composer phpmd` remain for contributor convenience.
@@ -69,6 +71,7 @@ brew install gitleaks
 | PHPCS | Structural PHP checks |
 | PHPStan / Larastan | Static analysis for Laravel package code |
 | PHPMD | Maintainability and design-smell checks |
+| PHP-CS-Fixer | Narrow PHPDoc cleanup that does not compete with Pint |
 | PHPUnit / Testbench | Unit and Laravel package integration tests |
 
 ## CI/CD

@@ -31,6 +31,7 @@
     "require-dev": {
         "captainhook/captainhook": "^5.23",
         "captainhook/plugin-composer": "^5.3",
+        "friendsofphp/php-cs-fixer": "^3.65",
         "larastan/larastan": "^3.9",
         "laravel/pint": "^1.27",
         "orchestra/testbench": "^10.0",
@@ -61,6 +62,8 @@
         "test:coverage": "phpunit -c phpunit.xml --coverage-text --coverage-clover build/coverage/clover.xml --coverage-html build/coverage/html",
         "lint:pint": "pint --test",
         "lint:pint:fix": "pint",
+        "lint:cs": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --dry-run --diff --sequential",
+        "lint:cs:fix": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --sequential",
         "lint:phpstan": "phpstan analyse --memory-limit=512M",
         "lint:phpmd": "@php -d error_reporting=24575 vendor/bin/phpmd src,tests text phpmd.xml",
         "lint:phpcs": "phpcs --standard=phpcs.xml",
@@ -71,9 +74,13 @@
         ],
         "lint:all": [
             "@lint",
-            "@lint:phpmd"
+            "@lint:phpmd",
+            "@lint:cs"
         ],
-        "lint:fix": "@lint:pint:fix",
+        "lint:fix": [
+            "@lint:pint:fix",
+            "@lint:cs:fix"
+        ],
         "check": [
             "@lint:all",
             "@test"
