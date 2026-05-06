@@ -36,11 +36,16 @@ The package does not provide:
 
 ## Repository Quality Rules
 
+- Inspect the real current codebase before changing anything.
+- Do not assume missing requirements or repository state.
+- Stop and report conflicts between requirements, code, docs, CI, or branch state.
+- Use PHP 8.5 and latest Laravel 12 package standards.
 - Formatting authority: Laravel Pint.
 - Structural checks: PHPCS.
 - Static analysis: PHPStan through Larastan.
 - Maintainability checks: PHPMD.
 - Tests: PHPUnit with Orchestra Testbench.
+- Commit completed feature groups with author `Viet Vu <jooservices@gmail.com>`.
 
 ## Command Map
 
@@ -68,7 +73,8 @@ Prefer `lint:*` scripts in automation and documentation. Legacy aliases such as 
 - Keep Laravel service provider discovery in `composer.json`.
 - Keep MongoDB collection names, connection names, and TTL behavior configurable through `config/events.php`.
 - Do not hardcode application model names, tenant rules, auth policies, or event catalogs inside the package.
-- Integration tests that touch storage should either use the configured MongoDB test database or stay clearly isolated behind test setup.
+- Integration tests that touch storage must use the configured MongoDB test database whenever possible.
+- Do not fake persisted event or audit data in storage behavior tests.
 
 ## Metadata Rules
 
@@ -81,6 +87,15 @@ Prefer `lint:*` scripts in automation and documentation. Legacy aliases such as 
 - AI support in this repository means contributor guidance and app-layer documentation only.
 - Do not add agent runtime code, external AI tool execution, or built-in AI data export to the package.
 - If documenting AI use, keep it framed as application responsibility with explicit authorization, redaction, retention, and audit controls.
+
+## Branch Workflow
+
+- `master` is production/release state.
+- `develop` is development state.
+- Feature branches start from `develop`.
+- Hotfix branches start from `master`.
+- Clean local work before starting new tasks.
+- Do not leave successful completed work uncommitted.
 
 ## Change Checklist
 

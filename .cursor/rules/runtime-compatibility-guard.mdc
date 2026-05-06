@@ -1,0 +1,7 @@
+---
+description: Runtime compatibility guard
+alwaysApply: true
+---
+
+Maintain PHP 8.5 and Laravel 12 compatibility. Keep public APIs backward
+compatible where practical and avoid app-specific assumptions.

@@ -1,0 +1,8 @@
+---
+description: CI, release, and hooks
+alwaysApply: true
+---
+
+CaptainHook installs on Composer install/update. `master` is production,
+`develop` is development, feature branches come from `develop`, and hotfixes
+come from `master`.
