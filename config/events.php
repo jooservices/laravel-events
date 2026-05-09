@@ -1,5 +1,19 @@
 <?php
 
+$positiveIntegerEnv = static function (string $key): ?int {
+    $value = env($key);
+
+    if ($value === null || $value === '') {
+        return null;
+    }
+
+    $validated = filter_var($value, FILTER_VALIDATE_INT, [
+        'options' => ['min_range' => 1],
+    ]);
+
+    return $validated === false ? null : (int) $validated;
+};
+
 return [
     'connection' => 'mongodb',
 
@@ -31,12 +45,8 @@ return [
     ],
 
     'retention' => [
-        'stored_events_days' => env('EVENTS_STORED_EVENTS_RETENTION_DAYS')
-            ? (int) env('EVENTS_STORED_EVENTS_RETENTION_DAYS')
-            : null,
-        'event_logs_days' => env('EVENTS_EVENT_LOGS_RETENTION_DAYS')
-            ? (int) env('EVENTS_EVENT_LOGS_RETENTION_DAYS')
-            : null,
+        'stored_events_days' => $positiveIntegerEnv('EVENTS_STORED_EVENTS_RETENTION_DAYS'),
+        'event_logs_days' => $positiveIntegerEnv('EVENTS_EVENT_LOGS_RETENTION_DAYS'),
     ],
 
     'eventsourcing' => [

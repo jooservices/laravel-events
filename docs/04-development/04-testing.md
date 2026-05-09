@@ -5,6 +5,7 @@ Run:
 ```bash
 composer test
 composer test:coverage
+composer ci
 ```
 
 Use unit tests for pure helpers and value objects. Use integration tests for

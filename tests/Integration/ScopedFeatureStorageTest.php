@@ -30,8 +30,8 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
             $this->markTestSkipped('MongoDB is not available.');
         }
 
-        StoredEvent::on('mongodb')->newQuery()->delete();
-        EventLogEntry::on('mongodb')->newQuery()->delete();
+        StoredEvent::on('mongodb')->delete();
+        EventLogEntry::on('mongodb')->delete();
     }
 
     public function test_query_services_filter_persisted_records(): void
@@ -101,6 +101,31 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
         $this->assertSame(2, EventLogEntry::on('mongodb')->where('entity_type', 'bulk')->count());
     }
 
+    public function test_bulk_record_support_merges_context_and_user_attribution(): void
+    {
+        config()->set('events.context_provider', fn (): array => [
+            'correlation_id' => 'bulk-context',
+            'user_id' => 'context-user',
+        ]);
+
+        $service = app(EventService::class);
+        $service->recordManyStoredEvents([
+            new StoredEventData('BulkContextEvent', ['id' => 1], 'bulk-context-1'),
+        ]);
+        $service->recordManyEventLogs([
+            new EventLogData('bulk-context', '1', 'updated', changed: ['id' => 1]),
+        ]);
+
+        $stored = StoredEvent::on('mongodb')->where('aggregate_id', 'bulk-context-1')->first();
+        $log = EventLogEntry::on('mongodb')->where('entity_type', 'bulk-context')->first();
+
+        $this->assertSame('bulk-context', $stored?->metadata['correlation_id'] ?? null);
+        $this->assertSame('context-user', $stored?->metadata['user_id'] ?? null);
+        $this->assertNull($stored?->user_id);
+        $this->assertSame('bulk-context', $log?->meta['correlation_id'] ?? null);
+        $this->assertSame('context-user', $log?->user_id);
+    }
+
     public function test_install_indexes_command_creates_ttl_indexes_when_configured(): void
     {
         config()->set('events.retention.stored_events_days', 30);
@@ -110,8 +135,12 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
 
         $connection = $this->app->make('db')->connection('mongodb');
         $this->assertInstanceOf(Connection::class, $connection);
-        $storedIndexes = iterator_to_array($connection->getCollection('stored_events')->listIndexes());
-        $logIndexes = iterator_to_array($connection->getCollection('event_logs')->listIndexes());
+        $storedIndexes = iterator_to_array(
+            $connection->getCollection(config('events.eventsourcing.collection', 'stored_events'))->listIndexes()
+        );
+        $logIndexes = iterator_to_array(
+            $connection->getCollection(config('events.event_log.collection', 'event_logs'))->listIndexes()
+        );
 
         $this->assertTrue($this->hasTtlIndex($storedIndexes, 30 * 86400));
         $this->assertTrue($this->hasTtlIndex($logIndexes, 60 * 86400));
@@ -120,7 +149,7 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
     private function hasTtlIndex(array $indexes, int $seconds): bool
     {
         foreach ($indexes as $index) {
-            if (($index['expireAfterSeconds'] ?? null) === $seconds) {
+            if ((int) ($index['expireAfterSeconds'] ?? -1) === $seconds) {
                 return true;
             }
         }

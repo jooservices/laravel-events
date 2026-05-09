@@ -45,8 +45,6 @@ class StoredEvent extends Model
     ];
 
     protected $casts = [
-        'payload' => 'array',
-        'metadata' => 'array',
         'occurred_at' => 'datetime',
     ];
 

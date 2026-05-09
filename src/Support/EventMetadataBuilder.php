@@ -35,6 +35,8 @@ final class EventMetadataBuilder
         $this->metadata[EventMetadata::SOURCE] = $source;
         if ($channel !== null) {
             $this->metadata[EventMetadata::CHANNEL] = $channel;
+        } else {
+            unset($this->metadata[EventMetadata::CHANNEL]);
         }
 
         return $this;

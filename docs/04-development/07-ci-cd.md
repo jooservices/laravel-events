@@ -8,7 +8,7 @@ Current jobs include:
 - Composer metadata validation
 - Pint, PHPCS, PHPStan/Larastan, PHPMD, and narrow PHP-CS-Fixer PHPDoc checks
 - PHPUnit coverage with a MongoDB service
-- coverage artifact upload
+- coverage artifact upload (minimum threshold: 80%)
 - dependency review for pull requests
 - optional Codecov upload when `CODECOV_TOKEN` is configured
 - optional SonarQube Cloud analysis when `SONAR_TOKEN` is configured

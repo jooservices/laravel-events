@@ -48,4 +48,39 @@ class EventServiceEnvelopeTest extends TestCase
         ]);
         $this->addToAssertionCount(1);
     }
+
+    public function test_record_many_stored_events_preserves_envelope_fields(): void
+    {
+        $storedEventModel = Mockery::mock(StoredEvent::class)->makePartial();
+        $storedEventModel->shouldReceive('newQuery')->andReturnSelf();
+        $storedEventModel->shouldReceive('insert')
+            ->once()
+            ->with(Mockery::on(function (array $records) {
+                $record = $records[0] ?? [];
+
+                return $record['event_id'] === 'evt-bulk'
+                    && $record['event_name'] === 'order.bulk'
+                    && $record['aggregate_type'] === 'orders'
+                    && $record['schema_version'] === 1
+                    && $record['event_version'] === '2026-05'
+                    && $record['correlation_id'] === 'corr-bulk'
+                    && $record['causation_id'] === 'cmd-bulk';
+            }));
+
+        $service = new EventService($storedEventModel, Mockery::mock(EventLogEntry::class));
+        $service->recordManyStoredEvents([
+            [
+                'event_class' => 'BulkEvent',
+                'payload' => [],
+                'event_id' => 'evt-bulk',
+                'event_name' => 'order.bulk',
+                'aggregate_type' => 'orders',
+                'schema_version' => 1,
+                'event_version' => '2026-05',
+                'correlation_id' => 'corr-bulk',
+                'causation_id' => 'cmd-bulk',
+            ],
+        ]);
+        $this->addToAssertionCount(1);
+    }
 }

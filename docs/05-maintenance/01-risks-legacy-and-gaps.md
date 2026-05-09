@@ -4,8 +4,8 @@
   DTO-style docs tree.
 - Optional model observer helpers should remain deferred unless they can be
   small, explicit, and opt-in.
-- Codecov, Sonar, Codacy, and Fortify integrations should only be enabled when
-  repository configuration and secrets make them safe.
+- Codecov, Sonar, Codacy, OpenSSF Scorecard, and Dependabot integrations should
+  only be enabled when repository configuration and secrets make them safe.
 - The event serializer is intentionally minimal. A future DTO-aware serializer
   can map package or application DTOs into payload arrays, but the default
   behavior must stay compatible with `EventSourcingInterface::payload()`.

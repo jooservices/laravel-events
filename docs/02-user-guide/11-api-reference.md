@@ -92,7 +92,7 @@ are normalized, redacted, timestamped, and batch inserted.
 
 ### StoredEventQueryService
 
-- `byAggregate(string $aggregateType, string $aggregateId, int $limit = 50)`
+- `byAggregateId(string $aggregateId, int $limit = 50)`
 - `byEventName(string $eventName, int $limit = 50)`
 - `byCorrelationId(string $correlationId, int $limit = 50)`
 - `byCausationId(string $causationId, int $limit = 50)`
@@ -201,9 +201,9 @@ php artisan events:install-indexes --drop [--force]
 MongoDB Eloquent model. Connection and collection from config. Fillable:
 `event_class`, `event_id`, `event_name`, `aggregate_id`, `aggregate_type`,
 `payload`, `metadata`, `schema_version`, `event_version`, `correlation_id`,
-`causation_id`, `user_id`, `occurred_at`. Casts: `payload`/`metadata` => array,
-`occurred_at` => datetime (Carbon).
+`causation_id`, `user_id`, `occurred_at`. Native MongoDB arrays are used for
+`payload` and `metadata`; `occurred_at` is cast to datetime (Carbon).
 
 ### EventLogEntry
 
-MongoDB Eloquent model. Fillable: `entity_type`, `entity_id`, `action`, `prev`, `changed`, `diff`, `meta`, `user_id`. Casts: `prev`, `changed`, `diff`, `meta` => array.
+MongoDB Eloquent model. Fillable: `entity_type`, `entity_id`, `action`, `prev`, `changed`, `diff`, `meta`, `user_id`. Native MongoDB arrays are used for `prev`, `changed`, `diff`, and `meta`.

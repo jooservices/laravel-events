@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace JooServices\LaravelEvents\Data;
 
-use Carbon\CarbonInterface;
 use DateTimeInterface;
 use InvalidArgumentException;
 
@@ -53,7 +52,7 @@ final readonly class StoredEventData
             payload: $payload,
             aggregateId: isset($values['aggregate_id'])
                 ? (string) $values['aggregate_id']
-                : ($values['aggregateId'] ?? null),
+                : (isset($values['aggregateId']) ? (string) $values['aggregateId'] : null),
             userId: $values['user_id'] ?? $values['userId'] ?? null,
             occurredAt: $occurredAt,
             metadata: $metadata,
@@ -86,7 +85,7 @@ final readonly class StoredEventData
             'payload' => $this->payload,
             'metadata' => $this->metadata,
             'user_id' => $this->userId,
-            'occurred_at' => $this->occurredAt instanceof CarbonInterface ? $this->occurredAt : $this->occurredAt,
+            'occurred_at' => $this->occurredAt,
             'event_id' => $this->envelope?->eventId,
             'event_name' => $this->envelope?->eventName,
             'aggregate_type' => $this->envelope?->aggregateType,

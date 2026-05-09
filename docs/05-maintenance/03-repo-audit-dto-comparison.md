@@ -40,24 +40,24 @@ features are not copied into this package.
 - Code examples, configuration, and package boundaries are specific to event
   persistence and audit logging.
 
-## Missing
+## Baseline gaps before this pass
 
-- Docs are still in a flat legacy structure instead of the current DTO-style
+- Docs were still in a flat legacy structure instead of the current DTO-style
   structure:
   `docs/00-architecture`, `docs/01-getting-started`, `docs/02-user-guide`,
   `docs/03-examples`, `docs/04-development`, and `docs/05-maintenance`.
 - `SECURITY.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`,
-  `.github/pull_request_template.md`, and issue templates are missing.
-- DTO-style AI/editor guidance is missing:
+  `.github/pull_request_template.md`, and issue templates were missing.
+- DTO-style AI/editor guidance was missing:
   `.github/skills`, `.github/instructions`, `.github/prompts`, `ai/skills`,
   `.cursor/rules`, `.claude/commands`, `antigravity/prompts`, and
   `jetbrains/prompts`.
-- `phpdoc.dist.xml` and `sonar-project.properties` are missing.
-- Composer tooling does not include PHP-CS-Fixer. DTO has it, but this package
-  currently uses Pint plus PHPCS for style. Adding PHP-CS-Fixer should be
-  evaluated carefully to avoid conflicting formatters.
+- `phpdoc.dist.xml` and `sonar-project.properties` were missing.
+- Composer tooling did not include PHP-CS-Fixer. DTO has it, but this package
+  uses Pint plus PHPCS for style. PHP-CS-Fixer is limited to non-conflicting
+  PHPDoc checks.
 - Optional model observer helper is not implemented.
-- Root README and docs do not yet cover all current and planned package
+- Root README and docs did not yet cover all current and planned package
   quality gates, branch workflow, redaction, retention, query APIs, or
   maintenance notes.
 
@@ -79,9 +79,10 @@ features are not copied into this package.
 
 - Dashboard, reporting UI, analytics, projection framework, AI runtime, and
   unrelated Laravel application features are explicitly out of scope.
-- Codecov, Sonar, Codacy, or Fortify integration will only be added when the
-  repository has safe optional configuration or required secrets. CI must not
-  contain fake success or guaranteed-failing secret-dependent steps.
+- Codecov, Sonar, Codacy, OpenSSF Scorecard, or Dependabot integration will
+  only be added when the repository has safe optional configuration or required
+  secrets. CI must not contain fake success or guaranteed-failing
+  secret-dependent steps.
 - Optional model observer helpers are deferred because they risk hidden model
   observation, app-specific assumptions, and scope creep unless designed as a
   separate small opt-in feature.

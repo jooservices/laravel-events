@@ -24,8 +24,8 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
             $this->markTestSkipped('MongoDB is not available at '.env('MONGODB_URI', 'mongodb://127.0.0.1:27017'));
         }
 
-        StoredEvent::on('mongodb')->newQuery()->delete();
-        EventLogEntry::on('mongodb')->newQuery()->delete();
+        StoredEvent::on('mongodb')->delete();
+        EventLogEntry::on('mongodb')->delete();
     }
 
     private function mongodbAvailable(): bool

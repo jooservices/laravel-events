@@ -15,7 +15,7 @@ class StoredEventQueryService
     public function __construct(private readonly StoredEvent $model) {}
 
     /** @return Collection<int, StoredEventData> */
-    public function byAggregate(string $aggregateType, string $aggregateId, int $limit = 50): Collection
+    public function byAggregateId(string $aggregateId, int $limit = 50): Collection
     {
         return $this->latest($limit, ['aggregate_id' => $aggregateId]);
     }
@@ -29,27 +29,13 @@ class StoredEventQueryService
     /** @return Collection<int, StoredEventData> */
     public function byCorrelationId(string $correlationId, int $limit = 50): Collection
     {
-        $this->assertLimit($limit);
-
-        return $this->latest(500)
-            ->filter(
-                fn (StoredEventData $event): bool => ($event->metadata['correlation_id'] ?? null) === $correlationId
-            )
-            ->take($limit)
-            ->values();
+        return $this->latest($limit, ['metadata.correlation_id' => $correlationId]);
     }
 
     /** @return Collection<int, StoredEventData> */
     public function byCausationId(string $causationId, int $limit = 50): Collection
     {
-        $this->assertLimit($limit);
-
-        return $this->latest(500)
-            ->filter(
-                fn (StoredEventData $event): bool => ($event->metadata['causation_id'] ?? null) === $causationId
-            )
-            ->take($limit)
-            ->values();
+        return $this->latest($limit, ['metadata.causation_id' => $causationId]);
     }
 
     /** @return Collection<int, StoredEventData> */
