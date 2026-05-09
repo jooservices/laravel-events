@@ -16,10 +16,16 @@ final class PayloadRedactor
             return $values;
         }
 
-        $keys = array_map(
-            static fn (string $key): string => strtolower($key),
-            array_filter(config('events.redaction.keys', []), 'is_string')
-        );
+        $configuredKeys = config('events.redaction.keys', []);
+        $keys = [];
+        if (is_array($configuredKeys)) {
+            foreach ($configuredKeys as $configuredKey) {
+                if (is_string($configuredKey)) {
+                    $keys[] = strtolower($configuredKey);
+                }
+            }
+        }
+
         $replacement = config('events.redaction.replacement', '[REDACTED]');
 
         return $this->redactArray($values, $keys, is_scalar($replacement) ? $replacement : '[REDACTED]');

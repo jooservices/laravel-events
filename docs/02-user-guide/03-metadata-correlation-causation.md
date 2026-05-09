@@ -8,6 +8,9 @@ Use consistent keys so records are easier to trace, audit, and evolve.
 
 | Key | Purpose |
 |-----|---------|
+| `event_id` | Optional stable event identifier; generated when omitted |
+| `event_name` | Optional event type/name override; defaults to event class basename |
+| `aggregate_type` | Optional aggregate category such as `orders` or `users` |
 | `request_id` | Incoming request or job identifier |
 | `correlation_id` | Groups related work across services/actions |
 | `causation_id` | Identifies the event/command that caused this record |
@@ -47,6 +50,11 @@ config([
 ```
 
 Event-specific metadata wins when keys overlap because it is merged after context metadata.
+
+The default serializer also copies `event_id`, `event_name`, `aggregate_type`,
+`schema_version`, `event_version`, `correlation_id`, and `causation_id` to
+nullable top-level stored-event fields. The full metadata array is still stored
+unchanged for backward compatibility and application-owned context.
 
 ## Versioning and Schema Evolution
 

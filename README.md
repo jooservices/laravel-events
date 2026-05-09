@@ -242,7 +242,7 @@ composer update
 The hooks are managed by CaptainHook and enforce:
 
 - `commit-msg`: Conventional Commits, for example `fix: Correct event metadata merge`
-- `pre-commit`: PHP syntax linting, staged secret scanning with gitleaks, Pint, PHPCS, PHPStan, and PHPMD
+- `pre-commit`: PHP syntax linting, staged secret scanning with gitleaks, Pint, PHPCS, PHPStan, PHPMD, and PHP-CS-Fixer
 - `pre-push`: gitleaks history scan when available, then `composer test`
 
 If hooks need to be reinstalled manually:
@@ -263,6 +263,8 @@ AI contributor guidance is intentionally documentation-only:
 
 - [AGENTS.md](AGENTS.md)
 - [CLAUDE.md](CLAUDE.md)
+- [AI Skills Map](ai/skills/README.md)
+- [AI Skills Usage](ai/skills/USAGE.md)
 - [Optional AI Integration](docs/04-development/13-optional-ai-integration.md)
 
 The package does not include AI runtime code, AI data fetching, authorization, redaction, or tool execution.
@@ -277,13 +279,14 @@ quality and docs structure, without depending on DTO domain internals.
 
 Configured workflows:
 
-- `CI`: Composer audit, Pint, PHPCS, PHPStan, PHPMD, PHPUnit coverage with a MongoDB service, and non-blocking dependency review for pull requests
-- `Release`: validate version tags, create GitHub releases, and trigger Packagist updates
+- `CI`: Composer audit, Pint, PHPCS, PHPStan, PHPMD, PHPUnit coverage with a MongoDB service, a 95% minimum statement coverage gate, and non-blocking dependency review for pull requests
+- `Release`: validate version tags, create GitHub releases, and trigger Packagist updates when Packagist secrets are configured
 - `PR Labeler`: apply labels based on changed files
 - `Semantic PR Title`: enforce Conventional Commit-style PR titles
 - `OpenSSF Scorecard`: publish security posture results as SARIF
+- `Secret Scanning`: run Gitleaks on pushes, pull requests, and manual dispatches
 
-Coverage is archived as a workflow artifact. A Codecov badge is intentionally not shown because Codecov upload is not configured for this repository.
+Coverage is archived as a workflow artifact. Codecov and SonarQube Cloud are optional and only run when repository secrets are configured, so README badges do not claim those services as mandatory package support.
 
 ---
 

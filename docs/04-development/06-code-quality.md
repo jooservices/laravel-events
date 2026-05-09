@@ -15,3 +15,9 @@ composer ci
 
 Fix warnings, risky tests, skipped failures, and ignored lint issues before
 claiming success.
+
+Current repository baseline:
+
+- PHPStan level 7 through `phpstan.neon.dist`
+- PHPUnit strict warning, notice, deprecation, risky-test, and output handling
+- 95% minimum statement coverage enforced by CI

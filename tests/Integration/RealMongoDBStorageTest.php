@@ -31,6 +31,7 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
     private function mongodbAvailable(): bool
     {
         try {
+            $this->assertNotNull($this->app);
             $connection = $this->app->make('db')->connection('mongodb');
             if (! $connection instanceof Connection) {
                 return false;
@@ -47,6 +48,7 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
     {
         $event = new class implements EventSourcingInterface
         {
+            /** @return array<string, mixed> */
             public function payload(): array
             {
                 return ['order_id' => 'ORD-999', 'amount' => 99.99, 'at' => now()->toIso8601String()];
@@ -93,11 +95,13 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
                 return '42';
             }
 
+            /** @return array<string, mixed> */
             public function getPrev(): array
             {
                 return ['status' => 'pending', 'total' => 50.00];
             }
 
+            /** @return array<string, mixed> */
             public function getChanged(): array
             {
                 return ['status' => 'completed', 'total' => 75.00];
@@ -134,6 +138,7 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
 
         $event = new class implements EventSourcingInterface
         {
+            /** @return array<string, mixed> */
             public function payload(): array
             {
                 return ['action' => 'test_logged_in'];
@@ -170,11 +175,13 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
                 return '1';
             }
 
+            /** @return array<string, mixed> */
             public function getPrev(): array
             {
                 return [];
             }
 
+            /** @return array<string, mixed> */
             public function getChanged(): array
             {
                 return ['x' => 1];
@@ -188,6 +195,7 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
         $this->assertSame(200, $entry->user_id);
     }
 
+    /** @param array<string, mixed> $evidence */
     private function writeEvidence(string $key, array $evidence): void
     {
         $dir = dirname(self::EVIDENCE_FILE);

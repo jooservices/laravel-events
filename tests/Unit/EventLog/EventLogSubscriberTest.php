@@ -35,11 +35,13 @@ class EventLogSubscriberTest extends TestCase
                 return '42';
             }
 
+            /** @return array<string, mixed> */
             public function getPrev(): array
             {
                 return ['status' => 'pending'];
             }
 
+            /** @return array<string, mixed> */
             public function getChanged(): array
             {
                 return ['status' => 'completed'];
@@ -68,6 +70,7 @@ class EventLogSubscriberTest extends TestCase
     public function test_subscribe_does_not_register_when_disabled(): void
     {
         config()->set('events.event_log.enabled', false);
+        $this->assertNotNull($this->app);
         $subscriber = $this->app->make(EventLogSubscriber::class);
         $dispatcher = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
         $dispatcher->shouldReceive('listen')->never();
@@ -90,11 +93,13 @@ class EventLogSubscriberTest extends TestCase
                 return '99';
             }
 
+            /** @return array<string, mixed> */
             public function getPrev(): array
             {
                 return [];
             }
 
+            /** @return array<string, mixed> */
             public function getChanged(): array
             {
                 return ['name' => 'x'];
@@ -137,11 +142,13 @@ class EventLogSubscriberTest extends TestCase
                 return '99';
             }
 
+            /** @return array<string, mixed> */
             public function getPrev(): array
             {
                 return [];
             }
 
+            /** @return array<string, mixed> */
             public function getChanged(): array
             {
                 return ['name' => 'x'];
@@ -180,11 +187,13 @@ class EventLogSubscriberTest extends TestCase
                 return '42';
             }
 
+            /** @return array<string, mixed> */
             public function getPrev(): array
             {
                 return [];
             }
 
+            /** @return array<string, mixed> */
             public function getChanged(): array
             {
                 return ['status' => 'pending'];

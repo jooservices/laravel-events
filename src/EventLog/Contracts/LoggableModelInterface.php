@@ -10,9 +10,9 @@ interface LoggableModelInterface
 
     public function getLoggableId(): string;
 
-    /** Previous attributes (before change). */
+    /** @return array<string, mixed> Previous attributes (before change). */
     public function getPrev(): array;
 
-    /** Current/changed attributes. */
+    /** @return array<string, mixed> Current/changed attributes. */
     public function getChanged(): array;
 }

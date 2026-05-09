@@ -5,7 +5,7 @@ parameters:
     paths:
         - src
         - tests
-    level: 5
+    level: 7
     ignoreErrors:
         # Mockery: MockInterface passed where concrete type expected
         - '~Parameter #\d+ .+ expects .+, Mockery\\(MockInterface|LegacyMockInterface) given\.~'

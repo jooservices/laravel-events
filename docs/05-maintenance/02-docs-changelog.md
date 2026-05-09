@@ -9,3 +9,11 @@
 - Added maintenance docs under `docs/05-maintenance`.
 - Removed the `05-ai-contributor-guide` directory; AI contributor guidance is
   consolidated in `AGENTS.md` and tool-specific prompt files.
+
+## 2026-05-09
+
+- Documented additive stored event envelope fields and serializer extension
+  points.
+- Expanded AI skill entry points and maintenance roadmap notes for event store,
+  outbox, replay, versioning, and observability.
+- Clarified Event Log diff behavior for changed-only values and explicit nulls.

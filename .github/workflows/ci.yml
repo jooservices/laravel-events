@@ -129,8 +129,8 @@ jobs:
           $covered = (int) $metrics["coveredstatements"];
           $percent = $statements > 0 ? round(($covered / $statements) * 100, 2) : 0.0;
           echo "Code coverage: {$percent}%\n";
-          if ($percent < 65) {
-              fwrite(STDERR, "Code coverage {$percent}% is below minimum threshold of 65%\n");
+            if ($percent < 95) {
+              fwrite(STDERR, "Code coverage {$percent}% is below minimum threshold of 95%\n");
               exit(1);
           }
           '

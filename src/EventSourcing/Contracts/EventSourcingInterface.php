@@ -13,6 +13,7 @@ namespace JooServices\LaravelEvents\EventSourcing\Contracts;
  */
 interface EventSourcingInterface
 {
+    /** @return array<string, mixed> */
     public function payload(): array;
 
     public function aggregateId(): ?string;

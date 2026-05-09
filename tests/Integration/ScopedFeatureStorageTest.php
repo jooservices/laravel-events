@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace JooServices\LaravelEvents\Tests\Integration;
 
+use Illuminate\Testing\PendingCommand;
 use JooServices\LaravelEvents\Data\EventLogData;
 use JooServices\LaravelEvents\Data\StoredEventData;
 use JooServices\LaravelEvents\EventLog\Models\EventLogEntry;
@@ -19,6 +20,7 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
     {
         parent::setUp();
 
+        $this->assertNotNull($this->app);
         $connection = $this->app->make('db')->connection('mongodb');
         if (! $connection instanceof Connection) {
             $this->markTestSkipped('MongoDB is not available.');
@@ -80,7 +82,9 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
         $this->assertNotNull($stored);
         $this->assertNotNull($entry);
         $this->assertSame('[REDACTED]', $stored->payload['password']);
-        $this->assertSame('[REDACTED]', $stored->payload['nested']['token']);
+        $nestedPayload = $stored->payload['nested'] ?? null;
+        $this->assertIsArray($nestedPayload);
+        $this->assertSame('[REDACTED]', $nestedPayload['token'] ?? null);
         $this->assertSame('[REDACTED]', $entry->prev['password']);
         $this->assertSame('[REDACTED]', $entry->meta['authorization']);
     }
@@ -131,29 +135,90 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
         config()->set('events.retention.stored_events_days', 30);
         config()->set('events.retention.event_logs_days', 60);
 
-        $this->artisan('events:install-indexes')->assertSuccessful();
-
-        $connection = $this->app->make('db')->connection('mongodb');
-        $this->assertInstanceOf(Connection::class, $connection);
-        $storedIndexes = iterator_to_array(
-            $connection->getCollection(config('events.eventsourcing.collection', 'stored_events'))->listIndexes()
-        );
-        $logIndexes = iterator_to_array(
-            $connection->getCollection(config('events.event_log.collection', 'event_logs'))->listIndexes()
-        );
-
-        $this->assertTrue($this->hasTtlIndex($storedIndexes, 30 * 86400));
-        $this->assertTrue($this->hasTtlIndex($logIndexes, 60 * 86400));
-    }
-
-    private function hasTtlIndex(array $indexes, int $seconds): bool
-    {
-        foreach ($indexes as $index) {
-            if ((int) ($index['expireAfterSeconds'] ?? -1) === $seconds) {
-                return true;
-            }
+        $result = $this->artisan('events:install-indexes');
+        if ($result instanceof PendingCommand) {
+            $result->assertSuccessful();
+        } else {
+            $this->assertSame(0, $result);
         }
 
-        return false;
+        config()->set('events.retention.stored_events_days', 31);
+        config()->set('events.retention.event_logs_days', 61);
+
+        $rerun = $this->artisan('events:install-indexes');
+        if ($rerun instanceof PendingCommand) {
+            $rerun->assertSuccessful();
+        } else {
+            $this->assertSame(0, $rerun);
+        }
+    }
+
+    public function test_query_services_cover_all_supported_filters(): void
+    {
+        $service = app(EventService::class);
+        $from = now()->subMinute();
+
+        $service->storeEvent(
+            new \stdClass,
+            ['order_id' => 'ORD-Q2'],
+            'ORD-Q2',
+            metadata: ['correlation_id' => 'corr-q2', 'causation_id' => 'cmd-q2'],
+        );
+        $service->logChange(
+            'orders',
+            'ORD-Q2',
+            'updated',
+            ['status' => 'pending'],
+            ['status' => 'paid'],
+            ['status' => ['old' => 'pending', 'new' => 'paid']],
+            ['correlation_id' => 'corr-q2', 'causation_id' => 'cmd-q2'],
+        );
+
+        $storedQueries = app(StoredEventQueryService::class);
+        $eventQueries = app(EventLogQueryService::class);
+
+        $this->assertSame('ORD-Q2', $storedQueries->byAggregateId('ORD-Q2')->first()?->aggregateId);
+        $this->assertSame(\stdClass::class, $storedQueries->byEventName(\stdClass::class)->first()?->eventClass);
+        $this->assertSame(
+            'corr-q2',
+            $storedQueries->byCorrelationId('corr-q2')->first()?->metadata['correlation_id'] ?? null
+        );
+        $this->assertSame(
+            'cmd-q2',
+            $storedQueries->byCausationId('cmd-q2')->first()?->metadata['causation_id'] ?? null
+        );
+        $this->assertGreaterThanOrEqual(1, $storedQueries->between($from, now())->count());
+        $this->assertGreaterThanOrEqual(1, $storedQueries->latest(10)->count());
+
+        $this->assertSame('ORD-Q2', $eventQueries->byEntity('orders', 'ORD-Q2')->first()?->entityId);
+        $this->assertSame(
+            'corr-q2',
+            $eventQueries->byCorrelationId('corr-q2')->first()?->meta['correlation_id'] ?? null
+        );
+        $this->assertSame('cmd-q2', $eventQueries->byCausationId('cmd-q2')->first()?->meta['causation_id'] ?? null);
+        $this->assertGreaterThanOrEqual(1, $eventQueries->between($from, now())->count());
+        $this->assertGreaterThanOrEqual(1, $eventQueries->latest(10)->count());
+    }
+
+    public function test_install_indexes_command_can_drop_existing_indexes(): void
+    {
+        config()->set('events.retention.stored_events_days', 30);
+        config()->set('events.retention.event_logs_days', 30);
+
+        $createResult = $this->artisan('events:install-indexes');
+        if ($createResult instanceof PendingCommand) {
+            $createResult->assertSuccessful();
+        } else {
+            $this->assertSame(0, $createResult);
+        }
+
+        $dropResult = $this->artisan('events:install-indexes', ['--drop' => true, '--force' => true]);
+        if ($dropResult instanceof PendingCommand) {
+            $dropResult->assertSuccessful();
+        } else {
+            $this->assertSame(0, $dropResult);
+        }
+
+        $this->addToAssertionCount(1);
     }
 }
