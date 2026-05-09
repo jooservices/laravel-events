@@ -8,3 +8,8 @@
 - Use real MongoDB integration tests for persisted data.
 - Pint wins formatter conflicts.
 - Run Composer quality gates before commit.
+
+Task-specific guidance:
+
+- [Laravel Events implementation](laravel-events-implementation.md)
+- [Laravel Events audit](laravel-events-audit.md)

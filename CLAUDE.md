@@ -15,6 +15,8 @@ When working in this repository:
 - Pint wins formatting conflicts.
 - Keep tests and docs in sync with behavior changes.
 - Use the repository command map from `composer.json`, especially `composer lint`, `composer lint:all`, `composer test`, `composer check`, and `composer ci`.
-- Keep `master` for production, `develop` for development, feature branches from `develop`, and hotfix branches from `master`.
+- Keep `master` for production, `develop` for development, feature branches from `develop`, normal pull requests to `develop`, and hotfix branches/pull requests from `master`.
+- Stop and ask before changing files if branch state, requirements, docs, CI, runtime behavior, or package scope conflict.
+- Treat work as complete only when the relevant validation commands pass or an environment limitation is reported exactly.
 - Commit completed feature groups as `Viet Vu <jooservices@gmail.com>`.
 - Be explicit about compatibility impact, metadata handling, and operational risk.

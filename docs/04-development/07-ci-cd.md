@@ -13,5 +13,11 @@ Current jobs include:
 - optional Codecov upload when `CODECOV_TOKEN` is configured
 - optional SonarQube Cloud analysis when `SONAR_TOKEN` is configured
 
-Release automation validates version tags, creates GitHub releases, and can
-notify Packagist when configured.
+The current temporary statement coverage threshold is 80%. The local baseline
+measured on 2026-05-09 was 84.51%. DTO uses a 95% long-term target; this package
+should raise the threshold toward 95% after query-service and command coverage
+is expanded.
+
+Release automation validates Composer metadata, runs dependency audit, runs
+`composer lint:all`, runs PHPUnit, creates GitHub releases, and can notify
+Packagist when configured.

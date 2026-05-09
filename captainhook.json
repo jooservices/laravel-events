@@ -40,6 +40,10 @@
             {
                 "action": "composer lint:phpmd",
                 "conditions": []
+            },
+            {
+                "action": "composer lint:cs",
+                "conditions": []
             }
         ]
     },

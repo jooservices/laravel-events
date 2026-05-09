@@ -93,8 +93,11 @@ Prefer `lint:*` scripts in automation and documentation. Legacy aliases such as 
 - `master` is production/release state.
 - `develop` is development state.
 - Feature branches start from `develop`.
+- Normal pull requests target `develop`.
 - Hotfix branches start from `master`.
+- Hotfix pull requests target `master`; after merge, sync the same change back to `develop`.
 - Clean local work before starting new tasks.
+- If branch state, requirements, docs, or CI expectations conflict, stop and ask before changing files.
 - Do not leave successful completed work uncommitted.
 
 ## Change Checklist
@@ -106,4 +109,5 @@ Before considering a task done:
 3. Add or update tests for changed behavior.
 4. Update README/docs when commands, workflows, or public behavior change.
 5. Run the relevant Composer quality commands.
-6. Explain risk, tradeoff, and compatibility impact in the final summary.
+6. Treat the task as done only when the relevant validation commands pass or an environment limitation is reported exactly.
+7. Explain risk, tradeoff, and compatibility impact in the final summary.
