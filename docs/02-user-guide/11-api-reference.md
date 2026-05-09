@@ -64,6 +64,49 @@ public function logChange(
 
 ---
 
+### recordManyStoredEvents
+
+```php
+public function recordManyStoredEvents(iterable $events): void
+```
+
+Accepts `StoredEventData` instances or arrays using persisted field names.
+Records are normalized, redacted, timestamped, and batch inserted.
+
+### recordManyEventLogs
+
+```php
+public function recordManyEventLogs(iterable $logs): void
+```
+
+Accepts `EventLogData` instances or arrays using persisted field names. Records
+are normalized, redacted, timestamped, and batch inserted.
+
+---
+
+## Query Services
+
+### StoredEventQueryService
+
+- `byAggregateId(string $aggregateId, int $limit = 50)`
+- `byEventName(string $eventName, int $limit = 50)`
+- `byCorrelationId(string $correlationId, int $limit = 50)`
+- `byCausationId(string $causationId, int $limit = 50)`
+- `between(DateTimeInterface $from, DateTimeInterface $to, int $limit = 50)`
+- `latest(int $limit = 50)`
+
+### EventLogQueryService
+
+- `byEntity(string $entityType, string $entityId, int $limit = 50)`
+- `byCorrelationId(string $correlationId, int $limit = 50)`
+- `byCausationId(string $causationId, int $limit = 50)`
+- `between(DateTimeInterface $from, DateTimeInterface $to, int $limit = 50)`
+- `latest(int $limit = 50)`
+
+Limits must be between 1 and 500.
+
+---
+
 ## Interfaces
 
 ### EventSourcingInterface
@@ -132,8 +175,8 @@ php artisan events:install-indexes --drop [--force]
 
 ### StoredEvent
 
-MongoDB Eloquent model. Connection and collection from config. Fillable: `event_class`, `aggregate_id`, `payload`, `metadata`, `user_id`, `occurred_at`. Casts: `payload`/`metadata` => array, `occurred_at` => datetime (Carbon).
+MongoDB Eloquent model. Connection and collection from config. Fillable: `event_class`, `aggregate_id`, `payload`, `metadata`, `user_id`, `occurred_at`. Native MongoDB arrays are used for `payload` and `metadata`; `occurred_at` is cast to datetime (Carbon).
 
 ### EventLogEntry
 
-MongoDB Eloquent model. Fillable: `entity_type`, `entity_id`, `action`, `prev`, `changed`, `diff`, `meta`, `user_id`. Casts: `prev`, `changed`, `diff`, `meta` => array.
+MongoDB Eloquent model. Fillable: `entity_type`, `entity_id`, `action`, `prev`, `changed`, `diff`, `meta`, `user_id`. Native MongoDB arrays are used for `prev`, `changed`, `diff`, and `meta`.

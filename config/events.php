@@ -1,5 +1,19 @@
 <?php
 
+$positiveIntegerEnv = static function (string $key): ?int {
+    $value = env($key);
+
+    if ($value === null || $value === '') {
+        return null;
+    }
+
+    $validated = filter_var($value, FILTER_VALIDATE_INT, [
+        'options' => ['min_range' => 1],
+    ]);
+
+    return $validated === false ? null : (int) $validated;
+};
+
 return [
     'connection' => 'mongodb',
 
@@ -13,6 +27,27 @@ return [
     | schema_version, tenant_id. Return [] to disable.
     */
     'context_provider' => null,
+
+    'redaction' => [
+        'enabled' => env('EVENTS_REDACTION_ENABLED', true),
+        'keys' => [
+            'password',
+            'password_confirmation',
+            'token',
+            'access_token',
+            'refresh_token',
+            'secret',
+            'api_key',
+            'authorization',
+            'cookie',
+        ],
+        'replacement' => '[REDACTED]',
+    ],
+
+    'retention' => [
+        'stored_events_days' => $positiveIntegerEnv('EVENTS_STORED_EVENTS_RETENTION_DAYS'),
+        'event_logs_days' => $positiveIntegerEnv('EVENTS_EVENT_LOGS_RETENTION_DAYS'),
+    ],
 
     'eventsourcing' => [
         'enabled' => env('EVENTS_EVENTSOURCING_ENABLED', true),

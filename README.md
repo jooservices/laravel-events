@@ -33,7 +33,7 @@ This package does **not**:
 - replace Laravel's event dispatcher
 - provide a projection/read-model framework
 - provide a business analytics or reporting layer
-- provide a full query/data-access toolkit
+- provide dashboards, projections, or analytics/reporting workflows
 - provide AI agents, AI data fetching, or an AI runtime
 
 ## When to Use
@@ -139,6 +139,62 @@ Recommended action names are available from `JooServices\LaravelEvents\EventLog\
 
 ---
 
+## Querying
+
+```php
+use JooServices\LaravelEvents\Query\EventLogQueryService;
+use JooServices\LaravelEvents\Query\StoredEventQueryService;
+
+$events = app(StoredEventQueryService::class)->byAggregateId('ORD-001');
+$audit = app(EventLogQueryService::class)->byEntity('orders', 'ORD-001');
+```
+
+Query services return typed package data records and intentionally stay small.
+Build dashboards, projections, and reporting in your application.
+
+## Redaction
+
+Recursive redaction is enabled by default for common secret keys:
+
+```php
+'redaction' => [
+    'enabled' => true,
+    'keys' => ['password', 'token', 'authorization'],
+    'replacement' => '[REDACTED]',
+],
+```
+
+This masks stored event payload/metadata and event log `prev`, `changed`,
+`diff`, and `meta`. It is defensive masking, not a replacement for avoiding
+secrets in dispatched events.
+
+## Retention
+
+Optional MongoDB TTL indexes are configured with:
+
+```env
+EVENTS_STORED_EVENTS_RETENTION_DAYS=
+EVENTS_EVENT_LOGS_RETENTION_DAYS=365
+```
+
+Run `php artisan events:install-indexes` after changing retention settings.
+MongoDB TTL deletion is asynchronous.
+
+## Bulk Records
+
+```php
+use JooServices\LaravelEvents\Data\StoredEventData;
+use JooServices\LaravelEvents\EventService;
+
+app(EventService::class)->recordManyStoredEvents([
+    new StoredEventData('OrderImported', ['order_id' => 'ORD-001'], 'ORD-001'),
+]);
+```
+
+Bulk APIs normalize and redact each record before MongoDB batch insert.
+
+---
+
 ## Documentation
 
 Full documentation is in the **`./docs`** folder:
@@ -146,19 +202,19 @@ Full documentation is in the **`./docs`** folder:
 | Document | Description |
 |----------|-------------|
 | [docs/README.md](docs/README.md) | Documentation index |
-| [Architecture](docs/architecture.md) | Design, data flow, diagrams |
-| [Code structure](docs/code-structure.md) | Package layout and namespaces |
-| [Installation](docs/installation.md) | Requirements and setup |
-| [Configuration](docs/configuration.md) | Config and context provider |
-| [Decision Guide](docs/decision-guide.md) | Event Sourcing vs Event Log |
-| [Event Sourcing](docs/event-sourcing.md) | Stored events and aggregates |
-| [Event Log](docs/event-log.md) | Audit trail and diff |
-| [Metadata](docs/metadata.md) | Metadata keys, versioning, corrections |
-| [Operations](docs/operations.md) | Indexes, query patterns, retention, production safety |
-| [AI Integration](docs/ai-integration.md) | Optional app-layer AI export examples |
-| [Development](docs/development.md) | Composer commands, CI, release, and contributor workflow |
-| [Samples](docs/samples.md) | Complete code examples |
-| [API Reference](docs/api.md) | EventService, interfaces, commands |
+| [Architecture](docs/00-architecture/01-project-overview.md) | Design, data flow, diagrams |
+| [Code structure](docs/00-architecture/02-repository-structure.md) | Package layout and namespaces |
+| [Installation](docs/01-getting-started/01-installation.md) | Requirements and setup |
+| [Configuration](docs/01-getting-started/02-configuration.md) | Config and context provider |
+| [Decision Guide](docs/02-user-guide/10-best-practices.md) | Event Sourcing vs Event Log |
+| [Event Sourcing](docs/02-user-guide/01-event-sourcing.md) | Stored events and aggregates |
+| [Event Log](docs/02-user-guide/02-event-log.md) | Audit trail and diff |
+| [Metadata](docs/02-user-guide/03-metadata-correlation-causation.md) | Metadata keys, versioning, corrections |
+| [Operations](docs/02-user-guide/08-operations.md) | Indexes, query patterns, retention, production safety |
+| [AI Integration](docs/04-development/13-optional-ai-integration.md) | Optional app-layer AI export examples |
+| [Development](docs/04-development/01-setup.md) | Composer commands, CI, release, and contributor workflow |
+| [Samples](docs/03-examples/01-basic-domain-event.md) | Complete code examples |
+| [API Reference](docs/02-user-guide/11-api-reference.md) | EventService, interfaces, commands |
 
 ---
 
@@ -171,6 +227,7 @@ composer lint       # Pint, PHPCS, PHPStan
 composer lint:all   # lint + PHPMD
 composer lint:fix
 composer check      # lint:all + test
+composer ci         # lint:all + test:coverage
 ```
 
 ## Git Hooks
@@ -206,9 +263,15 @@ AI contributor guidance is intentionally documentation-only:
 
 - [AGENTS.md](AGENTS.md)
 - [CLAUDE.md](CLAUDE.md)
-- [Optional AI Integration](docs/ai-integration.md)
+- [Optional AI Integration](docs/04-development/13-optional-ai-integration.md)
 
 The package does not include AI runtime code, AI data fetching, authorization, redaction, or tool execution.
+
+## DTO-Style Records
+
+The package uses small typed data records for normalized stored event and audit
+log data. It follows `jooservices/dto` as a maturity baseline for repository
+quality and docs structure, without depending on DTO domain internals.
 
 ## GitHub Actions
 

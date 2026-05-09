@@ -9,6 +9,8 @@ use Illuminate\Support\ServiceProvider;
 use JooServices\LaravelEvents\Console\InstallIndexesCommand;
 use JooServices\LaravelEvents\EventLog\EventLogSubscriber;
 use JooServices\LaravelEvents\EventSourcing\EventSourcingSubscriber;
+use JooServices\LaravelEvents\Query\EventLogQueryService;
+use JooServices\LaravelEvents\Query\StoredEventQueryService;
 
 class EventsServiceProvider extends ServiceProvider
 {
@@ -16,6 +18,8 @@ class EventsServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/events.php', 'events');
         $this->app->singleton(EventService::class);
+        $this->app->singleton(StoredEventQueryService::class);
+        $this->app->singleton(EventLogQueryService::class);
     }
 
     public function boot(Dispatcher $events): void

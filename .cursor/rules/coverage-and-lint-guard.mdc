@@ -1,0 +1,8 @@
+---
+description: Coverage and lint guard
+alwaysApply: true
+---
+
+Use `composer lint:all`, `composer test`, `composer test:coverage`,
+`composer check`, and `composer ci` as appropriate. Do not fake persisted
+MongoDB records in storage tests.

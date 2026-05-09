@@ -22,6 +22,8 @@ composer lint:pint:fix
 composer lint:phpcs
 composer lint:phpstan
 composer lint:phpmd
+composer lint:cs
+composer lint:cs:fix
 ```
 
 Legacy aliases such as `composer phpstan`, `composer phpcs`, and `composer phpmd` remain for contributor convenience.
@@ -41,7 +43,7 @@ Those commands run:
 captainhook install --force --skip-existing
 ```
 
-The hook configuration lives in [`captainhook.json`](../captainhook.json).
+The hook configuration lives in [`captainhook.json`](../../captainhook.json).
 
 | Hook | Gate |
 |------|------|
@@ -69,6 +71,7 @@ brew install gitleaks
 | PHPCS | Structural PHP checks |
 | PHPStan / Larastan | Static analysis for Laravel package code |
 | PHPMD | Maintainability and design-smell checks |
+| PHP-CS-Fixer | Narrow PHPDoc cleanup that does not compete with Pint |
 | PHPUnit / Testbench | Unit and Laravel package integration tests |
 
 ## CI/CD
@@ -76,7 +79,7 @@ brew install gitleaks
 GitHub Actions are configured for:
 
 - Composer audit
-- lint matrix for Pint, PHPCS, PHPStan, and PHPMD
+- lint matrix for Pint, PHPCS, PHPStan, PHPMD, and PHP-CS-Fixer PHPDoc checks
 - PHPUnit coverage with a MongoDB service
 - non-blocking Dependency Review on pull requests
 - PR labels based on changed files
@@ -123,4 +126,4 @@ These DTO repository features were reviewed but not copied now:
 
 ## AI Contributor Guidance
 
-Use [AGENTS.md](../AGENTS.md) as the canonical source for AI and human contributor rules. AI support is limited to contributor guidance and app-layer documentation; package runtime code must stay focused on Laravel events and MongoDB persistence.
+Use [AGENTS.md](../../AGENTS.md) as the canonical source for AI and human contributor rules. AI support is limited to contributor guidance and app-layer documentation; package runtime code must stay focused on Laravel events and MongoDB persistence.

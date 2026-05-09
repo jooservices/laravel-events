@@ -32,6 +32,11 @@ final class EventMetadata
 
     public const CORRECTION_REASON = 'correction_reason';
 
+    public static function make(): EventMetadataBuilder
+    {
+        return new EventMetadataBuilder;
+    }
+
     /**
      * @return array<string, mixed>
      */

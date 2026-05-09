@@ -1,0 +1,8 @@
+---
+description: Repository quality foundation for laravel-events
+alwaysApply: true
+---
+
+Inspect the real codebase before edits. Do not assume. Stop on conflicts.
+Use PHP 8.5, Laravel 12, MongoDB integration tests, Pint-first formatting, and
+Composer quality gates. Keep scope to event sourcing and audit event logs.
