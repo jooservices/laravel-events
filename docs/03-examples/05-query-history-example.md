@@ -5,7 +5,7 @@ Query by aggregate:
 ```php
 use JooServices\LaravelEvents\Query\StoredEventQueryService;
 
-$history = app(StoredEventQueryService::class)->byAggregate('orders', 'ORD-001');
+$history = app(StoredEventQueryService::class)->byAggregateId('ORD-001');
 ```
 
 Query audit history:

@@ -5,7 +5,7 @@ The package exposes lightweight query services for common lookup patterns:
 ```php
 use JooServices\LaravelEvents\Query\StoredEventQueryService;
 
-$events = app(StoredEventQueryService::class)->byAggregate('orders', $orderId);
+$events = app(StoredEventQueryService::class)->byAggregateId($orderId);
 $recent = app(StoredEventQueryService::class)->latest(50);
 $correlated = app(StoredEventQueryService::class)->byCorrelationId('corr-123');
 ```

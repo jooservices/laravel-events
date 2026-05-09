@@ -90,7 +90,17 @@ class EventService
         $records = [];
         foreach ($events as $event) {
             $data = $event instanceof StoredEventData ? $event : StoredEventData::fromArray($event);
-            $records[] = $this->withTimestamps($this->normalizeStoredEvent($data)->toArray());
+            $metadata = array_merge($this->getContext(), $data->metadata);
+            $enriched = new StoredEventData(
+                eventClass: $data->eventClass,
+                payload: $data->payload,
+                aggregateId: $data->aggregateId,
+                userId: $data->userId ?? auth()->id(),
+                occurredAt: $data->occurredAt,
+                metadata: $metadata,
+            );
+
+            $records[] = $this->withTimestamps($this->normalizeStoredEvent($enriched)->toArray());
         }
 
         if ($records === []) {
@@ -106,7 +116,19 @@ class EventService
         $records = [];
         foreach ($logs as $log) {
             $data = $log instanceof EventLogData ? $log : EventLogData::fromArray($log);
-            $records[] = $this->withTimestamps($this->normalizeEventLog($data)->toArray());
+            $meta = array_merge($this->getContext(), $data->meta);
+            $enriched = new EventLogData(
+                entityType: $data->entityType,
+                entityId: $data->entityId,
+                action: $data->action,
+                prev: $data->prev,
+                changed: $data->changed,
+                diff: $data->diff,
+                meta: $meta,
+                userId: $data->userId ?? $meta['user_id'] ?? auth()->id(),
+            );
+
+            $records[] = $this->withTimestamps($this->normalizeEventLog($enriched)->toArray());
         }
 
         if ($records === []) {

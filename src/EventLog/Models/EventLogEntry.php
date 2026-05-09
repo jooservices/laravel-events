@@ -24,13 +24,6 @@ class EventLogEntry extends Model
 
     protected $fillable = ['entity_type', 'entity_id', 'action', 'prev', 'changed', 'diff', 'meta', 'user_id'];
 
-    protected $casts = [
-        'prev' => 'array',
-        'changed' => 'array',
-        'diff' => 'array',
-        'meta' => 'array',
-    ];
-
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);

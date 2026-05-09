@@ -79,7 +79,7 @@ brew install gitleaks
 GitHub Actions are configured for:
 
 - Composer audit
-- lint matrix for Pint, PHPCS, PHPStan, and PHPMD
+- lint matrix for Pint, PHPCS, PHPStan, PHPMD, and PHP-CS-Fixer PHPDoc checks
 - PHPUnit coverage with a MongoDB service
 - non-blocking Dependency Review on pull requests
 - PR labels based on changed files

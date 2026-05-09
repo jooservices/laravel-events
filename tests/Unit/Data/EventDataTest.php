@@ -33,6 +33,17 @@ class EventDataTest extends TestCase
         StoredEventData::fromArray(['payload' => []]);
     }
 
+    public function test_stored_event_data_casts_camel_case_aggregate_id(): void
+    {
+        $data = StoredEventData::fromArray([
+            'eventClass' => 'OrderCreated',
+            'aggregateId' => 123,
+            'payload' => [],
+        ]);
+
+        $this->assertSame('123', $data->aggregateId);
+    }
+
     public function test_event_log_data_hydrates_and_serializes(): void
     {
         $data = EventLogData::fromArray([

@@ -145,7 +145,7 @@ Recommended action names are available from `JooServices\LaravelEvents\EventLog\
 use JooServices\LaravelEvents\Query\EventLogQueryService;
 use JooServices\LaravelEvents\Query\StoredEventQueryService;
 
-$events = app(StoredEventQueryService::class)->byAggregate('orders', 'ORD-001');
+$events = app(StoredEventQueryService::class)->byAggregateId('ORD-001');
 $audit = app(EventLogQueryService::class)->byEntity('orders', 'ORD-001');
 ```
 

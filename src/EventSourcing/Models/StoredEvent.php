@@ -24,8 +24,6 @@ class StoredEvent extends Model
     protected $fillable = ['event_class', 'aggregate_id', 'payload', 'metadata', 'user_id', 'occurred_at'];
 
     protected $casts = [
-        'payload' => 'array',
-        'metadata' => 'array',
         'occurred_at' => 'datetime',
     ];
 

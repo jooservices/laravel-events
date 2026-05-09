@@ -23,27 +23,13 @@ class EventLogQueryService
     /** @return Collection<int, EventLogData> */
     public function byCorrelationId(string $correlationId, int $limit = 50): Collection
     {
-        $this->assertLimit($limit);
-
-        return $this->latest(500)
-            ->filter(fn (EventLogData $log): bool => (
-                $log->meta['correlation_id'] ?? null
-            ) === $correlationId)
-            ->take($limit)
-            ->values();
+        return $this->latest($limit, ['meta.correlation_id' => $correlationId]);
     }
 
     /** @return Collection<int, EventLogData> */
     public function byCausationId(string $causationId, int $limit = 50): Collection
     {
-        $this->assertLimit($limit);
-
-        return $this->latest(500)
-            ->filter(fn (EventLogData $log): bool => (
-                $log->meta['causation_id'] ?? null
-            ) === $causationId)
-            ->take($limit)
-            ->values();
+        return $this->latest($limit, ['meta.causation_id' => $causationId]);
     }
 
     /** @return Collection<int, EventLogData> */

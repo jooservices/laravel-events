@@ -42,6 +42,10 @@ the file is `config/events.php`.
 | `EVENTS_EVENT_LOGS_RETENTION_DAYS` | `retention.event_logs_days` | `365` or empty |
 | `EVENTS_REDACTION_ENABLED` | `redaction.enabled` | `true` |
 
+`redaction.keys` and `redaction.replacement` are configured in
+`config/events.php` or application code, not through package-provided
+environment variables.
+
 ## Context Provider
 
 Set `context_provider` to a callable that returns an array. That array is merged into:

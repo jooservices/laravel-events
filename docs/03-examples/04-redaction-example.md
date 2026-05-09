@@ -2,6 +2,8 @@
 
 Configure recursive redaction:
 
+In `config/events.php`:
+
 ```php
 'redaction' => [
     'enabled' => true,

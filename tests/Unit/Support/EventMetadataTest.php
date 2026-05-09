@@ -70,4 +70,14 @@ class EventMetadataTest extends TestCase
             'tenant_id' => 'tenant-1',
         ], $metadata);
     }
+
+    public function test_builder_source_without_channel_clears_previous_channel(): void
+    {
+        $metadata = EventMetadata::make()
+            ->source('orders', 'api')
+            ->source('orders')
+            ->toArray();
+
+        $this->assertSame(['source' => 'orders'], $metadata);
+    }
 }

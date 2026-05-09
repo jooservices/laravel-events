@@ -1,4 +1,4 @@
 # Docs sync
 
-Keep docs in the current DTO-style tree with maintenance docs under
-`docs/05-maintenance`.
+Follow the canonical docs sync policy in
+`docs/05-maintenance/04-docs-sync-policy.md`.
