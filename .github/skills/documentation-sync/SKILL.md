@@ -17,3 +17,6 @@ Required behavior:
   - `05-maintenance`
 - update links after moving or renaming docs
 - run `composer lint:all` and `composer test` before considering docs-linked code work complete
+- mention Laravel 12 / PHP 8.5, Pint authority, and real MongoDB persistence tests when docs cover contributor workflow
+- ensure docs say public behavior changed only after source and tests prove it
+- stop and ask when docs, code, CI, or branch state disagree

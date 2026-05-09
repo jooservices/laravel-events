@@ -23,3 +23,4 @@ Validation:
 - use real MongoDB integration tests when storage behavior changes
 - report skipped MongoDB tests exactly when MongoDB is unavailable
 - run `composer validate --strict`, `composer lint:all`, `composer test`, and `composer check` before claiming completion
+- use Laravel 12 / PHP 8.5 standards, let Pint win formatter conflicts, and update docs when public behavior changes

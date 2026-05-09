@@ -224,8 +224,8 @@ Full documentation is in the **`./docs`** folder:
 composer test
 composer test:coverage
 composer lint       # Pint, PHPCS, PHPStan
-composer lint:all   # lint + PHPMD
-composer lint:fix
+composer lint:all   # lint + PHPMD + PHP-CS-Fixer
+composer lint:fix   # Pint fix + PHP-CS-Fixer fix
 composer check      # lint:all + test
 composer ci         # lint:all + test:coverage
 ```
@@ -279,7 +279,7 @@ quality and docs structure, without depending on DTO domain internals.
 
 Configured workflows:
 
-- `CI`: Composer audit, Pint, PHPCS, PHPStan, PHPMD, PHPUnit coverage with a MongoDB service, a 95% minimum statement coverage gate, and non-blocking dependency review for pull requests
+- `CI`: Composer metadata validation, Composer audit, Pint, PHPCS, PHPStan, PHPMD, PHP-CS-Fixer, PHPUnit coverage with a MongoDB service, a 95% minimum statement coverage gate, guarded Codecov upload, guarded SonarQube Cloud analysis, and non-blocking dependency review for pull requests
 - `Release`: validate version tags, create GitHub releases, and trigger Packagist updates when Packagist secrets are configured
 - `PR Labeler`: apply labels based on changed files
 - `Semantic PR Title`: enforce Conventional Commit-style PR titles
