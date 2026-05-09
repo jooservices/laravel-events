@@ -6,7 +6,10 @@ namespace JooServices\LaravelEvents\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use MongoDB\Collection;
 use MongoDB\Laravel\Connection;
+
+use function str_contains;
 
 class InstallIndexesCommand extends Command
 {
@@ -57,14 +60,7 @@ class InstallIndexesCommand extends Command
         $collection->createIndex(['user_id' => 1]);
 
         $ttlDays = config('events.retention.stored_events_days') ?? config('events.eventsourcing.ttl_days');
-        if ($ttlDays !== null && $ttlDays > 0) {
-            $collection->createIndex(
-                ['created_at' => 1],
-                ['expireAfterSeconds' => $ttlDays * 86400, 'name' => 'ttl_created_at']
-            );
-        } else {
-            $collection->createIndex(['created_at' => 1]);
-        }
+        $this->syncCreatedAtIndex($collection, is_numeric($ttlDays) ? (int) $ttlDays : null);
 
         $this->line("  [stored_events] indexes created (collection: {$collectionName})");
     }
@@ -83,16 +79,33 @@ class InstallIndexesCommand extends Command
         $collection->createIndex(['user_id' => 1]);
 
         $ttlDays = config('events.retention.event_logs_days') ?? config('events.event_log.ttl_days');
+        $this->syncCreatedAtIndex($collection, is_numeric($ttlDays) ? (int) $ttlDays : null);
+
+        $this->line("  [event_logs] indexes created (collection: {$collectionName})");
+    }
+
+    private function syncCreatedAtIndex(Collection $collection, ?int $ttlDays): void
+    {
+        foreach (['ttl_created_at', 'created_at_1'] as $name) {
+            try {
+                $collection->dropIndex($name);
+            } catch (\Throwable $exception) {
+                if (! str_contains(strtolower($exception->getMessage()), 'index not found')) {
+                    throw $exception;
+                }
+            }
+        }
+
         if ($ttlDays !== null && $ttlDays > 0) {
             $collection->createIndex(
                 ['created_at' => 1],
                 ['expireAfterSeconds' => $ttlDays * 86400, 'name' => 'ttl_created_at']
             );
-        } else {
-            $collection->createIndex(['created_at' => 1]);
+
+            return;
         }
 
-        $this->line("  [event_logs] indexes created (collection: {$collectionName})");
+        $collection->createIndex(['created_at' => 1]);
     }
 
     private function dropIndexes(Connection $connection): void

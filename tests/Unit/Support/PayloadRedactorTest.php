@@ -26,7 +26,11 @@ class PayloadRedactorTest extends TestCase
             ],
         ]);
 
-        $this->assertSame('[REDACTED]', $redacted['profile']['tokens']['access_token']);
+        $profile = $redacted['profile'] ?? null;
+        $this->assertIsArray($profile);
+        $tokens = $profile['tokens'] ?? null;
+        $this->assertIsArray($tokens);
+        $this->assertSame('[REDACTED]', $tokens['access_token'] ?? null);
     }
 
     public function test_redaction_keys_are_case_insensitive(): void

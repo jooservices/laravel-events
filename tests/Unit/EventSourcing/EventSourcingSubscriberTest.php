@@ -37,6 +37,7 @@ class EventSourcingSubscriberTest extends TestCase
 
         $event = new class implements EventSourcingInterface
         {
+            /** @return array<string, mixed> */
             public function payload(): array
             {
                 return ['key' => 'value'];
@@ -56,6 +57,7 @@ class EventSourcingSubscriberTest extends TestCase
     {
         $event = new class implements EventSourcingInterface
         {
+            /** @return array<string, mixed> */
             public function payload(): array
             {
                 return ['data' => true];
@@ -85,6 +87,7 @@ class EventSourcingSubscriberTest extends TestCase
 
         $event = new class implements EventSourcingInterface
         {
+            /** @return array<string, mixed> */
             public function payload(): array
             {
                 return ['x' => 1];

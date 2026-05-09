@@ -11,9 +11,9 @@
   behavior must stay compatible with `EventSourcingInterface::payload()`.
 - Stored event envelope fields are additive and nullable. Existing MongoDB
   documents without these fields must remain readable.
-- CI currently enforces an 80% temporary statement coverage threshold. The
-  measured local baseline on 2026-05-09 was 84.51%. The long-term DTO-standard
-  target remains 95%.
+- CI now enforces a 95% statement coverage threshold. The measured local
+  baseline on 2026-05-09 after the DTO-parity audit fixes was 95.02%, so
+  coverage headroom is currently narrow.
 
 ## Advanced scale roadmap
 

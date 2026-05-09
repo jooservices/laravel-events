@@ -28,6 +28,7 @@ class EventDataTest extends TestCase
             'causation_id' => 'cmd-1',
         ]);
 
+        $this->assertNotNull($data->envelope);
         $this->assertSame('OrderCreated', $data->eventClass);
         $this->assertSame('ORD-1', $data->aggregateId);
         $this->assertSame('evt-1', $data->envelope->eventId);
@@ -45,6 +46,17 @@ class EventDataTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         StoredEventData::fromArray(['payload' => []]);
+    }
+
+    public function test_stored_event_data_requires_array_payload_and_metadata(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        StoredEventData::fromArray([
+            'event_class' => 'OrderCreated',
+            'payload' => 'not-an-array',
+            'metadata' => [],
+        ]);
     }
 
     public function test_stored_event_data_casts_camel_case_aggregate_id(): void
@@ -73,5 +85,12 @@ class EventDataTest extends TestCase
         $this->assertSame('orders', $data->entityType);
         $this->assertSame('updated', $data->action);
         $this->assertSame(['status' => 'paid'], $data->toArray()['changed']);
+    }
+
+    public function test_event_log_data_requires_required_fields(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        EventLogData::fromArray(['entity_type' => 'orders']);
     }
 }
