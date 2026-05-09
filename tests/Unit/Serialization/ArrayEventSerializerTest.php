@@ -31,6 +31,7 @@ class ArrayEventSerializerTest extends TestCase
             ],
         );
 
+        $this->assertNotNull($data->envelope);
         $this->assertSame('evt-1', $data->envelope->eventId);
         $this->assertSame('order.created', $data->envelope->eventName);
         $this->assertSame('orders', $data->envelope->aggregateType);
@@ -45,6 +46,7 @@ class ArrayEventSerializerTest extends TestCase
         $event = new class {};
         $data = (new ArrayEventSerializer)->serializeStoredEvent($event, []);
 
+        $this->assertNotNull($data->envelope);
         $this->assertNotNull($data->envelope->eventId);
         $this->assertNotSame('', $data->envelope->eventId);
         $this->assertStringStartsWith('class@anonymous', (string) $data->envelope->eventName);

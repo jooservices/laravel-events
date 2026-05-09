@@ -33,6 +33,7 @@ class EventService
     /**
      * Store dispatched event payload (EventSourcing).
      *
+     * @param  array<string, mixed>  $payload
      * @param  int|string|null  $userId  Authorized user id (int or string/UUID); null when guest.
      * @param  CarbonInterface|null  $occurredAt  Event time (Carbon); null uses document created_at.
      * @param  array<string, mixed>  $metadata  Merged with config context_provider when storing.
@@ -61,6 +62,9 @@ class EventService
     /**
      * Store model change with prev/changed/diff (EventLog).
      *
+     * @param  array<string, mixed>  $prev
+     * @param  array<string, mixed>  $changed
+     * @param  array<string, mixed>  $diff
      * @param  int|string|null  $userId  Authorized user id (int or string/UUID); null when guest.
      * @param  array<string, mixed>  $meta  Merged with config context_provider when storing.
      */
@@ -198,6 +202,17 @@ class EventService
 
         $context = $provider();
 
-        return is_array($context) ? $context : [];
+        if (! is_array($context)) {
+            return [];
+        }
+
+        $normalized = [];
+        foreach ($context as $key => $value) {
+            if (is_string($key)) {
+                $normalized[$key] = $value;
+            }
+        }
+
+        return $normalized;
     }
 }

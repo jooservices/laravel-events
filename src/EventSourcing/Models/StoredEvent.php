@@ -13,8 +13,8 @@ use MongoDB\Laravel\Eloquent\Model;
  * @property string|null $event_name
  * @property string|null $aggregate_id
  * @property string|null $aggregate_type
- * @property array $payload
- * @property array $metadata
+ * @property array<string, mixed> $payload
+ * @property array<string, mixed> $metadata
  * @property int|string|null $schema_version
  * @property int|string|null $event_version
  * @property string|null $correlation_id
@@ -24,9 +24,9 @@ use MongoDB\Laravel\Eloquent\Model;
  */
 class StoredEvent extends Model
 {
-    protected $connection;
+    protected $connection = 'mongodb';
 
-    protected $table;
+    protected $table = 'stored_events';
 
     protected $fillable = [
         'event_class',
@@ -51,7 +51,15 @@ class StoredEvent extends Model
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
-        $this->connection = config('events.connection', 'mongodb');
-        $this->table = config('events.eventsourcing.collection', 'stored_events');
+
+        $connection = config('events.connection', 'mongodb');
+        if (is_string($connection)) {
+            $this->connection = $connection;
+        }
+
+        $table = config('events.eventsourcing.collection', 'stored_events');
+        if (is_string($table)) {
+            $this->table = $table;
+        }
     }
 }
