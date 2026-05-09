@@ -65,6 +65,7 @@ Prefer `lint:*` scripts in automation and documentation. Legacy aliases such as 
 - Hook configuration lives in `captainhook.json`.
 - `commit-msg` enforces Conventional Commits.
 - `pre-commit` runs PHP syntax linting, gitleaks staged secret scanning, Pint, PHPCS, PHPStan, and PHPMD.
+- `pre-commit` also runs PHP-CS-Fixer as a narrow PHPDoc check after Pint.
 - `pre-push` runs a gitleaks repository scan when available and then `composer test`.
 - Contributors need the `gitleaks` binary installed locally for the blocking pre-commit secret scan.
 
@@ -87,6 +88,8 @@ Prefer `lint:*` scripts in automation and documentation. Legacy aliases such as 
 - AI support in this repository means contributor guidance and app-layer documentation only.
 - Do not add agent runtime code, external AI tool execution, or built-in AI data export to the package.
 - If documenting AI use, keep it framed as application responsibility with explicit authorization, redaction, retention, and audit controls.
+- Repository skills live under `.github/skills/` and are indexed by `ai/skills/README.md` and `ai/skills/USAGE.md`.
+- Use the relevant repository skill for architecture, Laravel package wiring, Event Sourcing, Event Log audit, MongoDB storage, DTO-style records, redaction, real MongoDB testing, quality gates, documentation, CI/hooks, and release management.
 
 ## Branch Workflow
 

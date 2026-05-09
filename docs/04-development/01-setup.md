@@ -6,8 +6,8 @@ This guide describes the repository workflow for contributors to `jooservices/la
 
 ```bash
 composer lint          # Pint, PHPCS, PHPStan
-composer lint:all      # lint + PHPMD
-composer lint:fix      # Pint fix
+composer lint:all      # lint + PHPMD + PHP-CS-Fixer
+composer lint:fix      # Pint fix + PHP-CS-Fixer fix
 composer test          # PHPUnit
 composer test:coverage # PHPUnit coverage reports in build/coverage
 composer check         # lint:all + test
@@ -48,7 +48,7 @@ The hook configuration lives in [`captainhook.json`](../../captainhook.json).
 | Hook | Gate |
 |------|------|
 | `commit-msg` | Conventional Commit message format |
-| `pre-commit` | PHP syntax linting, gitleaks staged secret scan, Pint, PHPCS, PHPStan, PHPMD |
+| `pre-commit` | PHP syntax linting, gitleaks staged secret scan, Pint, PHPCS, PHPStan, PHPMD, PHP-CS-Fixer |
 | `pre-push` | gitleaks repository scan when available, then `composer test` |
 
 If hooks are missing after a local environment change, reinstall them manually:
@@ -119,10 +119,9 @@ The release workflow validates the package, creates a GitHub release, and trigge
 
 These DTO repository features were reviewed but not copied now:
 
-- Codecov upload and coverage badge: not configured yet, so README does not claim it.
-- hard coverage threshold: should wait until current coverage is measured and agreed for this MongoDB-backed package.
 - PHPBench: not relevant to the current package surface.
-- SonarCloud: optional future integration, not required for the current maturity step.
+- Codecov and SonarCloud badges: uploads/scans are configured only when repository secrets are present, so badges are not advertised as mandatory package guarantees.
+- DTO runtime schema/casting features: this package only uses DTO as a repository-quality baseline; Laravel event persistence remains the domain.
 
 ## AI Contributor Guidance
 
