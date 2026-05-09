@@ -12,3 +12,6 @@ Required behavior:
 - keep MongoDB services available for integration tests in CI
 - do not add blocking external services unless required secrets and repo settings are known
 - run `composer validate --strict`, `composer lint:all`, and `composer test` after tooling changes
+- keep Laravel 12 / PHP 8.5 assumptions explicit in workflows and docs
+- update README/docs when commands, hooks, or CI behavior change
+- stop and ask when tooling, secrets, branch state, or validation output conflicts

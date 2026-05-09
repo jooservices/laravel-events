@@ -17,3 +17,6 @@
 - Expanded AI skill entry points and maintenance roadmap notes for event store,
   outbox, replay, versioning, and observability.
 - Clarified Event Log diff behavior for changed-only values and explicit nulls.
+- Synced maintenance docs with the DTO-parity quality gates: Composer
+  validation, PHP-CS-Fixer, guarded Codecov/Sonar steps, 95% coverage
+  enforcement, MongoDB-backed tests, and expanded repository skills.

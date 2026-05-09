@@ -14,9 +14,10 @@ When working in this repository:
 - Use real MongoDB integration flow for persisted event and audit data; do not fake storage records.
 - Pint wins formatting conflicts.
 - Keep tests and docs in sync with behavior changes.
-- Use the repository command map from `composer.json`, especially `composer lint`, `composer lint:all`, `composer test`, `composer check`, and `composer ci`.
+- Use the repository command map from `composer.json`, especially `composer lint`, `composer lint:all`, `composer lint:cs`, `composer test`, `composer check`, and `composer ci`.
 - Keep `master` for production, `develop` for development, feature branches from `develop`, normal pull requests to `develop`, and hotfix branches/pull requests from `master`.
 - Stop and ask before changing files if branch state, requirements, docs, CI, runtime behavior, or package scope conflict.
 - Treat work as complete only when the relevant validation commands pass or an environment limitation is reported exactly.
 - Commit completed feature groups as `Viet Vu <jooservices@gmail.com>`.
 - Be explicit about compatibility impact, metadata handling, and operational risk.
+- Use `.github/skills/` and `ai/skills/USAGE.md` for repo-specific task routing before making architecture, storage, CI, docs, or release changes.

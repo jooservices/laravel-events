@@ -7,6 +7,7 @@ quality commands. Before final handoff, run:
 composer validate --strict
 composer lint
 composer lint:all
+composer lint:cs
 composer test
 composer test:coverage
 composer check
@@ -21,3 +22,4 @@ Current repository baseline:
 - PHPStan level 7 through `phpstan.neon.dist`
 - PHPUnit strict warning, notice, deprecation, risky-test, and output handling
 - 95% minimum statement coverage enforced by CI
+- Pint is the primary formatter; PHP-CS-Fixer is limited to non-conflicting PHPDoc cleanup.

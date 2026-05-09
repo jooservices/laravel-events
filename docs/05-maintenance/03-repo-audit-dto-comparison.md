@@ -53,9 +53,9 @@ features are not copied into this package.
   `.cursor/rules`, `.claude/commands`, `antigravity/prompts`, and
   `jetbrains/prompts`.
 - `phpdoc.dist.xml` and `sonar-project.properties` were missing.
-- Composer tooling did not include PHP-CS-Fixer. DTO has it, but this package
-  uses Pint plus PHPCS for style. PHP-CS-Fixer is limited to non-conflicting
-  PHPDoc checks.
+- Composer tooling did not include PHP-CS-Fixer. DTO has it, and this package
+  now wires PHP-CS-Fixer as a non-conflicting PHPDoc check while Pint remains
+  the primary formatter.
 - Optional model observer helper is not implemented.
 - Root README and docs did not yet cover all current and planned package
   quality gates, branch workflow, redaction, retention, query APIs, or
@@ -79,12 +79,15 @@ features are not copied into this package.
 
 - Dashboard, reporting UI, analytics, projection framework, AI runtime, and
   unrelated Laravel application features are explicitly out of scope.
-- Codecov, Sonar, Codacy, OpenSSF Scorecard, or Dependabot integration will
-  only be added when the repository has safe optional configuration or required
-  secrets. CI must not contain fake success or guaranteed-failing
-  secret-dependent steps.
+- Codecov and Sonar are now configured as guarded optional CI steps. They must
+  stay non-blocking when secrets are absent and should only receive README
+  badges after the repository integrations are confirmed.
+- Codacy, OpenSSF Scorecard, or Dependabot changes should only be added when
+  the repository has safe optional configuration. CI must not contain fake
+  success or guaranteed-failing secret-dependent steps.
 - Optional model observer helpers are deferred because they risk hidden model
   observation, app-specific assumptions, and scope creep unless designed as a
   separate small opt-in feature.
-- PHP-CS-Fixer will be deferred unless it can be configured as a non-conflicting
-  secondary style check under Pint's primary formatting authority.
+- Additional AI/editor skills should remain repository-specific and avoid
+  generic filler. They should keep Laravel 12, PHP 8.5, real MongoDB tests,
+  docs sync, and Composer quality gates explicit.
