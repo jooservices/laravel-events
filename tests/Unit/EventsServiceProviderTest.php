@@ -6,6 +6,8 @@ namespace JooServices\LaravelEvents\Tests\Unit;
 
 use JooServices\LaravelEvents\EventService;
 use JooServices\LaravelEvents\EventsServiceProvider;
+use JooServices\LaravelEvents\Serialization\ArrayEventSerializer;
+use JooServices\LaravelEvents\Serialization\EventSerializerInterface;
 use JooServices\LaravelEvents\Tests\TestCase;
 
 class EventsServiceProviderTest extends TestCase
@@ -29,5 +31,10 @@ class EventsServiceProviderTest extends TestCase
     {
         $provider = $this->app->getProvider(EventsServiceProvider::class);
         $this->assertInstanceOf(EventsServiceProvider::class, $provider);
+    }
+
+    public function test_provider_binds_default_event_serializer(): void
+    {
+        $this->assertInstanceOf(ArrayEventSerializer::class, $this->app->make(EventSerializerInterface::class));
     }
 }

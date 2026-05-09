@@ -48,10 +48,14 @@ jobs:
       - name: Install Composer dependencies
         uses: ramsey/composer-install@v4
 
-      - name: Run security and linting
-        run: |
-          composer audit
-          composer lint:all
+      - name: Validate Composer metadata
+        run: composer validate --strict
+
+      - name: Run security audit
+        run: composer audit
+
+      - name: Run lint checks
+        run: composer lint:all
 
       - name: Run tests
         run: composer test

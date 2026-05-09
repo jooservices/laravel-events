@@ -10,18 +10,24 @@ use JooServices\LaravelEvents\Data\EventLogData;
 use JooServices\LaravelEvents\Data\StoredEventData;
 use JooServices\LaravelEvents\EventLog\Models\EventLogEntry;
 use JooServices\LaravelEvents\EventSourcing\Models\StoredEvent;
+use JooServices\LaravelEvents\Serialization\ArrayEventSerializer;
+use JooServices\LaravelEvents\Serialization\EventSerializerInterface;
 use JooServices\LaravelEvents\Support\PayloadRedactor;
 
 class EventService
 {
     protected PayloadRedactor $redactor;
 
+    protected EventSerializerInterface $serializer;
+
     public function __construct(
         protected StoredEvent $storedEventModel,
         protected EventLogEntry $eventLogEntryModel,
         ?PayloadRedactor $redactor = null,
+        ?EventSerializerInterface $serializer = null,
     ) {
         $this->redactor = $redactor ?? new PayloadRedactor;
+        $this->serializer = $serializer ?? new ArrayEventSerializer;
     }
 
     /**
@@ -39,8 +45,8 @@ class EventService
         ?CarbonInterface $occurredAt = null,
         array $metadata = [],
     ): StoredEvent {
-        $data = new StoredEventData(
-            eventClass: $event::class,
+        $data = $this->serializer->serializeStoredEvent(
+            event: $event,
             payload: $payload,
             aggregateId: $aggregateId,
             userId: $userId ?? auth()->id(),
@@ -98,6 +104,7 @@ class EventService
                 userId: $data->userId ?? auth()->id(),
                 occurredAt: $data->occurredAt,
                 metadata: $metadata,
+                envelope: $data->envelope,
             );
 
             $records[] = $this->withTimestamps($this->normalizeStoredEvent($enriched)->toArray());
@@ -147,6 +154,7 @@ class EventService
             userId: $data->userId,
             occurredAt: $data->occurredAt,
             metadata: $this->redactor->redact($data->metadata),
+            envelope: $data->envelope,
         );
     }
 

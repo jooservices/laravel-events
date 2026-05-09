@@ -73,6 +73,10 @@ public function recordManyStoredEvents(iterable $events): void
 Accepts `StoredEventData` instances or arrays using persisted field names.
 Records are normalized, redacted, timestamped, and batch inserted.
 
+`StoredEventData` includes the original storage fields plus nullable envelope
+fields: `event_id`, `event_name`, `aggregate_type`, `schema_version`,
+`event_version`, `correlation_id`, and `causation_id`.
+
 ### recordManyEventLogs
 
 ```php
@@ -104,6 +108,25 @@ are normalized, redacted, timestamped, and batch inserted.
 - `latest(int $limit = 50)`
 
 Limits must be between 1 and 500.
+
+## Serialization
+
+### EventSerializerInterface
+
+```php
+public function serializeStoredEvent(
+    object $event,
+    array $payload,
+    ?string $aggregateId = null,
+    int|string|null $userId = null,
+    ?\Carbon\CarbonInterface $occurredAt = null,
+    array $metadata = [],
+): StoredEventData
+```
+
+The default implementation is `ArrayEventSerializer`. It preserves current array
+payload behavior and derives nullable envelope fields from metadata. Consumers
+can override the binding through Laravel's container.
 
 ---
 
@@ -175,7 +198,11 @@ php artisan events:install-indexes --drop [--force]
 
 ### StoredEvent
 
-MongoDB Eloquent model. Connection and collection from config. Fillable: `event_class`, `aggregate_id`, `payload`, `metadata`, `user_id`, `occurred_at`. Native MongoDB arrays are used for `payload` and `metadata`; `occurred_at` is cast to datetime (Carbon).
+MongoDB Eloquent model. Connection and collection from config. Fillable:
+`event_class`, `event_id`, `event_name`, `aggregate_id`, `aggregate_type`,
+`payload`, `metadata`, `schema_version`, `event_version`, `correlation_id`,
+`causation_id`, `user_id`, `occurred_at`. Native MongoDB arrays are used for
+`payload` and `metadata`; `occurred_at` is cast to datetime (Carbon).
 
 ### EventLogEntry
 

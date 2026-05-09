@@ -98,11 +98,18 @@ For corrections or reversions, use the `corrected` action and metadata keys such
 - `entity_type`, `entity_id`: from getLoggableType/getLoggableId
 - `action`: from HasLogAction or `"updated"`
 - `prev`: previous attributes
-- `changed`: current/changed attributes
+- `changed`: current/changed attributes supplied by the event
 - `diff`: per-field `['old' => x, 'new' => y]` computed by DiffHelper
 - `meta`: merge of context_provider and any passed meta (e.g. user_id)
 - `user_id`: from auth or meta
 - `created_at`: set by MongoDB/Eloquent
+
+`EventLogSubscriber` treats `getChanged()` as the values being applied to the
+previous state. Internally it merges `prev + changed` before diffing, so explicit
+null values are recorded as changes. Removed fields are only visible when the
+application represents the removal explicitly, for example by setting the field
+to `null` or by storing a direct `EventService::logChange()` record with a custom
+diff.
 
 ## Querying History for an Entity
 

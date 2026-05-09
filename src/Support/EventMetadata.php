@@ -6,6 +6,12 @@ namespace JooServices\LaravelEvents\Support;
 
 final class EventMetadata
 {
+    public const EVENT_ID = 'event_id';
+
+    public const EVENT_NAME = 'event_name';
+
+    public const AGGREGATE_TYPE = 'aggregate_type';
+
     public const REQUEST_ID = 'request_id';
 
     public const CORRELATION_ID = 'correlation_id';

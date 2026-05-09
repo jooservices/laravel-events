@@ -11,12 +11,15 @@ use JooServices\LaravelEvents\EventLog\EventLogSubscriber;
 use JooServices\LaravelEvents\EventSourcing\EventSourcingSubscriber;
 use JooServices\LaravelEvents\Query\EventLogQueryService;
 use JooServices\LaravelEvents\Query\StoredEventQueryService;
+use JooServices\LaravelEvents\Serialization\ArrayEventSerializer;
+use JooServices\LaravelEvents\Serialization\EventSerializerInterface;
 
 class EventsServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../config/events.php', 'events');
+        $this->app->bind(EventSerializerInterface::class, ArrayEventSerializer::class);
         $this->app->singleton(EventService::class);
         $this->app->singleton(StoredEventQueryService::class);
         $this->app->singleton(EventLogQueryService::class);

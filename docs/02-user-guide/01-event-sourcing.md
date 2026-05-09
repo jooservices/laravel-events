@@ -103,12 +103,36 @@ event(new OrderCreated('ORD-001', [['sku' => 'X', 'qty' => 2]]));
 ## Stored Document Shape (MongoDB)
 
 - `event_class`: FQCN of the event
+- `event_id`: generated UUID unless metadata provides `event_id`
+- `event_name`: short event class name unless metadata provides `event_name`
 - `aggregate_id`: from `aggregateId()`
+- `aggregate_type`: optional metadata-derived aggregate type
 - `payload`: from `payload()`
 - `metadata`: merge of context_provider and event `metadata()`
+- `schema_version`, `event_version`: optional top-level copies from metadata for easier filtering
+- `correlation_id`, `causation_id`: optional top-level copies from metadata for trace queries
 - `user_id`: from `auth()->id()` or passed to EventService
 - `occurred_at`: from `occurredAt()` or null
 - `created_at`: set by MongoDB/Eloquent
+
+The original storage fields remain backward compatible. New envelope fields are
+nullable/additive and are derived by the default serializer.
+
+## Serializer
+
+`EventSerializerInterface` converts a dispatched Laravel event plus payload,
+aggregate id, user id, occurred-at time, and merged metadata into
+`StoredEventData`. The default `ArrayEventSerializer` preserves the current
+array-payload behavior while adding optional envelope fields.
+
+Applications may bind their own serializer in the Laravel container when they
+need DTO payload mapping or a stricter event naming convention:
+
+```php
+use JooServices\LaravelEvents\Serialization\EventSerializerInterface;
+
+$this->app->bind(EventSerializerInterface::class, App\Events\AppEventSerializer::class);
+```
 
 ## Versioning Guidance
 

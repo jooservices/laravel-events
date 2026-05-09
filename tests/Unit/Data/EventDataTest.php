@@ -19,10 +19,24 @@ class EventDataTest extends TestCase
             'payload' => ['total' => 10],
             'metadata' => ['correlation_id' => 'corr-1'],
             'user_id' => 'user-1',
+            'event_id' => 'evt-1',
+            'event_name' => 'order.created',
+            'aggregate_type' => 'orders',
+            'schema_version' => 1,
+            'event_version' => 'v1',
+            'correlation_id' => 'corr-1',
+            'causation_id' => 'cmd-1',
         ]);
 
         $this->assertSame('OrderCreated', $data->eventClass);
         $this->assertSame('ORD-1', $data->aggregateId);
+        $this->assertSame('evt-1', $data->envelope->eventId);
+        $this->assertSame('order.created', $data->envelope->eventName);
+        $this->assertSame('orders', $data->envelope->aggregateType);
+        $this->assertSame(1, $data->envelope->schemaVersion);
+        $this->assertSame('v1', $data->envelope->eventVersion);
+        $this->assertSame('corr-1', $data->envelope->correlationId);
+        $this->assertSame('cmd-1', $data->envelope->causationId);
         $this->assertSame(['total' => 10], $data->toArray()['payload']);
     }
 

@@ -22,7 +22,21 @@ class StoredEventTest extends TestCase
     {
         $model = new StoredEvent;
         $this->assertSame(
-            ['event_class', 'aggregate_id', 'payload', 'metadata', 'user_id', 'occurred_at'],
+            [
+                'event_class',
+                'event_id',
+                'event_name',
+                'aggregate_id',
+                'aggregate_type',
+                'payload',
+                'metadata',
+                'schema_version',
+                'event_version',
+                'correlation_id',
+                'causation_id',
+                'user_id',
+                'occurred_at',
+            ],
             $model->getFillable()
         );
     }

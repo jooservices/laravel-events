@@ -242,7 +242,7 @@ composer update
 The hooks are managed by CaptainHook and enforce:
 
 - `commit-msg`: Conventional Commits, for example `fix: Correct event metadata merge`
-- `pre-commit`: PHP syntax linting, staged secret scanning with gitleaks, Pint, PHPCS, PHPStan, and PHPMD
+- `pre-commit`: PHP syntax linting, staged secret scanning with gitleaks, Pint, PHPCS, PHPStan, PHPMD, and PHP-CS-Fixer
 - `pre-push`: gitleaks history scan when available, then `composer test`
 
 If hooks need to be reinstalled manually:
@@ -283,7 +283,7 @@ Configured workflows:
 - `Semantic PR Title`: enforce Conventional Commit-style PR titles
 - `OpenSSF Scorecard`: publish security posture results as SARIF
 
-Coverage is archived as a workflow artifact. A Codecov badge is intentionally not shown because Codecov upload is not configured for this repository.
+Coverage is archived as a workflow artifact. Codecov and SonarQube Cloud are optional and only run when repository secrets are configured, so README badges do not claim those services as mandatory package support.
 
 ---
 
