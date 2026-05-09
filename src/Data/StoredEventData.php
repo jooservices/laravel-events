@@ -21,6 +21,7 @@ final readonly class StoredEventData
         public int|string|null $userId = null,
         public ?DateTimeInterface $occurredAt = null,
         public array $metadata = [],
+        public ?EventEnvelopeData $envelope = null,
     ) {
         if ($this->eventClass === '') {
             throw new InvalidArgumentException('Stored event class cannot be empty.');
@@ -56,6 +57,7 @@ final readonly class StoredEventData
             userId: $values['user_id'] ?? $values['userId'] ?? null,
             occurredAt: $occurredAt,
             metadata: $metadata,
+            envelope: EventEnvelopeData::fromArray($values),
         );
     }
 
@@ -66,7 +68,14 @@ final readonly class StoredEventData
      *     payload: array<string, mixed>,
      *     metadata: array<string, mixed>,
      *     user_id: int|string|null,
-     *     occurred_at: DateTimeInterface|null
+     *     occurred_at: DateTimeInterface|null,
+     *     event_id: string|null,
+     *     event_name: string|null,
+     *     aggregate_type: string|null,
+     *     schema_version: int|string|null,
+     *     event_version: int|string|null,
+     *     correlation_id: string|null,
+     *     causation_id: string|null
      * }
      */
     public function toArray(): array
@@ -78,6 +87,13 @@ final readonly class StoredEventData
             'metadata' => $this->metadata,
             'user_id' => $this->userId,
             'occurred_at' => $this->occurredAt instanceof CarbonInterface ? $this->occurredAt : $this->occurredAt,
+            'event_id' => $this->envelope?->eventId,
+            'event_name' => $this->envelope?->eventName,
+            'aggregate_type' => $this->envelope?->aggregateType,
+            'schema_version' => $this->envelope?->schemaVersion,
+            'event_version' => $this->envelope?->eventVersion,
+            'correlation_id' => $this->envelope?->correlationId,
+            'causation_id' => $this->envelope?->causationId,
         ];
     }
 }

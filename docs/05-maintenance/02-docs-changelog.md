@@ -8,3 +8,11 @@
 - Moved legacy flat docs into the new reading order.
 - Added maintenance docs under `docs/05-maintenance`.
 - Kept AI guidance out of a removed `05-ai-contributor-guide` directory.
+
+## 2026-05-09
+
+- Documented additive stored event envelope fields and serializer extension
+  points.
+- Expanded AI skill entry points and maintenance roadmap notes for event store,
+  outbox, replay, versioning, and observability.
+- Clarified Event Log diff behavior for changed-only values and explicit nulls.

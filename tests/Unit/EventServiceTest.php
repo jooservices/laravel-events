@@ -44,6 +44,8 @@ class EventServiceTest extends TestCase
                 return $arg['event_class'] === $event::class
                     && $arg['payload'] === $payload
                     && $arg['aggregate_id'] === $aggregateId
+                    && is_string($arg['event_id'])
+                    && is_string($arg['event_name'])
                     && isset($arg['metadata'])
                     && array_key_exists('user_id', $arg);
             }))

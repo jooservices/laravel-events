@@ -19,3 +19,8 @@ $caused = app(EventLogQueryService::class)->byCausationId('cmd-123');
 
 Query services return typed data records. Keep dashboards, reporting, and
 application-specific analytics in the application layer.
+
+`StoredEventQueryService::byAggregate()` keeps an `aggregateType` argument for
+developer readability, but current storage still filters by `aggregate_id` only
+for backward compatibility. Add application-specific indexes before relying on
+large metadata or aggregate-type query workloads.

@@ -82,4 +82,14 @@ class DiffHelperTest extends TestCase
 
         $this->assertSame([], $result);
     }
+
+    public function test_diff_treats_null_in_current_as_explicit_changed_value(): void
+    {
+        $prev = ['name' => 'Old'];
+        $current = ['name' => null];
+
+        $result = $this->helper->diff($prev, $current);
+
+        $this->assertSame(['name' => ['old' => 'Old', 'new' => null]], $result);
+    }
 }
