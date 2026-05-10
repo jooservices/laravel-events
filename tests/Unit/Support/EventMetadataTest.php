@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Tests\Unit\Support;
+namespace JOOservices\LaravelEvents\Tests\Unit\Support;
 
-use JooServices\LaravelEvents\Support\EventMetadata;
+use JOOservices\LaravelEvents\Support\EventMetadata;
 use PHPUnit\Framework\TestCase;
 
 class EventMetadataTest extends TestCase

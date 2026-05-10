@@ -9,7 +9,7 @@ For choosing between Event Sourcing and Event Log, see the [Decision Guide](10-b
 ## Interface
 
 ```php
-namespace JooServices\LaravelEvents\EventSourcing\Contracts;
+namespace JOOservices\LaravelEvents\EventSourcing\Contracts;
 
 interface EventSourcingInterface
 {
@@ -28,8 +28,8 @@ Optional methods on your event (detected via `method_exists`):
 Use `HasEventSourcingDefaults` so you only implement `payload()` and `aggregateId()`. Override `occurredAt()` or `metadata()` when needed.
 
 ```php
-use JooServices\LaravelEvents\EventSourcing\Concerns\HasEventSourcingDefaults;
-use JooServices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
+use JOOservices\LaravelEvents\EventSourcing\Concerns\HasEventSourcingDefaults;
+use JOOservices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
 
 class OrderCreated implements EventSourcingInterface
 {
@@ -53,8 +53,8 @@ class OrderCreated implements EventSourcingInterface
 
 ```php
 use Carbon\CarbonInterface;
-use JooServices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
-use JooServices\LaravelEvents\Support\EventMetadata;
+use JOOservices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
+use JOOservices\LaravelEvents\Support\EventMetadata;
 
 class OrderCreated implements EventSourcingInterface
 {
@@ -129,7 +129,7 @@ Applications may bind their own serializer in the Laravel container when they
 need DTO payload mapping or a stricter event naming convention:
 
 ```php
-use JooServices\LaravelEvents\Serialization\EventSerializerInterface;
+use JOOservices\LaravelEvents\Serialization\EventSerializerInterface;
 
 $this->app->bind(EventSerializerInterface::class, App\Events\AppEventSerializer::class);
 ```
@@ -145,7 +145,7 @@ This package does not include an upcaster framework. Replay and schema transform
 Use the same MongoDB connection and collection (e.g. `StoredEvent` model or raw collection). Example:
 
 ```php
-use JooServices\LaravelEvents\EventSourcing\Models\StoredEvent;
+use JOOservices\LaravelEvents\EventSourcing\Models\StoredEvent;
 
 $events = StoredEvent::on(config('events.connection'))
     ->where('aggregate_id', 'ORD-001')

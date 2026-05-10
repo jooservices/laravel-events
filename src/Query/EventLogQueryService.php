@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Query;
+namespace JOOservices\LaravelEvents\Query;
 
 use DateTimeInterface;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
-use JooServices\LaravelEvents\Data\EventLogData;
-use JooServices\LaravelEvents\EventLog\Models\EventLogEntry;
+use JOOservices\LaravelEvents\Data\EventLogData;
+use JOOservices\LaravelEvents\EventLog\Models\EventLogEntry;
 
 class EventLogQueryService
 {

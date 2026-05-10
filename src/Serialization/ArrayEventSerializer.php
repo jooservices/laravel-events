@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Serialization;
+namespace JOOservices\LaravelEvents\Serialization;
 
 use Carbon\CarbonInterface;
 use Illuminate\Support\Str;
-use JooServices\LaravelEvents\Data\EventEnvelopeData;
-use JooServices\LaravelEvents\Data\StoredEventData;
-use JooServices\LaravelEvents\Support\EventMetadata;
+use JOOservices\LaravelEvents\Data\EventEnvelopeData;
+use JOOservices\LaravelEvents\Data\StoredEventData;
+use JOOservices\LaravelEvents\Support\EventMetadata;
 
 class ArrayEventSerializer implements EventSerializerInterface
 {

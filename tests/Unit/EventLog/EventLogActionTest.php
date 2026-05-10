@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Tests\Unit\EventLog;
+namespace JOOservices\LaravelEvents\Tests\Unit\EventLog;
 
-use JooServices\LaravelEvents\EventLog\Concerns\DefaultsToUpdatedAction;
-use JooServices\LaravelEvents\EventLog\EventLogAction;
+use JOOservices\LaravelEvents\EventLog\Concerns\DefaultsToUpdatedAction;
+use JOOservices\LaravelEvents\EventLog\EventLogAction;
 use PHPUnit\Framework\TestCase;
 
 class EventLogActionTest extends TestCase

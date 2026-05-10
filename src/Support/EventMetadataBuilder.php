@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Support;
+namespace JOOservices\LaravelEvents\Support;
 
 final class EventMetadataBuilder
 {

@@ -21,10 +21,10 @@ Use consistent keys so records are easier to trace, audit, and evolve.
 | `event_version` | Version of the event meaning or contract |
 | `tenant_id` | Optional tenant identifier when the app is multi-tenant |
 
-The `JooServices\LaravelEvents\Support\EventMetadata` helper exposes constants and small factory methods for these conventions:
+The `JOOservices\LaravelEvents\Support\EventMetadata` helper exposes constants and small factory methods for these conventions:
 
 ```php
-use JooServices\LaravelEvents\Support\EventMetadata;
+use JOOservices\LaravelEvents\Support\EventMetadata;
 
 public function metadata(): array
 {
@@ -85,7 +85,7 @@ Use metadata to link corrective records to the event or log entry they correct. 
 Example:
 
 ```php
-use JooServices\LaravelEvents\Support\EventMetadata;
+use JOOservices\LaravelEvents\Support\EventMetadata;
 
 public function metadata(): array
 {

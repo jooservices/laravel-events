@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Tests\Unit\Data;
+namespace JOOservices\LaravelEvents\Tests\Unit\Data;
 
 use InvalidArgumentException;
-use JooServices\LaravelEvents\Data\EventLogData;
-use JooServices\LaravelEvents\Data\StoredEventData;
-use JooServices\LaravelEvents\Tests\TestCase;
+use JOOservices\LaravelEvents\Data\EventLogData;
+use JOOservices\LaravelEvents\Data\StoredEventData;
+use JOOservices\LaravelEvents\Tests\TestCase;
 
 class EventDataTest extends TestCase
 {

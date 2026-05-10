@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\EventSourcing\Models;
+namespace JOOservices\LaravelEvents\EventSourcing\Models;
 
 use Carbon\Carbon;
 use MongoDB\Laravel\Eloquent\Model;

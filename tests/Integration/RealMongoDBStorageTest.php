@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Tests\Integration;
+namespace JOOservices\LaravelEvents\Tests\Integration;
 
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Event;
-use JooServices\LaravelEvents\EventLog\Contracts\LoggableModelInterface;
-use JooServices\LaravelEvents\EventLog\Models\EventLogEntry;
-use JooServices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
-use JooServices\LaravelEvents\EventSourcing\Models\StoredEvent;
+use JOOservices\LaravelEvents\EventLog\Contracts\LoggableModelInterface;
+use JOOservices\LaravelEvents\EventLog\Models\EventLogEntry;
+use JOOservices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
+use JOOservices\LaravelEvents\EventSourcing\Models\StoredEvent;
 use MongoDB\Laravel\Connection;
 
 class RealMongoDBStorageTest extends MongoDBIntegrationTestCase

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Tests\Unit\EventLog\Models;
+namespace JOOservices\LaravelEvents\Tests\Unit\EventLog\Models;
 
-use JooServices\LaravelEvents\EventLog\Models\EventLogEntry;
-use JooServices\LaravelEvents\Tests\TestCase;
+use JOOservices\LaravelEvents\EventLog\Models\EventLogEntry;
+use JOOservices\LaravelEvents\Tests\TestCase;
 
 class EventLogEntryTest extends TestCase
 {

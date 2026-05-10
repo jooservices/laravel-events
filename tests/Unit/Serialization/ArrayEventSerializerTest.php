@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Tests\Unit\Serialization;
+namespace JOOservices\LaravelEvents\Tests\Unit\Serialization;
 
-use JooServices\LaravelEvents\Serialization\ArrayEventSerializer;
-use JooServices\LaravelEvents\Support\EventMetadata;
+use JOOservices\LaravelEvents\Serialization\ArrayEventSerializer;
+use JOOservices\LaravelEvents\Support\EventMetadata;
 use PHPUnit\Framework\TestCase;
 
 class ArrayEventSerializerTest extends TestCase

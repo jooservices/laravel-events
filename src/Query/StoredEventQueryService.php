@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Query;
+namespace JOOservices\LaravelEvents\Query;
 
 use DateTimeInterface;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
-use JooServices\LaravelEvents\Data\StoredEventData;
-use JooServices\LaravelEvents\EventSourcing\Models\StoredEvent;
+use JOOservices\LaravelEvents\Data\StoredEventData;
+use JOOservices\LaravelEvents\EventSourcing\Models\StoredEvent;
 
 class StoredEventQueryService
 {

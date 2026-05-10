@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\EventLog\Concerns;
+namespace JOOservices\LaravelEvents\EventLog\Concerns;
 
-use JooServices\LaravelEvents\EventLog\EventLogAction;
+use JOOservices\LaravelEvents\EventLog\EventLogAction;
 
 /**
  * Trait providing default getAction() for HasLogAction (returns "updated").

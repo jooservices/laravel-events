@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\EventLog\Models;
+namespace JOOservices\LaravelEvents\EventLog\Models;
 
 use MongoDB\Laravel\Eloquent\Model;
 

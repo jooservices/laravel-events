@@ -87,7 +87,7 @@ php artisan events:install-indexes
 Implement `EventSourcingInterface` and dispatch:
 
 ```php
-use JooServices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
+use JOOservices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
 
 class OrderCreated implements EventSourcingInterface
 {
@@ -116,9 +116,9 @@ Recommended metadata keys include `request_id`, `correlation_id`, `causation_id`
 Implement `LoggableModelInterface` (and optionally `HasLogAction`) and dispatch with prev/changed state. Use the `DefaultsToUpdatedAction` trait when the action is always `updated`:
 
 ```php
-use JooServices\LaravelEvents\EventLog\Concerns\DefaultsToUpdatedAction;
-use JooServices\LaravelEvents\EventLog\Contracts\LoggableModelInterface;
-use JooServices\LaravelEvents\EventLog\Contracts\HasLogAction;
+use JOOservices\LaravelEvents\EventLog\Concerns\DefaultsToUpdatedAction;
+use JOOservices\LaravelEvents\EventLog\Contracts\LoggableModelInterface;
+use JOOservices\LaravelEvents\EventLog\Contracts\HasLogAction;
 
 class OrderUpdated implements LoggableModelInterface, HasLogAction
 {
@@ -135,15 +135,15 @@ class OrderUpdated implements LoggableModelInterface, HasLogAction
 
 Changes are stored in `event_logs` with a computed diff. Query by `entity_type` + `entity_id`.
 
-Recommended action names are available from `JooServices\LaravelEvents\EventLog\EventLogAction`: `created`, `updated`, `deleted`, `restored`, `status_changed`, `corrected`, `synchronized`, and `imported`.
+Recommended action names are available from `JOOservices\LaravelEvents\EventLog\EventLogAction`: `created`, `updated`, `deleted`, `restored`, `status_changed`, `corrected`, `synchronized`, and `imported`.
 
 ---
 
 ## Querying
 
 ```php
-use JooServices\LaravelEvents\Query\EventLogQueryService;
-use JooServices\LaravelEvents\Query\StoredEventQueryService;
+use JOOservices\LaravelEvents\Query\EventLogQueryService;
+use JOOservices\LaravelEvents\Query\StoredEventQueryService;
 
 $events = app(StoredEventQueryService::class)->byAggregateId('ORD-001');
 $audit = app(EventLogQueryService::class)->byEntity('orders', 'ORD-001');
@@ -183,8 +183,8 @@ MongoDB TTL deletion is asynchronous.
 ## Bulk Records
 
 ```php
-use JooServices\LaravelEvents\Data\StoredEventData;
-use JooServices\LaravelEvents\EventService;
+use JOOservices\LaravelEvents\Data\StoredEventData;
+use JOOservices\LaravelEvents\EventService;
 
 app(EventService::class)->recordManyStoredEvents([
     new StoredEventData('OrderImported', ['order_id' => 'ORD-001'], 'ORD-001'),

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\EventSourcing;
+namespace JOOservices\LaravelEvents\EventSourcing;
 
 use Illuminate\Contracts\Events\Dispatcher;
-use JooServices\LaravelEvents\EventService;
-use JooServices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
+use JOOservices\LaravelEvents\EventService;
+use JOOservices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
 
 class EventSourcingSubscriber
 {

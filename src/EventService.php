@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents;
+namespace JOOservices\LaravelEvents;
 
 use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
-use JooServices\LaravelEvents\Data\EventLogData;
-use JooServices\LaravelEvents\Data\StoredEventData;
-use JooServices\LaravelEvents\EventLog\Models\EventLogEntry;
-use JooServices\LaravelEvents\EventSourcing\Models\StoredEvent;
-use JooServices\LaravelEvents\Serialization\ArrayEventSerializer;
-use JooServices\LaravelEvents\Serialization\EventSerializerInterface;
-use JooServices\LaravelEvents\Support\PayloadRedactor;
+use JOOservices\LaravelEvents\Data\EventLogData;
+use JOOservices\LaravelEvents\Data\StoredEventData;
+use JOOservices\LaravelEvents\EventLog\Models\EventLogEntry;
+use JOOservices\LaravelEvents\EventSourcing\Models\StoredEvent;
+use JOOservices\LaravelEvents\Serialization\ArrayEventSerializer;
+use JOOservices\LaravelEvents\Serialization\EventSerializerInterface;
+use JOOservices\LaravelEvents\Support\PayloadRedactor;
 
 class EventService
 {
