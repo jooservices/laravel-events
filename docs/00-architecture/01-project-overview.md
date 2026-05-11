@@ -15,7 +15,7 @@ flowchart TB
         A -->|dispatch| B[Event Dispatcher]
     end
 
-    subgraph Package["JooServices\\LaravelEvents"]
+    subgraph Package["JOOservices\\LaravelEvents"]
         B -->|EventSourcingInterface| C[EventSourcingSubscriber]
         B -->|LoggableModelInterface| D[EventLogSubscriber]
         C --> E[EventService]

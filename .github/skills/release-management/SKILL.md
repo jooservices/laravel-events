@@ -4,7 +4,7 @@ Use this skill for release preparation, branch sync, version tags, changelog upd
 
 ## What
 
-`master` is production/release state and `develop` is development state. Normal features start from `develop` and target `develop`; hotfixes start from `master`, target `master`, and are synced back to `develop`.
+`master` is production/release state and `develop` is development state. Normal features start from `develop` and target `develop`; approved releases are prepared from a short-lived `release/<version>` branch cut from `develop`, merged into `master`, tagged from `master`, and then synced back into `develop`. Hotfixes start from `master`, target `master`, and are synced back to `develop`.
 
 ## Why
 

@@ -43,17 +43,17 @@ laravel-events/
 
 | Namespace | Responsibility |
 |-----------|----------------|
-| `JooServices\LaravelEvents` | Service provider, EventService |
-| `JooServices\LaravelEvents\Console` | Artisan commands (indexes) |
-| `JooServices\LaravelEvents\EventSourcing` | EventSourcing subscriber and contract |
-| `JooServices\LaravelEvents\EventSourcing\Concerns` | HasEventSourcingDefaults trait (optional occurredAt/metadata) |
-| `JooServices\LaravelEvents\EventSourcing\Contracts` | EventSourcingInterface |
-| `JooServices\LaravelEvents\EventSourcing\Models` | StoredEvent MongoDB model |
-| `JooServices\LaravelEvents\EventLog` | EventLog subscriber and action taxonomy |
-| `JooServices\LaravelEvents\EventLog\Concerns` | DefaultsToUpdatedAction trait (default getAction) |
-| `JooServices\LaravelEvents\EventLog\Contracts` | LoggableModelInterface, HasLogAction |
-| `JooServices\LaravelEvents\EventLog\Models` | EventLogEntry MongoDB model |
-| `JooServices\LaravelEvents\Support` | DiffHelper and metadata convention helpers |
+| `JOOservices\LaravelEvents` | Service provider, EventService |
+| `JOOservices\LaravelEvents\Console` | Artisan commands (indexes) |
+| `JOOservices\LaravelEvents\EventSourcing` | EventSourcing subscriber and contract |
+| `JOOservices\LaravelEvents\EventSourcing\Concerns` | HasEventSourcingDefaults trait (optional occurredAt/metadata) |
+| `JOOservices\LaravelEvents\EventSourcing\Contracts` | EventSourcingInterface |
+| `JOOservices\LaravelEvents\EventSourcing\Models` | StoredEvent MongoDB model |
+| `JOOservices\LaravelEvents\EventLog` | EventLog subscriber and action taxonomy |
+| `JOOservices\LaravelEvents\EventLog\Concerns` | DefaultsToUpdatedAction trait (default getAction) |
+| `JOOservices\LaravelEvents\EventLog\Contracts` | LoggableModelInterface, HasLogAction |
+| `JOOservices\LaravelEvents\EventLog\Models` | EventLogEntry MongoDB model |
+| `JOOservices\LaravelEvents\Support` | DiffHelper and metadata convention helpers |
 
 ## Key Types
 

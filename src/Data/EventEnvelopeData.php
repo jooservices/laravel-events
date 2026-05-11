@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Data;
+namespace JOOservices\LaravelEvents\Data;
 
 final readonly class EventEnvelopeData
 {
     public function __construct(
         public ?string $eventId = null,
         public ?string $eventName = null,
+        public ?string $eventCategory = null,
         public ?string $aggregateType = null,
         public int|string|null $schemaVersion = null,
         public int|string|null $eventVersion = null,
@@ -22,6 +23,7 @@ final readonly class EventEnvelopeData
         return new self(
             eventId: self::nullableString($values, 'event_id', 'eventId'),
             eventName: self::nullableString($values, 'event_name', 'eventName'),
+            eventCategory: self::nullableString($values, 'event_category', 'eventCategory'),
             aggregateType: self::nullableString($values, 'aggregate_type', 'aggregateType'),
             schemaVersion: self::nullableStringOrInt($values, 'schema_version', 'schemaVersion'),
             eventVersion: self::nullableStringOrInt($values, 'event_version', 'eventVersion'),

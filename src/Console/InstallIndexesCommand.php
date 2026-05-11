@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Console;
+namespace JOOservices\LaravelEvents\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -54,6 +54,7 @@ class InstallIndexesCommand extends Command
         $collection->createIndex(['aggregate_id' => 1]);
         $collection->createIndex(['aggregate_id' => 1, 'created_at' => 1]);
         $collection->createIndex(['event_class' => 1]);
+        $collection->createIndex(['event_category' => 1]);
         $collection->createIndex(['event_class' => 1, 'created_at' => 1]);
         $collection->createIndex(['metadata.correlation_id' => 1]);
         $collection->createIndex(['metadata.causation_id' => 1]);

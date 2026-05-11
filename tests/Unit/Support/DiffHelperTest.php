@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Tests\Unit\Support;
+namespace JOOservices\LaravelEvents\Tests\Unit\Support;
 
-use JooServices\LaravelEvents\Support\DiffHelper;
+use JOOservices\LaravelEvents\Support\DiffHelper;
 use PHPUnit\Framework\TestCase;
 
 class DiffHelperTest extends TestCase

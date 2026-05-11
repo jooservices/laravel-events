@@ -7,8 +7,8 @@ Implement only `payload()` and `aggregateId()` by using `HasEventSourcingDefault
 ```php
 namespace App\Events;
 
-use JooServices\LaravelEvents\EventSourcing\Concerns\HasEventSourcingDefaults;
-use JooServices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
+use JOOservices\LaravelEvents\EventSourcing\Concerns\HasEventSourcingDefaults;
+use JOOservices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
 
 class OrderCreated implements EventSourcingInterface
 {
@@ -34,8 +34,8 @@ class OrderCreated implements EventSourcingInterface
 namespace App\Events;
 
 use Carbon\CarbonInterface;
-use JooServices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
-use JooServices\LaravelEvents\Support\EventMetadata;
+use JOOservices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
+use JOOservices\LaravelEvents\Support\EventMetadata;
 
 class OrderCreated implements EventSourcingInterface
 {
@@ -78,7 +78,7 @@ Dispatch and query:
 ```php
 event(new OrderCreated('ORD-123', 99.99));
 
-$stored = \JooServices\LaravelEvents\EventSourcing\Models\StoredEvent::on('mongodb')
+$stored = \JOOservices\LaravelEvents\EventSourcing\Models\StoredEvent::on('mongodb')
     ->where('aggregate_id', 'ORD-123')
     ->orderBy('created_at')
     ->get();
@@ -92,9 +92,9 @@ When the action is always `updated`, use `DefaultsToUpdatedAction` so you don't 
 namespace App\Events;
 
 use App\Models\Order;
-use JooServices\LaravelEvents\EventLog\Concerns\DefaultsToUpdatedAction;
-use JooServices\LaravelEvents\EventLog\Contracts\HasLogAction;
-use JooServices\LaravelEvents\EventLog\Contracts\LoggableModelInterface;
+use JOOservices\LaravelEvents\EventLog\Concerns\DefaultsToUpdatedAction;
+use JOOservices\LaravelEvents\EventLog\Contracts\HasLogAction;
+use JOOservices\LaravelEvents\EventLog\Contracts\LoggableModelInterface;
 
 class OrderAuditEvent implements LoggableModelInterface, HasLogAction
 {
@@ -129,7 +129,7 @@ class OrderAuditEvent implements LoggableModelInterface, HasLogAction
 Override `getAction()` or omit the trait when the action varies (e.g. pass `'created'` or `'deleted'`).
 
 ```php
-use JooServices\LaravelEvents\EventLog\EventLogAction;
+use JOOservices\LaravelEvents\EventLog\EventLogAction;
 
 public function getAction(): string
 {
@@ -150,7 +150,7 @@ event(new OrderAuditEvent($order, $prev));
 You can inject `EventService` and call it without dispatching:
 
 ```php
-use JooServices\LaravelEvents\EventService;
+use JOOservices\LaravelEvents\EventService;
 
 class SomeService
 {
@@ -190,7 +190,7 @@ config([
 Or use the metadata helper for standard keys:
 
 ```php
-use JooServices\LaravelEvents\Support\EventMetadata;
+use JOOservices\LaravelEvents\Support\EventMetadata;
 
 config([
     'events.context_provider' => fn () => EventMetadata::merge(

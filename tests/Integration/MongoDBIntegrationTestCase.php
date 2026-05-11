@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Tests\Integration;
+namespace JOOservices\LaravelEvents\Tests\Integration;
 
-use JooServices\LaravelEvents\Tests\TestCase;
+use JOOservices\LaravelEvents\Tests\TestCase;
 use MongoDB\Laravel\MongoDBServiceProvider;
 
 /**

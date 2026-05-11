@@ -56,7 +56,7 @@ Set `context_provider` to a callable that returns an array. That array is merged
 Example (e.g. in `AppServiceProvider`):
 
 ```php
-use JooServices\LaravelEvents\Support\EventMetadata;
+use JOOservices\LaravelEvents\Support\EventMetadata;
 
 config([
     'events.context_provider' => function () {

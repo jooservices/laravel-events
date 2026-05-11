@@ -6,6 +6,8 @@
          xsi:noNamespaceSchemaLocation="https://phpmd.org/phpdm/ruleset_xml_schema.xsd">
     <description>PHPMD rules (Pint has highest priority for style).</description>
 
+    <exclude-pattern>.*/tests/TestCase.php</exclude-pattern>
+
     <rule ref="rulesets/codesize.xml"/>
     <rule ref="rulesets/controversial.xml">
         <exclude name="CamelCaseMethodName"/>

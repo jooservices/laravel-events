@@ -42,18 +42,20 @@
     },
     "autoload": {
         "psr-4": {
+            "JOOservices\\LaravelEvents\\": "src/",
             "JooServices\\LaravelEvents\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
+            "JOOservices\\LaravelEvents\\Tests\\": "tests/",
             "JooServices\\LaravelEvents\\Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "JooServices\\LaravelEvents\\EventsServiceProvider"
+                "JOOservices\\LaravelEvents\\EventsServiceProvider"
             ]
         }
     },

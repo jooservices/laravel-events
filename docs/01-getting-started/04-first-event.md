@@ -3,8 +3,8 @@
 Create an event implementing `EventSourcingInterface`:
 
 ```php
-use JooServices\LaravelEvents\EventSourcing\Concerns\HasEventSourcingDefaults;
-use JooServices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
+use JOOservices\LaravelEvents\EventSourcing\Concerns\HasEventSourcingDefaults;
+use JOOservices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
 
 final class OrderCreated implements EventSourcingInterface
 {

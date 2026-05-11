@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Tests\Unit\Support;
+namespace JOOservices\LaravelEvents\Tests\Unit\Support;
 
-use JooServices\LaravelEvents\Support\EventMetadata;
+use JOOservices\LaravelEvents\Support\EventMetadata;
 use PHPUnit\Framework\TestCase;
 
 class EventMetadataTest extends TestCase
@@ -54,6 +54,7 @@ class EventMetadataTest extends TestCase
             ->causationId('cmd-1')
             ->requestId('req-1')
             ->source('orders', 'api')
+            ->eventCategory('domain')
             ->schemaVersion(1)
             ->eventVersion(2)
             ->tenantId('tenant-1')
@@ -65,10 +66,17 @@ class EventMetadataTest extends TestCase
             'request_id' => 'req-1',
             'source' => 'orders',
             'channel' => 'api',
+            'event_category' => 'domain',
             'schema_version' => 1,
             'event_version' => 2,
             'tenant_id' => 'tenant-1',
         ], $metadata);
+    }
+
+    public function test_category_metadata_omits_null_values(): void
+    {
+        $this->assertSame(['event_category' => 'integration'], EventMetadata::category('integration'));
+        $this->assertSame([], EventMetadata::category());
     }
 
     public function test_builder_source_without_channel_clears_previous_channel(): void

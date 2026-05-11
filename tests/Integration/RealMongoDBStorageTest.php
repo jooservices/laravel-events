@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Tests\Integration;
+namespace JOOservices\LaravelEvents\Tests\Integration;
 
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Event;
-use JooServices\LaravelEvents\EventLog\Contracts\LoggableModelInterface;
-use JooServices\LaravelEvents\EventLog\Models\EventLogEntry;
-use JooServices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
-use JooServices\LaravelEvents\EventSourcing\Models\StoredEvent;
+use JOOservices\LaravelEvents\EventLog\Contracts\LoggableModelInterface;
+use JOOservices\LaravelEvents\EventLog\Models\EventLogEntry;
+use JOOservices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
+use JOOservices\LaravelEvents\EventSourcing\Models\StoredEvent;
 use MongoDB\Laravel\Connection;
 
 class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
@@ -46,12 +46,17 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
 
     public function test_event_sourcing_stored_to_real_mongodb_and_evidence_written(): void
     {
+        $payload = ['order_id' => 'ORD-999', 'amount' => 99.99, 'at' => now()->toIso8601String()];
+
         $event = new class implements EventSourcingInterface
         {
+            /** @var array<string, mixed> */
+            public array $payload = [];
+
             /** @return array<string, mixed> */
             public function payload(): array
             {
-                return ['order_id' => 'ORD-999', 'amount' => 99.99, 'at' => now()->toIso8601String()];
+                return $this->payload;
             }
 
             public function aggregateId(): ?string
@@ -59,6 +64,7 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
                 return 'ORD-999';
             }
         };
+        $event->payload = $payload;
 
         Event::dispatch($event);
 
@@ -66,10 +72,7 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
         $this->assertNotNull($stored, 'StoredEvent should exist in MongoDB');
         $this->assertSame($event::class, $stored->event_class);
         $this->assertSame('ORD-999', $stored->aggregate_id);
-        $this->assertSame(
-            ['order_id' => 'ORD-999', 'amount' => 99.99, 'at' => $event->payload()['at']],
-            $stored->payload
-        );
+        $this->assertSame($payload, $stored->payload);
         $this->assertNull($stored->user_id, 'Guest: user_id should be null');
 
         $evidence = [

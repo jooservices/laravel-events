@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\EventLog;
+namespace JOOservices\LaravelEvents\EventLog;
 
 final class EventLogAction
 {

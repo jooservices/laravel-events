@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Tests\Unit;
+namespace JOOservices\LaravelEvents\Tests\Unit;
 
-use JooServices\LaravelEvents\EventService;
-use JooServices\LaravelEvents\EventsServiceProvider;
-use JooServices\LaravelEvents\Serialization\ArrayEventSerializer;
-use JooServices\LaravelEvents\Serialization\EventSerializerInterface;
-use JooServices\LaravelEvents\Tests\TestCase;
+use JOOservices\LaravelEvents\EventService;
+use JOOservices\LaravelEvents\EventsServiceProvider;
+use JOOservices\LaravelEvents\Serialization\ArrayEventSerializer;
+use JOOservices\LaravelEvents\Serialization\EventSerializerInterface;
+use JOOservices\LaravelEvents\Tests\TestCase;
 
 class EventsServiceProviderTest extends TestCase
 {
