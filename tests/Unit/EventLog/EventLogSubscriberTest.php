@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Tests\Unit\EventLog;
+namespace JOOservices\LaravelEvents\Tests\Unit\EventLog;
 
 use Illuminate\Foundation\Auth\User;
-use JooServices\LaravelEvents\EventLog\Contracts\HasLogAction;
-use JooServices\LaravelEvents\EventLog\Contracts\LoggableModelInterface;
-use JooServices\LaravelEvents\EventLog\EventLogSubscriber;
-use JooServices\LaravelEvents\EventService;
-use JooServices\LaravelEvents\Support\DiffHelper;
-use JooServices\LaravelEvents\Tests\TestCase;
+use JOOservices\LaravelEvents\EventLog\Contracts\HasLogAction;
+use JOOservices\LaravelEvents\EventLog\Contracts\LoggableModelInterface;
+use JOOservices\LaravelEvents\EventLog\EventLogSubscriber;
+use JOOservices\LaravelEvents\EventService;
+use JOOservices\LaravelEvents\Support\DiffHelper;
+use JOOservices\LaravelEvents\Tests\TestCase;
 use Mockery;
 
 class EventLogSubscriberTest extends TestCase

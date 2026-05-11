@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\EventSourcing\Concerns;
+namespace JOOservices\LaravelEvents\EventSourcing\Concerns;
 
 use Carbon\CarbonInterface;
 

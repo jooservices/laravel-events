@@ -2,9 +2,9 @@
 
 ```php
 use App\Models\Order;
-use JooServices\LaravelEvents\EventLog\Concerns\DefaultsToUpdatedAction;
-use JooServices\LaravelEvents\EventLog\Contracts\HasLogAction;
-use JooServices\LaravelEvents\EventLog\Contracts\LoggableModelInterface;
+use JOOservices\LaravelEvents\EventLog\Concerns\DefaultsToUpdatedAction;
+use JOOservices\LaravelEvents\EventLog\Contracts\HasLogAction;
+use JOOservices\LaravelEvents\EventLog\Contracts\LoggableModelInterface;
 
 final class OrderUpdated implements LoggableModelInterface, HasLogAction
 {

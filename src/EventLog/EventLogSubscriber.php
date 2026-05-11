@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\EventLog;
+namespace JOOservices\LaravelEvents\EventLog;
 
 use Illuminate\Contracts\Events\Dispatcher;
-use JooServices\LaravelEvents\EventLog\Contracts\HasLogAction;
-use JooServices\LaravelEvents\EventLog\Contracts\LoggableModelInterface;
-use JooServices\LaravelEvents\EventService;
-use JooServices\LaravelEvents\Support\DiffHelper;
+use JOOservices\LaravelEvents\EventLog\Contracts\HasLogAction;
+use JOOservices\LaravelEvents\EventLog\Contracts\LoggableModelInterface;
+use JOOservices\LaravelEvents\EventService;
+use JOOservices\LaravelEvents\Support\DiffHelper;
 
 class EventLogSubscriber
 {

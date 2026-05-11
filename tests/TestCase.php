@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Tests;
+namespace JOOservices\LaravelEvents\Tests;
 
-use JooServices\LaravelEvents\EventsServiceProvider;
+use JOOservices\LaravelEvents\EventsServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 abstract class TestCase extends Orchestra

@@ -87,7 +87,7 @@ php artisan events:install-indexes
 Implement `EventSourcingInterface` and dispatch:
 
 ```php
-use JooServices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
+use JOOservices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
 
 class OrderCreated implements EventSourcingInterface
 {
@@ -109,16 +109,18 @@ event(new OrderCreated('ORD-001', [['sku' => 'X', 'qty' => 2]]));
 
 Events are stored in the `stored_events` collection. Optional: `occurredAt(): ?\Carbon\CarbonInterface`, `metadata(): array`. Use the `HasEventSourcingDefaults` trait to implement only `payload()` and `aggregateId()`.
 
-Recommended metadata keys include `request_id`, `correlation_id`, `causation_id`, `source`, `channel`, `reason_code`, `schema_version`, `event_version`, and optional `tenant_id`. The `EventMetadata` helper exposes constants and small factory methods for those conventions.
+Recommended metadata keys include `request_id`, `correlation_id`, `causation_id`, `source`, `channel`, `reason_code`, `schema_version`, `event_version`, `event_category`, and optional `tenant_id`. The `EventMetadata` helper exposes constants and small factory methods for those conventions.
+
+Use `event_category` for a lightweight event type convention when you need broad categories such as `domain`, `integration`, `audit`, or `system` without introducing a full event taxonomy framework.
 
 ### Event Log (Audit)
 
 Implement `LoggableModelInterface` (and optionally `HasLogAction`) and dispatch with prev/changed state. Use the `DefaultsToUpdatedAction` trait when the action is always `updated`:
 
 ```php
-use JooServices\LaravelEvents\EventLog\Concerns\DefaultsToUpdatedAction;
-use JooServices\LaravelEvents\EventLog\Contracts\LoggableModelInterface;
-use JooServices\LaravelEvents\EventLog\Contracts\HasLogAction;
+use JOOservices\LaravelEvents\EventLog\Concerns\DefaultsToUpdatedAction;
+use JOOservices\LaravelEvents\EventLog\Contracts\LoggableModelInterface;
+use JOOservices\LaravelEvents\EventLog\Contracts\HasLogAction;
 
 class OrderUpdated implements LoggableModelInterface, HasLogAction
 {
@@ -135,22 +137,25 @@ class OrderUpdated implements LoggableModelInterface, HasLogAction
 
 Changes are stored in `event_logs` with a computed diff. Query by `entity_type` + `entity_id`.
 
-Recommended action names are available from `JooServices\LaravelEvents\EventLog\EventLogAction`: `created`, `updated`, `deleted`, `restored`, `status_changed`, `corrected`, `synchronized`, and `imported`.
+Recommended action names are available from `JOOservices\LaravelEvents\EventLog\EventLogAction`: `created`, `updated`, `deleted`, `restored`, `status_changed`, `corrected`, `synchronized`, and `imported`.
 
 ---
 
 ## Querying
 
 ```php
-use JooServices\LaravelEvents\Query\EventLogQueryService;
-use JooServices\LaravelEvents\Query\StoredEventQueryService;
+use JOOservices\LaravelEvents\Query\EventLogQueryService;
+use JOOservices\LaravelEvents\Query\StoredEventQueryService;
 
 $events = app(StoredEventQueryService::class)->byAggregateId('ORD-001');
+$domainEvents = app(StoredEventQueryService::class)->byEventCategory('domain');
 $audit = app(EventLogQueryService::class)->byEntity('orders', 'ORD-001');
 ```
 
 Query services return typed package data records and intentionally stay small.
 Build dashboards, projections, and reporting in your application.
+
+`JOOservices\...` is the canonical package namespace in `1.2.0`. The legacy `JooServices\...` namespace remains available for backward compatibility.
 
 ## Redaction
 
@@ -183,8 +188,8 @@ MongoDB TTL deletion is asynchronous.
 ## Bulk Records
 
 ```php
-use JooServices\LaravelEvents\Data\StoredEventData;
-use JooServices\LaravelEvents\EventService;
+use JOOservices\LaravelEvents\Data\StoredEventData;
+use JOOservices\LaravelEvents\EventService;
 
 app(EventService::class)->recordManyStoredEvents([
     new StoredEventData('OrderImported', ['order_id' => 'ORD-001'], 'ORD-001'),

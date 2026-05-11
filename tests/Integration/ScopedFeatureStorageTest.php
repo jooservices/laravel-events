@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Tests\Integration;
+namespace JOOservices\LaravelEvents\Tests\Integration;
 
 use Illuminate\Testing\PendingCommand;
-use JooServices\LaravelEvents\Data\EventLogData;
-use JooServices\LaravelEvents\Data\StoredEventData;
-use JooServices\LaravelEvents\EventLog\Models\EventLogEntry;
-use JooServices\LaravelEvents\EventService;
-use JooServices\LaravelEvents\EventSourcing\Models\StoredEvent;
-use JooServices\LaravelEvents\Query\EventLogQueryService;
-use JooServices\LaravelEvents\Query\StoredEventQueryService;
+use JOOservices\LaravelEvents\Data\EventLogData;
+use JOOservices\LaravelEvents\Data\StoredEventData;
+use JOOservices\LaravelEvents\EventLog\Models\EventLogEntry;
+use JOOservices\LaravelEvents\EventService;
+use JOOservices\LaravelEvents\EventSourcing\Models\StoredEvent;
+use JOOservices\LaravelEvents\Query\EventLogQueryService;
+use JOOservices\LaravelEvents\Query\StoredEventQueryService;
 use MongoDB\Laravel\Connection;
 
 class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
@@ -162,7 +162,11 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
             new \stdClass,
             ['order_id' => 'ORD-Q2'],
             'ORD-Q2',
-            metadata: ['correlation_id' => 'corr-q2', 'causation_id' => 'cmd-q2'],
+            metadata: [
+                'correlation_id' => 'corr-q2',
+                'causation_id' => 'cmd-q2',
+                'event_category' => 'domain',
+            ],
         );
         $service->logChange(
             'orders',
@@ -179,6 +183,7 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
 
         $this->assertSame('ORD-Q2', $storedQueries->byAggregateId('ORD-Q2')->first()?->aggregateId);
         $this->assertSame(\stdClass::class, $storedQueries->byEventName(\stdClass::class)->first()?->eventClass);
+        $this->assertSame('domain', $storedQueries->byEventCategory('domain')->first()?->envelope?->eventCategory);
         $this->assertSame(
             'corr-q2',
             $storedQueries->byCorrelationId('corr-q2')->first()?->metadata['correlation_id'] ?? null

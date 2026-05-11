@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Tests\Unit\Data;
+namespace JOOservices\LaravelEvents\Tests\Unit\Data;
 
 use InvalidArgumentException;
-use JooServices\LaravelEvents\Data\EventLogData;
-use JooServices\LaravelEvents\Data\StoredEventData;
-use JooServices\LaravelEvents\Tests\TestCase;
+use JOOservices\LaravelEvents\Data\EventLogData;
+use JOOservices\LaravelEvents\Data\StoredEventData;
+use JOOservices\LaravelEvents\Tests\TestCase;
 
 class EventDataTest extends TestCase
 {
@@ -21,6 +21,7 @@ class EventDataTest extends TestCase
             'user_id' => 'user-1',
             'event_id' => 'evt-1',
             'event_name' => 'order.created',
+            'event_category' => 'domain',
             'aggregate_type' => 'orders',
             'schema_version' => 1,
             'event_version' => 'v1',
@@ -33,11 +34,13 @@ class EventDataTest extends TestCase
         $this->assertSame('ORD-1', $data->aggregateId);
         $this->assertSame('evt-1', $data->envelope->eventId);
         $this->assertSame('order.created', $data->envelope->eventName);
+        $this->assertSame('domain', $data->envelope->eventCategory);
         $this->assertSame('orders', $data->envelope->aggregateType);
         $this->assertSame(1, $data->envelope->schemaVersion);
         $this->assertSame('v1', $data->envelope->eventVersion);
         $this->assertSame('corr-1', $data->envelope->correlationId);
         $this->assertSame('cmd-1', $data->envelope->causationId);
+        $this->assertSame('domain', $data->toArray()['event_category']);
         $this->assertSame(['total' => 10], $data->toArray()['payload']);
     }
 

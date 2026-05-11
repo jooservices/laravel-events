@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Tests\Unit\Query;
+namespace JOOservices\LaravelEvents\Tests\Unit\Query;
 
 use InvalidArgumentException;
-use JooServices\LaravelEvents\EventLog\Models\EventLogEntry;
-use JooServices\LaravelEvents\EventSourcing\Models\StoredEvent;
-use JooServices\LaravelEvents\Query\EventLogQueryService;
-use JooServices\LaravelEvents\Query\StoredEventQueryService;
-use JooServices\LaravelEvents\Tests\TestCase;
+use JOOservices\LaravelEvents\EventLog\Models\EventLogEntry;
+use JOOservices\LaravelEvents\EventSourcing\Models\StoredEvent;
+use JOOservices\LaravelEvents\Query\EventLogQueryService;
+use JOOservices\LaravelEvents\Query\StoredEventQueryService;
+use JOOservices\LaravelEvents\Tests\TestCase;
 
 class QueryServiceTest extends TestCase
 {

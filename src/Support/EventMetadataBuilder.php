@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Support;
+namespace JOOservices\LaravelEvents\Support;
 
 final class EventMetadataBuilder
 {
@@ -59,6 +59,13 @@ final class EventMetadataBuilder
     public function tenantId(int|string $tenantId): self
     {
         $this->metadata[EventMetadata::TENANT_ID] = $tenantId;
+
+        return $this;
+    }
+
+    public function eventCategory(string $eventCategory): self
+    {
+        $this->metadata[EventMetadata::EVENT_CATEGORY] = $eventCategory;
 
         return $this;
     }

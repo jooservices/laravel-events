@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Tests\Unit\EventSourcing;
+namespace JOOservices\LaravelEvents\Tests\Unit\EventSourcing;
 
 use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Auth\User;
-use JooServices\LaravelEvents\EventService;
-use JooServices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
-use JooServices\LaravelEvents\EventSourcing\EventSourcingSubscriber;
-use JooServices\LaravelEvents\EventSourcing\Models\StoredEvent;
-use JooServices\LaravelEvents\Tests\TestCase;
+use JOOservices\LaravelEvents\EventService;
+use JOOservices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
+use JOOservices\LaravelEvents\EventSourcing\EventSourcingSubscriber;
+use JOOservices\LaravelEvents\EventSourcing\Models\StoredEvent;
+use JOOservices\LaravelEvents\Tests\TestCase;
 use Mockery;
 
 class EventSourcingSubscriberTest extends TestCase

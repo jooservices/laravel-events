@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\EventSourcing\Models;
+namespace JOOservices\LaravelEvents\EventSourcing\Models;
 
 use Carbon\Carbon;
 use MongoDB\Laravel\Eloquent\Model;
@@ -11,6 +11,7 @@ use MongoDB\Laravel\Eloquent\Model;
  * @property string $event_class
  * @property string|null $event_id
  * @property string|null $event_name
+ * @property string|null $event_category
  * @property string|null $aggregate_id
  * @property string|null $aggregate_type
  * @property array<string, mixed> $payload
@@ -32,6 +33,7 @@ class StoredEvent extends Model
         'event_class',
         'event_id',
         'event_name',
+        'event_category',
         'aggregate_id',
         'aggregate_type',
         'payload',

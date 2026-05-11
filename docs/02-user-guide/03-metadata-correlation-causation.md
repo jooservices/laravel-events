@@ -19,12 +19,13 @@ Use consistent keys so records are easier to trace, audit, and evolve.
 | `reason_code` | Stable machine-readable reason for the change |
 | `schema_version` | Payload/metadata schema version |
 | `event_version` | Version of the event meaning or contract |
+| `event_category` | Lightweight event type such as `domain`, `integration`, `audit`, or `system` |
 | `tenant_id` | Optional tenant identifier when the app is multi-tenant |
 
-The `JooServices\LaravelEvents\Support\EventMetadata` helper exposes constants and small factory methods for these conventions:
+The `JOOservices\LaravelEvents\Support\EventMetadata` helper exposes constants and small factory methods for these conventions:
 
 ```php
-use JooServices\LaravelEvents\Support\EventMetadata;
+use JOOservices\LaravelEvents\Support\EventMetadata;
 
 public function metadata(): array
 {
@@ -52,9 +53,11 @@ config([
 Event-specific metadata wins when keys overlap because it is merged after context metadata.
 
 The default serializer also copies `event_id`, `event_name`, `aggregate_type`,
-`schema_version`, `event_version`, `correlation_id`, and `causation_id` to
+`event_category`, `schema_version`, `event_version`, `correlation_id`, and `causation_id` to
 nullable top-level stored-event fields. The full metadata array is still stored
 unchanged for backward compatibility and application-owned context.
+
+For consistent broad event typing, prefer `JOOservices\LaravelEvents\EventSourcing\EventCategory` constants together with `EventMetadata::category(...)` or `EventMetadata::make()->eventCategory(...)`.
 
 ## Versioning and Schema Evolution
 
@@ -85,7 +88,7 @@ Use metadata to link corrective records to the event or log entry they correct. 
 Example:
 
 ```php
-use JooServices\LaravelEvents\Support\EventMetadata;
+use JOOservices\LaravelEvents\Support\EventMetadata;
 
 public function metadata(): array
 {

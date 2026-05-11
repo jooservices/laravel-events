@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Tests\Unit;
+namespace JOOservices\LaravelEvents\Tests\Unit;
 
-use JooServices\LaravelEvents\EventLog\Models\EventLogEntry;
-use JooServices\LaravelEvents\EventService;
-use JooServices\LaravelEvents\EventSourcing\Models\StoredEvent;
-use JooServices\LaravelEvents\Support\EventMetadata;
-use JooServices\LaravelEvents\Tests\TestCase;
+use JOOservices\LaravelEvents\EventLog\Models\EventLogEntry;
+use JOOservices\LaravelEvents\EventService;
+use JOOservices\LaravelEvents\EventSourcing\Models\StoredEvent;
+use JOOservices\LaravelEvents\Support\EventMetadata;
+use JOOservices\LaravelEvents\Tests\TestCase;
 use Mockery;
 
 class EventServiceEnvelopeTest extends TestCase

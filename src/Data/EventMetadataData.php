@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Data;
+namespace JOOservices\LaravelEvents\Data;
 
 final readonly class EventMetadataData
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\EventSourcing\Contracts;
+namespace JOOservices\LaravelEvents\EventSourcing\Contracts;
 
 /**
  * Events implementing this interface are persisted to the stored_events collection.

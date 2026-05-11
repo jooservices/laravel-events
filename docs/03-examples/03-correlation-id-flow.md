@@ -6,7 +6,7 @@ Place this in your `AppServiceProvider::boot()` method, or equivalent
 application bootstrap, so the context provider is registered once at startup.
 
 ```php
-use JooServices\LaravelEvents\Support\EventMetadata;
+use JOOservices\LaravelEvents\Support\EventMetadata;
 
 config([
     'events.context_provider' => fn () => EventMetadata::merge(
