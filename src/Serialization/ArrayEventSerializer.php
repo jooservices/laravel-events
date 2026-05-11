@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Serialization;
+namespace JOOservices\LaravelEvents\Serialization;
 
 use Carbon\CarbonInterface;
 use Illuminate\Support\Str;
-use JooServices\LaravelEvents\Data\EventEnvelopeData;
-use JooServices\LaravelEvents\Data\StoredEventData;
-use JooServices\LaravelEvents\Support\EventMetadata;
+use JOOservices\LaravelEvents\Data\EventEnvelopeData;
+use JOOservices\LaravelEvents\Data\StoredEventData;
+use JOOservices\LaravelEvents\Support\EventMetadata;
 
 class ArrayEventSerializer implements EventSerializerInterface
 {
@@ -32,6 +32,7 @@ class ArrayEventSerializer implements EventSerializerInterface
                     ?? (string) Str::uuid(),
                 eventName: $this->stringMetadata($metadata, EventMetadata::EVENT_NAME)
                     ?? $this->shortClassName($event::class),
+                eventCategory: $this->stringMetadata($metadata, EventMetadata::EVENT_CATEGORY),
                 aggregateType: $this->stringMetadata($metadata, EventMetadata::AGGREGATE_TYPE),
                 schemaVersion: $this->stringOrIntMetadata($metadata, EventMetadata::SCHEMA_VERSION),
                 eventVersion: $this->stringOrIntMetadata($metadata, EventMetadata::EVENT_VERSION),

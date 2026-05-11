@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Tests\Unit\EventSourcing\Models;
+namespace JOOservices\LaravelEvents\Tests\Unit\EventSourcing\Models;
 
-use JooServices\LaravelEvents\EventSourcing\Models\StoredEvent;
-use JooServices\LaravelEvents\Tests\TestCase;
+use JOOservices\LaravelEvents\EventSourcing\Models\StoredEvent;
+use JOOservices\LaravelEvents\Tests\TestCase;
 
 class StoredEventTest extends TestCase
 {
@@ -26,6 +26,7 @@ class StoredEventTest extends TestCase
                 'event_class',
                 'event_id',
                 'event_name',
+                'event_category',
                 'aggregate_id',
                 'aggregate_type',
                 'payload',

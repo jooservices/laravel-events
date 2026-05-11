@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Serialization;
+namespace JOOservices\LaravelEvents\Serialization;
 
 use Carbon\CarbonInterface;
-use JooServices\LaravelEvents\Data\StoredEventData;
+use JOOservices\LaravelEvents\Data\StoredEventData;
 
 interface EventSerializerInterface
 {

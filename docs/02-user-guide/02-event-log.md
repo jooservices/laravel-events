@@ -11,7 +11,7 @@ For choosing between Event Log and Event Sourcing, see the [Decision Guide](10-b
 ### LoggableModelInterface
 
 ```php
-namespace JooServices\LaravelEvents\EventLog\Contracts;
+namespace JOOservices\LaravelEvents\EventLog\Contracts;
 
 interface LoggableModelInterface
 {
@@ -27,7 +27,7 @@ interface LoggableModelInterface
 When implemented, the stored `action` is taken from your event. Otherwise the subscriber uses `"updated"`. Use the `DefaultsToUpdatedAction` trait when the action is always `updated`.
 
 ```php
-namespace JooServices\LaravelEvents\EventLog\Contracts;
+namespace JOOservices\LaravelEvents\EventLog\Contracts;
 
 interface HasLogAction
 {
@@ -35,7 +35,7 @@ interface HasLogAction
 }
 ```
 
-Recommended action constants are available in `JooServices\LaravelEvents\EventLog\EventLogAction`.
+Recommended action constants are available in `JOOservices\LaravelEvents\EventLog\EventLogAction`.
 
 | Action | Use for |
 |--------|---------|
@@ -54,9 +54,9 @@ Example: log when an order is updated, using `DefaultsToUpdatedAction` so you do
 
 ```php
 use App\Models\Order;
-use JooServices\LaravelEvents\EventLog\Contracts\HasLogAction;
-use JooServices\LaravelEvents\EventLog\Contracts\LoggableModelInterface;
-use JooServices\LaravelEvents\EventLog\Concerns\DefaultsToUpdatedAction;
+use JOOservices\LaravelEvents\EventLog\Contracts\HasLogAction;
+use JOOservices\LaravelEvents\EventLog\Contracts\LoggableModelInterface;
+use JOOservices\LaravelEvents\EventLog\Concerns\DefaultsToUpdatedAction;
 
 class OrderUpdated implements LoggableModelInterface, HasLogAction
 {
@@ -114,7 +114,7 @@ diff.
 ## Querying History for an Entity
 
 ```php
-use JooServices\LaravelEvents\EventLog\Models\EventLogEntry;
+use JOOservices\LaravelEvents\EventLog\Models\EventLogEntry;
 
 $history = EventLogEntry::on(config('events.connection'))
     ->where('entity_type', 'orders')

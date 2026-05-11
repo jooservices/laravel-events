@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Tests\Unit\Support;
+namespace JOOservices\LaravelEvents\Tests\Unit\Support;
 
-use JooServices\LaravelEvents\Support\PayloadRedactor;
-use JooServices\LaravelEvents\Tests\TestCase;
+use JOOservices\LaravelEvents\Support\PayloadRedactor;
+use JOOservices\LaravelEvents\Tests\TestCase;
 
 class PayloadRedactorTest extends TestCase
 {

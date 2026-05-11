@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents;
+namespace JOOservices\LaravelEvents;
 
 use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
-use JooServices\LaravelEvents\Data\EventLogData;
-use JooServices\LaravelEvents\Data\StoredEventData;
-use JooServices\LaravelEvents\EventLog\Models\EventLogEntry;
-use JooServices\LaravelEvents\EventSourcing\Models\StoredEvent;
-use JooServices\LaravelEvents\Serialization\ArrayEventSerializer;
-use JooServices\LaravelEvents\Serialization\EventSerializerInterface;
-use JooServices\LaravelEvents\Support\PayloadRedactor;
+use JOOservices\LaravelEvents\Data\EventLogData;
+use JOOservices\LaravelEvents\Data\StoredEventData;
+use JOOservices\LaravelEvents\EventLog\Models\EventLogEntry;
+use JOOservices\LaravelEvents\EventSourcing\Models\StoredEvent;
+use JOOservices\LaravelEvents\Serialization\ArrayEventSerializer;
+use JOOservices\LaravelEvents\Serialization\EventSerializerInterface;
+use JOOservices\LaravelEvents\Support\PayloadRedactor;
 
 class EventService
 {
@@ -98,9 +98,12 @@ class EventService
     public function recordManyStoredEvents(iterable $events): void
     {
         $records = [];
+        $context = $this->getContext();
+        $timestamp = Carbon::now();
+
         foreach ($events as $event) {
             $data = $event instanceof StoredEventData ? $event : StoredEventData::fromArray($event);
-            $metadata = array_merge($this->getContext(), $data->metadata);
+            $metadata = array_merge($context, $data->metadata);
             $enriched = new StoredEventData(
                 eventClass: $data->eventClass,
                 payload: $data->payload,
@@ -111,7 +114,7 @@ class EventService
                 envelope: $data->envelope,
             );
 
-            $records[] = $this->withTimestamps($this->normalizeStoredEvent($enriched)->toArray());
+            $records[] = $this->withTimestamps($this->normalizeStoredEvent($enriched)->toArray(), $timestamp);
         }
 
         if ($records === []) {
@@ -125,9 +128,12 @@ class EventService
     public function recordManyEventLogs(iterable $logs): void
     {
         $records = [];
+        $context = $this->getContext();
+        $timestamp = Carbon::now();
+
         foreach ($logs as $log) {
             $data = $log instanceof EventLogData ? $log : EventLogData::fromArray($log);
-            $meta = array_merge($this->getContext(), $data->meta);
+            $meta = array_merge($context, $data->meta);
             $enriched = new EventLogData(
                 entityType: $data->entityType,
                 entityId: $data->entityId,
@@ -139,7 +145,7 @@ class EventService
                 userId: $data->userId ?? $meta['user_id'] ?? auth()->id(),
             );
 
-            $records[] = $this->withTimestamps($this->normalizeEventLog($enriched)->toArray());
+            $records[] = $this->withTimestamps($this->normalizeEventLog($enriched)->toArray(), $timestamp);
         }
 
         if ($records === []) {
@@ -180,13 +186,15 @@ class EventService
      * @param  array<string, mixed>  $attributes
      * @return array<string, mixed>
      */
-    private function withTimestamps(array $attributes): array
+    private function withTimestamps(array $attributes, ?CarbonInterface $timestamp = null): array
     {
+        $timestamp ??= Carbon::now();
+
         if (! array_key_exists('created_at', $attributes)) {
-            $attributes['created_at'] = Carbon::now();
+            $attributes['created_at'] = $timestamp;
         }
         if (! array_key_exists('updated_at', $attributes)) {
-            $attributes['updated_at'] = Carbon::now();
+            $attributes['updated_at'] = $timestamp;
         }
 
         return $attributes;

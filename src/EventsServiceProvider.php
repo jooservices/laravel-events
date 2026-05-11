@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents;
+namespace JOOservices\LaravelEvents;
 
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ServiceProvider;
-use JooServices\LaravelEvents\Console\InstallIndexesCommand;
-use JooServices\LaravelEvents\EventLog\EventLogSubscriber;
-use JooServices\LaravelEvents\EventSourcing\EventSourcingSubscriber;
-use JooServices\LaravelEvents\Query\EventLogQueryService;
-use JooServices\LaravelEvents\Query\StoredEventQueryService;
-use JooServices\LaravelEvents\Serialization\ArrayEventSerializer;
-use JooServices\LaravelEvents\Serialization\EventSerializerInterface;
+use JOOservices\LaravelEvents\Console\InstallIndexesCommand;
+use JOOservices\LaravelEvents\EventLog\EventLogSubscriber;
+use JOOservices\LaravelEvents\EventSourcing\EventSourcingSubscriber;
+use JOOservices\LaravelEvents\Query\EventLogQueryService;
+use JOOservices\LaravelEvents\Query\StoredEventQueryService;
+use JOOservices\LaravelEvents\Serialization\ArrayEventSerializer;
+use JOOservices\LaravelEvents\Serialization\EventSerializerInterface;
 
 class EventsServiceProvider extends ServiceProvider
 {

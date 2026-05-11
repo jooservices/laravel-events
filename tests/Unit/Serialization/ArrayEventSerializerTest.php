@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace JooServices\LaravelEvents\Tests\Unit\Serialization;
+namespace JOOservices\LaravelEvents\Tests\Unit\Serialization;
 
-use JooServices\LaravelEvents\Serialization\ArrayEventSerializer;
-use JooServices\LaravelEvents\Support\EventMetadata;
+use JOOservices\LaravelEvents\Serialization\ArrayEventSerializer;
+use JOOservices\LaravelEvents\Support\EventMetadata;
 use PHPUnit\Framework\TestCase;
 
 class ArrayEventSerializerTest extends TestCase
@@ -23,6 +23,7 @@ class ArrayEventSerializerTest extends TestCase
             metadata: [
                 EventMetadata::EVENT_ID => 'evt-1',
                 EventMetadata::EVENT_NAME => 'order.created',
+                EventMetadata::EVENT_CATEGORY => 'domain',
                 EventMetadata::AGGREGATE_TYPE => 'orders',
                 EventMetadata::SCHEMA_VERSION => 2,
                 EventMetadata::EVENT_VERSION => '2026-05',
@@ -34,6 +35,7 @@ class ArrayEventSerializerTest extends TestCase
         $this->assertNotNull($data->envelope);
         $this->assertSame('evt-1', $data->envelope->eventId);
         $this->assertSame('order.created', $data->envelope->eventName);
+        $this->assertSame('domain', $data->envelope->eventCategory);
         $this->assertSame('orders', $data->envelope->aggregateType);
         $this->assertSame(2, $data->envelope->schemaVersion);
         $this->assertSame('2026-05', $data->envelope->eventVersion);

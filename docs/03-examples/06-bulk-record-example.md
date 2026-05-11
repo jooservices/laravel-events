@@ -3,8 +3,8 @@
 Use `EventService` for explicit batch writes:
 
 ```php
-use JooServices\LaravelEvents\Data\StoredEventData;
-use JooServices\LaravelEvents\EventService;
+use JOOservices\LaravelEvents\Data\StoredEventData;
+use JOOservices\LaravelEvents\EventService;
 
 app(EventService::class)->recordManyStoredEvents([
     new StoredEventData('OrderImported', ['order_id' => 'ORD-1'], 'ORD-1'),

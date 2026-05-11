@@ -74,7 +74,7 @@ Accepts `StoredEventData` instances or arrays using persisted field names.
 Records are normalized, redacted, timestamped, and batch inserted.
 
 `StoredEventData` includes the original storage fields plus nullable envelope
-fields: `event_id`, `event_name`, `aggregate_type`, `schema_version`,
+fields: `event_id`, `event_name`, `event_category`, `aggregate_type`, `schema_version`,
 `event_version`, `correlation_id`, and `causation_id`.
 
 ### recordManyEventLogs
@@ -94,6 +94,7 @@ are normalized, redacted, timestamped, and batch inserted.
 
 - `byAggregateId(string $aggregateId, int $limit = 50)`
 - `byEventName(string $eventName, int $limit = 50)`
+- `byEventCategory(string $eventCategory, int $limit = 50)`
 - `byCorrelationId(string $correlationId, int $limit = 50)`
 - `byCausationId(string $causationId, int $limit = 50)`
 - `between(DateTimeInterface $from, DateTimeInterface $to, int $limit = 50)`
@@ -171,10 +172,20 @@ Constants and helpers for metadata conventions:
 - trace keys: `request_id`, `correlation_id`, `causation_id`
 - source keys: `source`, `channel`, `reason_code`
 - version keys: `schema_version`, `event_version`
+- category key: `event_category`
 - optional tenancy key: `tenant_id`
 - correction keys: `reverted_event_id`, `supersedes_event_id`, `correction_of`, `correction_reason`
 
-Helpers: `trace()`, `source()`, `version()`, `tenant()`, `correction()`, `merge()`, `withoutNulls()`.
+Helpers: `trace()`, `source()`, `version()`, `tenant()`, `category()`, `correction()`, `merge()`, `withoutNulls()`.
+
+### EventCategory
+
+Constants for the lightweight stored-event type convention:
+
+- `DOMAIN`
+- `INTEGRATION`
+- `AUDIT`
+- `SYSTEM`
 
 ---
 
@@ -199,7 +210,7 @@ php artisan events:install-indexes --drop [--force]
 ### StoredEvent
 
 MongoDB Eloquent model. Connection and collection from config. Fillable:
-`event_class`, `event_id`, `event_name`, `aggregate_id`, `aggregate_type`,
+`event_class`, `event_id`, `event_name`, `event_category`, `aggregate_id`, `aggregate_type`,
 `payload`, `metadata`, `schema_version`, `event_version`, `correlation_id`,
 `causation_id`, `user_id`, `occurred_at`. Native MongoDB arrays are used for
 `payload` and `metadata`; `occurred_at` is cast to datetime (Carbon).
