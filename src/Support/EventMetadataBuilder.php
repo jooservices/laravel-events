@@ -63,6 +63,13 @@ final class EventMetadataBuilder
         return $this;
     }
 
+    public function eventCategory(string $eventCategory): self
+    {
+        $this->metadata[EventMetadata::EVENT_CATEGORY] = $eventCategory;
+
+        return $this;
+    }
+
     /** @return array<string, mixed> */
     public function toArray(): array
     {

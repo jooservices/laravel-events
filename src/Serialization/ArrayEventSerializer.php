@@ -32,6 +32,7 @@ class ArrayEventSerializer implements EventSerializerInterface
                     ?? (string) Str::uuid(),
                 eventName: $this->stringMetadata($metadata, EventMetadata::EVENT_NAME)
                     ?? $this->shortClassName($event::class),
+                eventCategory: $this->stringMetadata($metadata, EventMetadata::EVENT_CATEGORY),
                 aggregateType: $this->stringMetadata($metadata, EventMetadata::AGGREGATE_TYPE),
                 schemaVersion: $this->stringOrIntMetadata($metadata, EventMetadata::SCHEMA_VERSION),
                 eventVersion: $this->stringOrIntMetadata($metadata, EventMetadata::EVENT_VERSION),

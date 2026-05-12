@@ -26,6 +26,7 @@ class StoredEventTest extends TestCase
                 'event_class',
                 'event_id',
                 'event_name',
+                'event_category',
                 'aggregate_id',
                 'aggregate_type',
                 'payload',

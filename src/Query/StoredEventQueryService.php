@@ -27,6 +27,12 @@ class StoredEventQueryService
     }
 
     /** @return Collection<int, StoredEventData> */
+    public function byEventCategory(string $eventCategory, int $limit = 50): Collection
+    {
+        return $this->latest($limit, ['event_category' => $eventCategory]);
+    }
+
+    /** @return Collection<int, StoredEventData> */
     public function byCorrelationId(string $correlationId, int $limit = 50): Collection
     {
         return $this->latest($limit, ['metadata.correlation_id' => $correlationId]);

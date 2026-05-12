@@ -54,6 +54,7 @@ class InstallIndexesCommand extends Command
         $collection->createIndex(['aggregate_id' => 1]);
         $collection->createIndex(['aggregate_id' => 1, 'created_at' => 1]);
         $collection->createIndex(['event_class' => 1]);
+        $collection->createIndex(['event_category' => 1]);
         $collection->createIndex(['event_class' => 1, 'created_at' => 1]);
         $collection->createIndex(['metadata.correlation_id' => 1]);
         $collection->createIndex(['metadata.causation_id' => 1]);

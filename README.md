@@ -109,7 +109,9 @@ event(new OrderCreated('ORD-001', [['sku' => 'X', 'qty' => 2]]));
 
 Events are stored in the `stored_events` collection. Optional: `occurredAt(): ?\Carbon\CarbonInterface`, `metadata(): array`. Use the `HasEventSourcingDefaults` trait to implement only `payload()` and `aggregateId()`.
 
-Recommended metadata keys include `request_id`, `correlation_id`, `causation_id`, `source`, `channel`, `reason_code`, `schema_version`, `event_version`, and optional `tenant_id`. The `EventMetadata` helper exposes constants and small factory methods for those conventions.
+Recommended metadata keys include `request_id`, `correlation_id`, `causation_id`, `source`, `channel`, `reason_code`, `schema_version`, `event_version`, `event_category`, and optional `tenant_id`. The `EventMetadata` helper exposes constants and small factory methods for those conventions.
+
+Use `event_category` for a lightweight event type convention when you need broad categories such as `domain`, `integration`, `audit`, or `system` without introducing a full event taxonomy framework.
 
 ### Event Log (Audit)
 
@@ -146,11 +148,14 @@ use JOOservices\LaravelEvents\Query\EventLogQueryService;
 use JOOservices\LaravelEvents\Query\StoredEventQueryService;
 
 $events = app(StoredEventQueryService::class)->byAggregateId('ORD-001');
+$domainEvents = app(StoredEventQueryService::class)->byEventCategory('domain');
 $audit = app(EventLogQueryService::class)->byEntity('orders', 'ORD-001');
 ```
 
 Query services return typed package data records and intentionally stay small.
 Build dashboards, projections, and reporting in your application.
+
+`JOOservices\...` is the canonical package namespace in `1.2.0`. The legacy `JooServices\...` namespace remains available for backward compatibility.
 
 ## Redaction
 

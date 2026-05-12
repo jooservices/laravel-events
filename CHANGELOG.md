@@ -7,24 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-05-11
+
 ### Added
 
-- **Carbon:** Event time (`occurredAt`) and StoredEvent `occurred_at` use Carbon (`\Carbon\CarbonInterface`) instead of `\DateTimeInterface`.
-- **HasEventSourcingDefaults** trait: default `occurredAt(): null` and `metadata(): []` so events need only implement `payload()` and `aggregateId()`.
-- **DefaultsToUpdatedAction** trait: default `getAction(): 'updated'` for `HasLogAction` so log events need not implement `getAction()` when action is always updated.
-- **EventLogAction** constants for the recommended event log action taxonomy (`created`, `updated`, `deleted`, `restored`, `status_changed`, `corrected`, `synchronized`, `imported`).
-- **EventMetadata** helper with constants and small factory methods for trace, source, version, tenant, and correction metadata conventions.
-- **Documentation:** Added decision guide, metadata/versioning/correction conventions, operations guidance, production safety notes, and optional AI integration stubs.
+- **Namespace compatibility:** `JOOservices\LaravelEvents\...` is now the canonical package namespace while the legacy `JooServices\LaravelEvents\...` namespace remains available for backward compatibility.
+- **Event category support:** Added lightweight stored-event `event_category` support, including `EventMetadata::category()`, `EventMetadataBuilder::eventCategory()`, `EventSourcing\EventCategory`, top-level envelope persistence, query support, and index installation support.
+- **Compatibility coverage:** Added tests to verify legacy namespace compatibility and the new event-category behavior.
 
 ### Changed
 
-- `EventService::storeEvent()` now accepts `?\Carbon\CarbonInterface $occurredAt` (was `?\DateTimeInterface`).
-- **Documentation:** Updated `./docs` (api, code-structure, configuration, event-log, event-sourcing, installation, samples).
-- **Indexes:** `events:install-indexes` now also creates safe compound indexes for common chronological aggregate, event class, entity, and action queries.
+- **Batch persistence:** `EventService::recordManyStoredEvents()` and `recordManyEventLogs()` now reuse a single resolved context payload and timestamp per batch write.
+- **Documentation:** Updated README and package docs for the canonical `JOOservices` namespace, the `release/<version>` flow, and stored-event category querying.
+- **Dependencies:** Refreshed Composer metadata and validated the locked dependency set against the current package constraints.
 
 ### Not Added
 
-- No AI runtime, agents, data fetching, projections/read models, analytics/reporting, compensation engine, or upcaster framework.
+- No package-level event taxonomy framework, projections, analytics, replay orchestration, tenant-specific policies, or AI runtime features were introduced in this release.
+
 
 ## [1.0.0] - 2026-03-09
 

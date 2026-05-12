@@ -42,12 +42,14 @@
     },
     "autoload": {
         "psr-4": {
-            "JOOservices\\LaravelEvents\\": "src/"
+            "JOOservices\\LaravelEvents\\": "src/",
+            "JooServices\\LaravelEvents\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "JOOservices\\LaravelEvents\\Tests\\": "tests/"
+            "JOOservices\\LaravelEvents\\Tests\\": "tests/",
+            "JooServices\\LaravelEvents\\Tests\\": "tests/"
         }
     },
     "extra": {
@@ -65,7 +67,7 @@
         "lint:cs": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --dry-run --diff --sequential",
         "lint:cs:fix": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --sequential",
         "lint:phpstan": "phpstan analyse --memory-limit=512M",
-        "lint:phpmd": "@php -d error_reporting=24575 vendor/bin/phpmd src text phpmd.xml",
+        "lint:phpmd": "@php -d error_reporting=24575 vendor/bin/phpmd src,tests text phpmd.xml",
         "lint:phpcs": "phpcs --standard=phpcs.xml",
         "lint": [
             "@lint:pint",

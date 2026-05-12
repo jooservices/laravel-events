@@ -12,6 +12,8 @@ final class EventMetadata
 
     public const AGGREGATE_TYPE = 'aggregate_type';
 
+    public const EVENT_CATEGORY = 'event_category';
+
     public const REQUEST_ID = 'request_id';
 
     public const CORRELATION_ID = 'correlation_id';
@@ -90,6 +92,14 @@ final class EventMetadata
     public static function tenant(int|string|null $tenantId = null): array
     {
         return self::withoutNulls([self::TENANT_ID => $tenantId]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function category(?string $eventCategory = null): array
+    {
+        return self::withoutNulls([self::EVENT_CATEGORY => $eventCategory]);
     }
 
     /**

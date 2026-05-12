@@ -109,6 +109,7 @@ event(new OrderCreated('ORD-001', [['sku' => 'X', 'qty' => 2]]));
 - `aggregate_type`: optional metadata-derived aggregate type
 - `payload`: from `payload()`
 - `metadata`: merge of context_provider and event `metadata()`
+- `event_category`: optional top-level copy from metadata for lightweight event-type filtering
 - `schema_version`, `event_version`: optional top-level copies from metadata for easier filtering
 - `correlation_id`, `causation_id`: optional top-level copies from metadata for trace queries
 - `user_id`: from `auth()->id()` or passed to EventService
@@ -124,6 +125,8 @@ nullable/additive and are derived by the default serializer.
 aggregate id, user id, occurred-at time, and merged metadata into
 `StoredEventData`. The default `ArrayEventSerializer` preserves the current
 array-payload behavior while adding optional envelope fields.
+
+The default serializer also promotes `metadata['event_category']` into a top-level nullable `event_category` field on stored events.
 
 Applications may bind their own serializer in the Laravel container when they
 need DTO payload mapping or a stricter event naming convention:
