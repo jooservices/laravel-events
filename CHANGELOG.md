@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-05-12
+
+### Changed
+
+- **Namespace policy:** Formalized `JOOservices\LaravelEvents\...` as the preferred namespace for the `1.3.x` line while keeping the legacy `JooServices\LaravelEvents\...` aliases available for compatibility.
+- **Release workflow:** Removed the GitHub Discussions dependency from tag-driven releases so release publishing works in repositories where Discussions are disabled.
+- **Packagist publishing:** Corrected the Packagist update payload to send the GitHub repository URL for stable tag notifications.
+
 ## [1.2.0] - 2026-05-11
 
 ### Added
@@ -50,4 +58,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Laravel ^12.0
 - mongodb/laravel-mongodb ^5.6
 
+[1.3.0]: https://github.com/jooservices/laravel-events/releases/tag/v1.3.0
 [1.0.0]: https://github.com/jooservices/laravel-events/releases/tag/v1.0.0
