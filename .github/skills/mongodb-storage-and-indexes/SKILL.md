@@ -19,5 +19,5 @@ MongoDB behavior is the core package responsibility. Hardcoded collection names,
 - Test index installation against real MongoDB whenever index behavior changes.
 - Keep query APIs narrowly focused on stored events and audit logs; do not add analytics dashboards or tenant filtering.
 - If MongoDB is unavailable, report the exact limitation instead of claiming tests passed.
-- Use Laravel 12 / PHP 8.5 standards, keep Pint as formatter authority, and update docs for public storage behavior changes.
+- Use Laravel 12/13 / PHP 8.5 standards, keep Pint as formatter authority, and update docs for public storage behavior changes.
 - Stop and ask when retention, TTL, index uniqueness, or migration safety is unclear.

@@ -19,5 +19,5 @@ Event streams and audit logs can have long retention. Sensitive data persisted t
 - Do not add AI data export, external AI tools, or agent runtime code to the package.
 - If documenting app-layer AI use, require authorization, redaction, retention controls, and audit controls.
 - Add focused tests for nested redaction and explicit null behavior when relevant.
-- Use Laravel 12 / PHP 8.5 standards, keep Pint as formatter authority, and test storage with real MongoDB when persistence behavior changes.
+- Use Laravel 12/13 / PHP 8.5 standards, keep Pint as formatter authority, and test storage with real MongoDB when persistence behavior changes.
 - Stop and ask when sensitivity, authorization, retention, or compliance expectations are unclear.

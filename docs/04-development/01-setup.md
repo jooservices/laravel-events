@@ -87,7 +87,7 @@ GitHub Actions are configured for:
 - tag-driven GitHub releases and Packagist updates
 - OpenSSF Scorecard analysis
 
-The CI workflow targets PHP 8.5 and Laravel 12, matching the package's current runtime constraints.
+The CI workflow targets PHP 8.5 and Laravel 12/13, matching the package's current runtime constraints.
 
 ## MongoDB Integration Tests
 

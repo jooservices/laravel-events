@@ -39,7 +39,7 @@ The package does not provide:
 - Inspect the real current codebase before changing anything.
 - Do not assume missing requirements or repository state.
 - Stop and report conflicts between requirements, code, docs, CI, or branch state.
-- Use PHP 8.5 and latest Laravel 12 package standards.
+- Use PHP 8.5 and latest Laravel 12/13 package standards.
 - Formatting authority: Laravel Pint.
 - Structural checks: PHPCS.
 - Static analysis: PHPStan through Larastan.

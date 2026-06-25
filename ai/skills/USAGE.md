@@ -11,7 +11,7 @@ Shared baseline:
 - Do not assume.
 - Stop and report ambiguity or conflicts.
 - Keep scope limited to Laravel event sourcing and MongoDB audit event logs.
-- Use PHP 8.5 and Laravel 12.
+- Use PHP 8.5 and Laravel 12/13.
 - Use real MongoDB integration tests for persisted data.
 - Pint wins formatter conflicts.
 - Run Composer quality gates before commit.

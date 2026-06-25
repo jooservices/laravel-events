@@ -1,7 +1,7 @@
 # Tech stack
 
 - PHP 8.5
-- Laravel 12
+- Laravel 12/13
 - `mongodb/laravel-mongodb` for MongoDB Eloquent models
 - Orchestra Testbench for package integration tests
 - PHPUnit for tests and coverage

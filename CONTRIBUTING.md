@@ -1,7 +1,7 @@
 # Contributing
 
 Contributions to `jooservices/laravel-events` should keep the package aligned
-with Laravel 12, PHP 8.5, MongoDB persistence, and the repository quality gates.
+with Laravel 12/13, PHP 8.5, MongoDB persistence, and the repository quality gates.
 
 For more detail, see [docs/04-development/09-contributing.md](docs/04-development/09-contributing.md),
 [AGENTS.md](AGENTS.md), and [CLAUDE.md](CLAUDE.md).

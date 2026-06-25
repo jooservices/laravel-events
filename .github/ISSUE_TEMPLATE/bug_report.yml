@@ -19,7 +19,7 @@ body:
     id: php-laravel-version
     attributes:
       label: PHP and Laravel version
-      placeholder: e.g. PHP 8.5.1, Laravel 12.x
+      placeholder: e.g. PHP 8.5.1, Laravel 12.x/13.x
     validations:
       required: true
   - type: input
