@@ -4,7 +4,7 @@ Use this skill when changing package structure, public contracts, service respon
 
 ## What
 
-Keep the package a Laravel 12 / PHP 8.5 event persistence package. The architecture centers on Laravel-native event dispatching, `EventService`, MongoDB-backed stored events, MongoDB-backed audit logs, typed data records, query services, metadata helpers, and index installation.
+Keep the package a Laravel 12/13 / PHP 8.5 event persistence package. The architecture centers on Laravel-native event dispatching, `EventService`, MongoDB-backed stored events, MongoDB-backed audit logs, typed data records, query services, metadata helpers, and index installation.
 
 ## Why
 

@@ -6,7 +6,7 @@ When working in this repository:
 
 - Prefer the smallest change that fits the existing Laravel package structure.
 - Inspect the real codebase before changing anything and stop on ambiguity or conflicts.
-- Use PHP 8.5 and Laravel 12 package standards.
+- Use PHP 8.5 and Laravel 12/13 package standards.
 - Keep Event Sourcing and Event Log concepts separate.
 - Match Laravel conventions and the current namespace layout.
 - Do not introduce projections, analytics, query frameworks, or AI runtime behavior into the package core.

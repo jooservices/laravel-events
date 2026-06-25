@@ -19,5 +19,5 @@ The package's public value is durable MongoDB-backed event and audit storage. Mo
 - CI uses `mongo:7.0`; local tests should use the documented `MONGODB_URI` and `MONGODB_DATABASE`.
 - Report exact MongoDB availability problems instead of silently skipping.
 - Do not add useless tests only to satisfy coverage. Cover behavior that could regress.
-- Use Laravel 12 / PHP 8.5 package standards, keep Pint as formatter authority, and update docs when test commands or public behavior change.
+- Use Laravel 12/13 / PHP 8.5 package standards, keep Pint as formatter authority, and update docs when test commands or public behavior change.
 - Stop and ask when a test would require fake persistence for behavior that should be proven against MongoDB.

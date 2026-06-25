@@ -3,9 +3,9 @@
 ## Requirements
 
 - **PHP** ^8.5
-- **Laravel** ^12.0
+- **Laravel** ^12.0|^13.0
 - **MongoDB** (server) and PHP MongoDB extension
-- **mongodb/laravel-mongodb** ^5.6 (MongoDB Eloquent adapter for Laravel)
+- **mongodb/laravel-mongodb** ^5.7 (MongoDB Eloquent adapter for Laravel)
 
 ## Composer
 

@@ -19,5 +19,5 @@ Stored events can become long-lived historical records. Breaking payload semanti
 - Preserve readability of older MongoDB documents when adding nullable fields.
 - Test storage behavior against real MongoDB; do not mock persisted stored event records.
 - Stop and ask when a change implies replay orchestration, projections, outbox behavior, or side effects.
-- Use Laravel 12 / PHP 8.5 standards and let Pint win formatter conflicts.
+- Use Laravel 12/13 / PHP 8.5 standards and let Pint win formatter conflicts.
 - Update README/docs and run Composer quality gates when public Event Sourcing behavior changes.

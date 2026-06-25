@@ -1,6 +1,6 @@
 # Laravel Events documentation
 
-Documentation for `jooservices/laravel-events`, a Laravel 12 package for
+Documentation for `jooservices/laravel-events`, a Laravel 12/13 package for
 MongoDB-backed event sourcing records and audit event logs.
 
 ## Reading order

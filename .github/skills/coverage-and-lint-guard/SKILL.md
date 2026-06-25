@@ -18,6 +18,6 @@ The repository follows the DTO baseline for quality gates while preserving Larav
 - Keep `lint:fix` as Pint fix + PHP-CS-Fixer fix.
 - Use meaningful tests to protect coverage; do not game coverage by excluding source files without a valid reason.
 - Run every relevant Composer gate before claiming success, and report exact failures or environment limits.
-- Keep Laravel 12 / PHP 8.5 assumptions explicit.
+- Keep Laravel 12/13 / PHP 8.5 assumptions explicit.
 - Use real MongoDB tests for persisted event and audit storage behavior.
 - Update docs when quality gates, scripts, hooks, or CI thresholds change.

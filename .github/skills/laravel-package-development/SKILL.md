@@ -4,7 +4,7 @@ Use this skill for Laravel package code, service provider behavior, commands, co
 
 ## What
 
-This repository is a Laravel 12 package for MongoDB persistence of Event Sourcing and Event Log records. It should keep Laravel service provider discovery in `composer.json`, publish configuration through Laravel conventions, and test package integration through Orchestra Testbench.
+This repository is a Laravel 12/13 package for MongoDB persistence of Event Sourcing and Event Log records. It should keep Laravel service provider discovery in `composer.json`, publish configuration through Laravel conventions, and test package integration through Orchestra Testbench.
 
 ## Why
 
@@ -16,6 +16,6 @@ Consumers expect package behavior to follow Laravel conventions. Hidden app assu
 - Preserve Laravel-native event dispatching; do not replace it with a custom bus.
 - Keep public config keys backward compatible unless a breaking change is explicitly approved.
 - Add tests for command registration, config merge/publish behavior, subscriber wiring, and service behavior when public behavior changes.
-- Use PHP 8.5 typing and latest Laravel 12 package standards.
+- Use PHP 8.5 typing and latest Laravel 12/13 package standards.
 - Let Pint own formatting; keep PHP-CS-Fixer limited to non-conflicting PHPDoc cleanup.
 - Run `composer validate --strict`, `composer lint:all`, `composer test`, and `composer check` before completion.
