@@ -57,7 +57,7 @@ jobs:
         run: composer lint:all
 
       - name: Run tests
-        run: composer test
+        run: composer test -- --no-coverage
 
   release:
     name: Create GitHub Release
