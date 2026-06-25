@@ -19,4 +19,4 @@ This package is distributed through Composer. Release branches, tags, docs, and 
 - Run `composer validate --strict`, `composer install`, `composer lint:all`, `composer test`, `composer test:coverage`, `composer check`, and `composer ci` before release handoff.
 - Confirm guarded release steps do not fail when optional Packagist or analysis secrets are missing.
 - Stop and ask if branch state, tags, docs, CI, or dependency changes conflict.
-- Keep Laravel 12 / PHP 8.5 support, Pint authority, real MongoDB tests, and docs synchronization visible in release readiness checks.
+- Keep Laravel 12/13 / PHP 8.5 support, Pint authority, real MongoDB tests, and docs synchronization visible in release readiness checks.

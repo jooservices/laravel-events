@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-06-25
+
+### Added
+
+- Added Laravel 13 support alongside Laravel 12: `laravel/framework` now accepts `^12.0|^13.0`
+- Added `orchestra/testbench:^11.0` to `require-dev` so the package can be tested against Laravel 13
+- Added a CI test matrix running the suite against both Laravel 12 and Laravel 13
+
+### Changed
+
+- Bumped the `mongodb/laravel-mongodb` floor to `^5.7` (the first release with Laravel 13 support)
+- Updated docs, AI skills, and agent instructions to state the Laravel 12/13 support range
+
 ## [1.3.0] - 2026-05-12
 
 ### Changed

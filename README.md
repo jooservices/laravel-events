@@ -10,7 +10,7 @@ Lightweight Event Sourcing and Event Log persistence for Laravel with **MongoDB*
 
 Package name: `jooservices/laravel-events`
 
-- **Laravel 12** · **PHP 8.5+**
+- **Laravel 12/13** · **PHP 8.5+**
 - **MongoDB** via [mongodb/laravel-mongodb](https://github.com/mongodb/laravel-mongodb)
 
 ---

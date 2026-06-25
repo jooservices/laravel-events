@@ -12,7 +12,7 @@ Required behavior:
 - do not assume missing requirements
 - stop and report conflicts or ambiguity
 - keep scope limited to Laravel event persistence and audit logging
-- use PHP 8.5 and Laravel 12 package standards
+- use PHP 8.5 and Laravel 12/13 package standards
 - let Pint win formatter conflicts
 - use real MongoDB integration tests for persisted data
 - update docs when public behavior, commands, hooks, or CI changes

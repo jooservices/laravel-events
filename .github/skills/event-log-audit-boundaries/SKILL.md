@@ -19,5 +19,5 @@ Audit trails need consistent before/after semantics without becoming business an
 - Apply redaction before persisting sensitive fields.
 - Use real MongoDB integration tests for storage behavior.
 - Update README and docs when action, diff, metadata, or retention behavior changes.
-- Use Laravel 12 / PHP 8.5 standards and let Pint win formatter conflicts.
+- Use Laravel 12/13 / PHP 8.5 standards and let Pint win formatter conflicts.
 - Run Composer quality gates before claiming audit behavior is done.
