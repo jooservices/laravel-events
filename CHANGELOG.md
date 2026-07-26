@@ -1,10 +1,11 @@
 ## [Unreleased]
 
+## [1.5.0] - 2026-07-26
+
 ### Changed
 
 - Removed alternate-casing PSR-4 compatibility. The only public PHP root
   namespace is `JOOservices\LaravelEvents` (uppercase `OO`).
-
 
 ## [1.4.0] - 2026-06-25
 
@@ -33,7 +34,7 @@
 
 - **Namespace policy:** Documented `JOOservices\LaravelEvents\...` as the canonical package namespace.
 - **Event category support:** Added lightweight stored-event `event_category` support, including `EventMetadata::category()`, `EventMetadataBuilder::eventCategory()`, `EventSourcing\EventCategory`, top-level envelope persistence, query support, and index installation support.
-- **Compatibility coverage:** Added tests to verify legacy namespace compatibility and the new event-category behavior.
+- **Namespace transition coverage:** Added tests for the package namespace transition and the new event-category behavior.
 
 ### Changed
 
@@ -70,5 +71,10 @@
 - Laravel ^12.0
 - mongodb/laravel-mongodb ^5.6
 
+[Unreleased]: https://github.com/jooservices/laravel-events/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/jooservices/laravel-events/releases/tag/v1.5.0
+[1.4.0]: https://github.com/jooservices/laravel-events/releases/tag/v1.4.0
 [1.3.0]: https://github.com/jooservices/laravel-events/releases/tag/v1.3.0
+[1.2.0]: https://github.com/jooservices/laravel-events/releases/tag/v1.2.0
+[1.1.0]: https://github.com/jooservices/laravel-events/releases/tag/v1.1.0
 [1.0.0]: https://github.com/jooservices/laravel-events/releases/tag/v1.0.0
