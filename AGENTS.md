@@ -2,6 +2,12 @@
 
 This repository is the PHP package `jooservices/laravel-events`.
 
+
+## Mandatory PHP namespace
+
+**FORCE ALWAYS** use `JOOservices\LaravelEvents\` (uppercase `OO`). Do not use
+alternate casing or restore dual PSR-4 aliases.
+
 ## Core Intent
 
 - Preserve Laravel-native event dispatching; do not replace it with a custom bus.

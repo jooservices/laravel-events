@@ -1,6 +1,7 @@
 # Laravel Events
 
-[![CI](https://github.com/jooservices/laravel-events/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/jooservices/laravel-events/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/jooservices/laravel-events/branch/master/graph/badge.svg)](https://codecov.io/gh/jooservices/laravel-events)
+[![CI](https://github.com/jooservices/laravel-events/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jooservices/laravel-events/actions/workflows/ci.yml)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/jooservices/laravel-events/badge)](https://securityscorecards.dev/viewer/?uri=github.com/jooservices/laravel-events)
 [![PHP Version](https://img.shields.io/badge/PHP-8.5%2B-blue.svg)](https://www.php.net/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -155,7 +156,7 @@ $audit = app(EventLogQueryService::class)->byEntity('orders', 'ORD-001');
 Query services return typed package data records and intentionally stay small.
 Build dashboards, projections, and reporting in your application.
 
-`JOOservices\...` is the canonical package namespace in `1.2.0`. The legacy `JooServices\...` namespace remains available for backward compatibility.
+`JOOservices\...` is the canonical package namespace in `1.2.0`. The legacy `JOOservices\...` namespace remains available for backward compatibility.
 
 ## Redaction
 

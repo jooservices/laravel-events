@@ -42,14 +42,12 @@
     },
     "autoload": {
         "psr-4": {
-            "JOOservices\\LaravelEvents\\": "src/",
-            "JooServices\\LaravelEvents\\": "src/"
+            "JOOservices\\LaravelEvents\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "JOOservices\\LaravelEvents\\Tests\\": "tests/",
-            "JooServices\\LaravelEvents\\Tests\\": "tests/"
+            "JOOservices\\LaravelEvents\\Tests\\": "tests/"
         }
     },
     "extra": {
