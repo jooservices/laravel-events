@@ -1,11 +1,10 @@
-# Changelog
-
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
 ## [Unreleased]
+
+### Changed
+
+- Removed the legacy `JooServices\LaravelEvents` PSR-4 alias. The only public
+  PHP root namespace is `JOOservices\LaravelEvents` (uppercase `OO`).
+
 
 ## [1.4.0] - 2026-06-25
 
@@ -24,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Namespace policy:** Formalized `JOOservices\LaravelEvents\...` as the preferred namespace for the `1.3.x` line while keeping the legacy `JooServices\LaravelEvents\...` aliases available for compatibility.
+- **Namespace policy:** Formalized `JOOservices\LaravelEvents\...` as the preferred namespace for the `1.3.x` line while keeping the legacy `JOOservices\LaravelEvents\...` aliases available for compatibility.
 - **Release workflow:** Removed the GitHub Discussions dependency from tag-driven releases so release publishing works in repositories where Discussions are disabled.
 - **Packagist publishing:** Corrected the Packagist update payload to send the GitHub repository URL for stable tag notifications.
 
@@ -32,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Namespace compatibility:** `JOOservices\LaravelEvents\...` is now the canonical package namespace while the legacy `JooServices\LaravelEvents\...` namespace remains available for backward compatibility.
+- **Namespace compatibility:** `JOOservices\LaravelEvents\...` is now the canonical package namespace while the legacy `JOOservices\LaravelEvents\...` namespace remains available for backward compatibility.
 - **Event category support:** Added lightweight stored-event `event_category` support, including `EventMetadata::category()`, `EventMetadataBuilder::eventCategory()`, `EventSourcing\EventCategory`, top-level envelope persistence, query support, and index installation support.
 - **Compatibility coverage:** Added tests to verify legacy namespace compatibility and the new event-category behavior.
 

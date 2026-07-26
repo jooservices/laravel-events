@@ -10,7 +10,7 @@ use ReflectionClass;
 
 class NamespaceCompatibilityTest extends TestCase
 {
-    private const LEGACY_NAMESPACE = 'JooServices\\LaravelEvents\\';
+    private const LEGACY_NAMESPACE = 'JOOservices\\LaravelEvents\\';
 
     private const LEGACY_EVENT_SOURCING_INTERFACE = self::LEGACY_NAMESPACE
         .'EventSourcing\\Contracts\\EventSourcingInterface';
@@ -26,7 +26,7 @@ class NamespaceCompatibilityTest extends TestCase
 
     public function test_legacy_class_namespace_resolves_to_canonical_class(): void
     {
-        $legacyClass = 'JooServices\\LaravelEvents\\EventService';
+        $legacyClass = 'JOOservices\\LaravelEvents\\EventService';
 
         $this->assertTrue(class_exists($legacyClass));
         $this->assertSame(
