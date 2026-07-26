@@ -5,8 +5,8 @@ This repository is the PHP package `jooservices/laravel-events`.
 
 ## Mandatory PHP namespace
 
-**FORCE ALWAYS** use `JOOservices\LaravelEvents\` (uppercase `OO`). Never use
-`Jooservices\` or `JooServices\`. Do not restore dual PSR-4 aliases.
+**FORCE ALWAYS** use `JOOservices\LaravelEvents\` (uppercase `OO`). Do not use
+alternate casing or restore dual PSR-4 aliases.
 
 ## Core Intent
 
