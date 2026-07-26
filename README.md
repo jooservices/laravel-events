@@ -155,7 +155,7 @@ $audit = app(EventLogQueryService::class)->byEntity('orders', 'ORD-001');
 Query services return typed package data records and intentionally stay small.
 Build dashboards, projections, and reporting in your application.
 
-`JOOservices\...` is the canonical package namespace in `1.2.0`. The legacy `JooServices\...` namespace remains available for backward compatibility.
+`JOOservices\...` is the canonical package namespace in `1.2.0`. The legacy `JOOservices\...` namespace remains available for backward compatibility.
 
 ## Redaction
 
