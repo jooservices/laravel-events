@@ -2,8 +2,8 @@
 
 ### Changed
 
-- Removed the legacy `JooServices\LaravelEvents` PSR-4 alias. The only public
-  PHP root namespace is `JOOservices\LaravelEvents` (uppercase `OO`).
+- Removed alternate-casing PSR-4 compatibility. The only public PHP root
+  namespace is `JOOservices\LaravelEvents` (uppercase `OO`).
 
 
 ## [1.4.0] - 2026-06-25
@@ -23,7 +23,7 @@
 
 ### Changed
 
-- **Namespace policy:** Formalized `JOOservices\LaravelEvents\...` as the preferred namespace for the `1.3.x` line while keeping the legacy `JOOservices\LaravelEvents\...` aliases available for compatibility.
+- **Namespace policy:** Formalized `JOOservices\LaravelEvents\...` as the public namespace for the `1.3.x` line.
 - **Release workflow:** Removed the GitHub Discussions dependency from tag-driven releases so release publishing works in repositories where Discussions are disabled.
 - **Packagist publishing:** Corrected the Packagist update payload to send the GitHub repository URL for stable tag notifications.
 
@@ -31,7 +31,7 @@
 
 ### Added
 
-- **Namespace compatibility:** `JOOservices\LaravelEvents\...` is now the canonical package namespace while the legacy `JOOservices\LaravelEvents\...` namespace remains available for backward compatibility.
+- **Namespace policy:** Documented `JOOservices\LaravelEvents\...` as the canonical package namespace.
 - **Event category support:** Added lightweight stored-event `event_category` support, including `EventMetadata::category()`, `EventMetadataBuilder::eventCategory()`, `EventSourcing\EventCategory`, top-level envelope persistence, query support, and index installation support.
 - **Compatibility coverage:** Added tests to verify legacy namespace compatibility and the new event-category behavior.
 
