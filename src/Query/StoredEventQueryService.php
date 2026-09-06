@@ -6,13 +6,15 @@ namespace JOOservices\LaravelEvents\Query;
 
 use DateTimeInterface;
 use Illuminate\Support\Collection;
-use InvalidArgumentException;
 use JOOservices\LaravelEvents\Data\StoredEventData;
 use JOOservices\LaravelEvents\EventSourcing\Models\StoredEvent;
+use JOOservices\LaravelEvents\Exceptions\InvalidQueryException;
 
 class StoredEventQueryService
 {
-    public function __construct(private readonly StoredEvent $model) {}
+    public function __construct(private readonly StoredEvent $model)
+    {
+    }
 
     /** @return Collection<int, StoredEventData> */
     public function byAggregateId(string $aggregateId, int $limit = 50): Collection
@@ -85,14 +87,14 @@ class StoredEventQueryService
         return $query->orderByDesc('created_at')
             ->limit($limit)
             ->get()
-            ->map(fn (StoredEvent $event): StoredEventData => StoredEventData::fromArray($event->toArray()))
+            ->map(fn(StoredEvent $event): StoredEventData => StoredEventData::fromArray($event->toArray()))
             ->values();
     }
 
     private function assertLimit(int $limit): void
     {
         if ($limit < 1 || $limit > 500) {
-            throw new InvalidArgumentException('Query limit must be between 1 and 500.');
+            throw InvalidQueryException::limitOutOfRange($limit);
         }
     }
 }

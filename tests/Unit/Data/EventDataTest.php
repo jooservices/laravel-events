@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace JOOservices\LaravelEvents\Tests\Unit\Data;
 
-use InvalidArgumentException;
 use JOOservices\LaravelEvents\Data\EventLogData;
 use JOOservices\LaravelEvents\Data\StoredEventData;
+use JOOservices\LaravelEvents\Exceptions\InvalidEventDataException;
 use JOOservices\LaravelEvents\Tests\TestCase;
 
 class EventDataTest extends TestCase
@@ -46,14 +46,14 @@ class EventDataTest extends TestCase
 
     public function test_stored_event_data_requires_event_class(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidEventDataException::class);
 
         StoredEventData::fromArray(['payload' => []]);
     }
 
     public function test_stored_event_data_requires_array_payload_and_metadata(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidEventDataException::class);
 
         StoredEventData::fromArray([
             'event_class' => 'OrderCreated',
@@ -92,7 +92,7 @@ class EventDataTest extends TestCase
 
     public function test_event_log_data_requires_required_fields(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidEventDataException::class);
 
         EventLogData::fromArray(['entity_type' => 'orders']);
     }

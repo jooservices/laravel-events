@@ -21,7 +21,7 @@ class NamespaceCompatibilityTest extends TestCase
         $this->assertTrue(class_exists($class));
         $this->assertSame(
             EventService::class,
-            (new ReflectionClass($class))->getName()
+            (new ReflectionClass($class))->getName(),
         );
         $this->assertStringStartsWith('JOOservices\\LaravelEvents\\', $class);
     }

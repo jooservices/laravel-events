@@ -14,7 +14,7 @@ class DiffHelperTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->helper = new DiffHelper;
+        $this->helper = new DiffHelper();
     }
 
     public function test_diff_returns_empty_when_arrays_are_identical(): void

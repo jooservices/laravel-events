@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 $positiveIntegerEnv = static function (string $key): ?int {
     $value = env($key);
 

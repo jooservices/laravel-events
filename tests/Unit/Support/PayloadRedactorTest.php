@@ -11,14 +11,14 @@ class PayloadRedactorTest extends TestCase
 {
     public function test_redacts_simple_key(): void
     {
-        $redacted = (new PayloadRedactor)->redact(['password' => 'secret', 'name' => 'Jane']);
+        $redacted = (new PayloadRedactor())->redact(['password' => 'secret', 'name' => 'Jane']);
 
         $this->assertSame(['password' => '[REDACTED]', 'name' => 'Jane'], $redacted);
     }
 
     public function test_redacts_nested_key(): void
     {
-        $redacted = (new PayloadRedactor)->redact([
+        $redacted = (new PayloadRedactor())->redact([
             'profile' => [
                 'tokens' => [
                     'access_token' => 'abc',
@@ -35,7 +35,7 @@ class PayloadRedactorTest extends TestCase
 
     public function test_redaction_keys_are_case_insensitive(): void
     {
-        $redacted = (new PayloadRedactor)->redact(['Authorization' => 'Bearer token']);
+        $redacted = (new PayloadRedactor())->redact(['Authorization' => 'Bearer token']);
 
         $this->assertSame('[REDACTED]', $redacted['Authorization']);
     }
@@ -44,7 +44,7 @@ class PayloadRedactorTest extends TestCase
     {
         config()->set('events.redaction.enabled', false);
 
-        $redacted = (new PayloadRedactor)->redact(['password' => 'secret']);
+        $redacted = (new PayloadRedactor())->redact(['password' => 'secret']);
 
         $this->assertSame(['password' => 'secret'], $redacted);
     }

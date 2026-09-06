@@ -10,7 +10,9 @@ use JOOservices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
 
 class EventSourcingSubscriber
 {
-    public function __construct(protected EventService $eventService) {}
+    public function __construct(protected EventService $eventService)
+    {
+    }
 
     public function subscribe(Dispatcher $events): void
     {

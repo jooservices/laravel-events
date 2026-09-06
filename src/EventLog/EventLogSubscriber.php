@@ -15,7 +15,8 @@ class EventLogSubscriber
     public function __construct(
         protected EventService $eventService,
         protected DiffHelper $diffHelper,
-    ) {}
+    ) {
+    }
 
     public function subscribe(Dispatcher $events): void
     {

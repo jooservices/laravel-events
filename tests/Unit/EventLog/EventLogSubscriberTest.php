@@ -23,8 +23,7 @@ class EventLogSubscriberTest extends TestCase
 
     public function test_log_model_change_calls_event_service_with_diff(): void
     {
-        $event = new class implements LoggableModelInterface
-        {
+        $event = new class implements LoggableModelInterface {
             public function getLoggableType(): string
             {
                 return 'Order';
@@ -58,10 +57,10 @@ class EventLogSubscriberTest extends TestCase
                 ['status' => 'pending'],
                 ['status' => 'completed'],
                 ['status' => ['old' => 'pending', 'new' => 'completed']],
-                Mockery::on(fn (array $meta) => array_key_exists('user_id', $meta))
+                Mockery::on(fn(array $meta) => array_key_exists('user_id', $meta)),
             );
 
-        $diffHelper = new DiffHelper;
+        $diffHelper = new DiffHelper();
         $subscriber = new EventLogSubscriber($eventService, $diffHelper);
         $subscriber->logModelChange($event);
         $this->addToAssertionCount(1);
@@ -81,8 +80,7 @@ class EventLogSubscriberTest extends TestCase
     public function test_log_model_change_passes_null_user_id_when_guest(): void
     {
         $this->assertNull(auth()->id());
-        $event = new class implements LoggableModelInterface
-        {
+        $event = new class implements LoggableModelInterface {
             public function getLoggableType(): string
             {
                 return 'Item';
@@ -116,22 +114,21 @@ class EventLogSubscriberTest extends TestCase
                 [],
                 ['name' => 'x'],
                 ['name' => ['old' => null, 'new' => 'x']],
-                ['user_id' => null]
+                ['user_id' => null],
             );
 
-        $subscriber = new EventLogSubscriber($eventService, new DiffHelper);
+        $subscriber = new EventLogSubscriber($eventService, new DiffHelper());
         $subscriber->logModelChange($event);
         $this->addToAssertionCount(1);
     }
 
     public function test_log_model_change_passes_logged_in_user_id(): void
     {
-        $user = new User;
+        $user = new User();
         $user->id = 33;
         $this->actingAs($user);
 
-        $event = new class implements LoggableModelInterface
-        {
+        $event = new class implements LoggableModelInterface {
             public function getLoggableType(): string
             {
                 return 'Item';
@@ -165,18 +162,17 @@ class EventLogSubscriberTest extends TestCase
                 [],
                 ['name' => 'x'],
                 ['name' => ['old' => null, 'new' => 'x']],
-                ['user_id' => 33]
+                ['user_id' => 33],
             );
 
-        $subscriber = new EventLogSubscriber($eventService, new DiffHelper);
+        $subscriber = new EventLogSubscriber($eventService, new DiffHelper());
         $subscriber->logModelChange($event);
         $this->addToAssertionCount(1);
     }
 
     public function test_log_model_change_uses_action_from_has_log_action(): void
     {
-        $event = new class implements HasLogAction, LoggableModelInterface
-        {
+        $event = new class implements HasLogAction, LoggableModelInterface {
             public function getLoggableType(): string
             {
                 return 'Order';
@@ -215,10 +211,10 @@ class EventLogSubscriberTest extends TestCase
                 [],
                 ['status' => 'pending'],
                 ['status' => ['old' => null, 'new' => 'pending']],
-                Mockery::on(fn (array $meta) => array_key_exists('user_id', $meta))
+                Mockery::on(fn(array $meta) => array_key_exists('user_id', $meta)),
             );
 
-        $subscriber = new EventLogSubscriber($eventService, new DiffHelper);
+        $subscriber = new EventLogSubscriber($eventService, new DiffHelper());
         $subscriber->logModelChange($event);
         $this->addToAssertionCount(1);
     }

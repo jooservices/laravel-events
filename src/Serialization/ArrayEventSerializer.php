@@ -16,7 +16,7 @@ class ArrayEventSerializer implements EventSerializerInterface
         object $event,
         array $payload,
         ?string $aggregateId = null,
-        int|string|null $userId = null,
+        int | string | null $userId = null,
         ?CarbonInterface $occurredAt = null,
         array $metadata = [],
     ): StoredEventData {
@@ -58,7 +58,7 @@ class ArrayEventSerializer implements EventSerializerInterface
     }
 
     /** @param array<string, mixed> $metadata */
-    private function stringOrIntMetadata(array $metadata, string $key): int|string|null
+    private function stringOrIntMetadata(array $metadata, string $key): int | string | null
     {
         $value = $metadata[$key] ?? null;
 

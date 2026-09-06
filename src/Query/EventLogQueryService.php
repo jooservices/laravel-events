@@ -6,13 +6,15 @@ namespace JOOservices\LaravelEvents\Query;
 
 use DateTimeInterface;
 use Illuminate\Support\Collection;
-use InvalidArgumentException;
 use JOOservices\LaravelEvents\Data\EventLogData;
 use JOOservices\LaravelEvents\EventLog\Models\EventLogEntry;
+use JOOservices\LaravelEvents\Exceptions\InvalidQueryException;
 
 class EventLogQueryService
 {
-    public function __construct(private readonly EventLogEntry $model) {}
+    public function __construct(private readonly EventLogEntry $model)
+    {
+    }
 
     /** @return Collection<int, EventLogData> */
     public function byEntity(string $entityType, string $entityId, int $limit = 50): Collection
@@ -73,14 +75,14 @@ class EventLogQueryService
         return $query->orderByDesc('created_at')
             ->limit($limit)
             ->get()
-            ->map(fn (EventLogEntry $entry): EventLogData => EventLogData::fromArray($entry->toArray()))
+            ->map(fn(EventLogEntry $entry): EventLogData => EventLogData::fromArray($entry->toArray()))
             ->values();
     }
 
     private function assertLimit(int $limit): void
     {
         if ($limit < 1 || $limit > 500) {
-            throw new InvalidArgumentException('Query limit must be between 1 and 500.');
+            throw InvalidQueryException::limitOutOfRange($limit);
         }
     }
 }

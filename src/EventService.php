@@ -26,8 +26,8 @@ class EventService
         ?PayloadRedactor $redactor = null,
         ?EventSerializerInterface $serializer = null,
     ) {
-        $this->redactor = $redactor ?? new PayloadRedactor;
-        $this->serializer = $serializer ?? new ArrayEventSerializer;
+        $this->redactor = $redactor ?? new PayloadRedactor();
+        $this->serializer = $serializer ?? new ArrayEventSerializer();
     }
 
     /**
@@ -42,7 +42,7 @@ class EventService
         object $event,
         array $payload,
         ?string $aggregateId = null,
-        int|string|null $userId = null,
+        int | string | null $userId = null,
         ?CarbonInterface $occurredAt = null,
         array $metadata = [],
     ): StoredEvent {
@@ -76,7 +76,7 @@ class EventService
         array $changed,
         array $diff,
         array $meta = [],
-        int|string|null $userId = null,
+        int | string | null $userId = null,
     ): EventLogEntry {
         $userId = $userId ?? $meta['user_id'] ?? auth()->id();
         $data = new EventLogData(

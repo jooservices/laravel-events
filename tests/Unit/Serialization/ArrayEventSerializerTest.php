@@ -13,7 +13,7 @@ class ArrayEventSerializerTest extends TestCase
     public function test_serializer_builds_additive_event_envelope_fields_from_metadata(): void
     {
         $event = new class {};
-        $serializer = new ArrayEventSerializer;
+        $serializer = new ArrayEventSerializer();
 
         $data = $serializer->serializeStoredEvent(
             $event,
@@ -46,7 +46,7 @@ class ArrayEventSerializerTest extends TestCase
     public function test_serializer_generates_event_id_and_uses_class_basename_when_metadata_is_missing(): void
     {
         $event = new class {};
-        $data = (new ArrayEventSerializer)->serializeStoredEvent($event, []);
+        $data = (new ArrayEventSerializer())->serializeStoredEvent($event, []);
 
         $this->assertNotNull($data->envelope);
         $this->assertNotNull($data->envelope->eventId);

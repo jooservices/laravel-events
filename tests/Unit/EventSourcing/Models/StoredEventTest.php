@@ -13,14 +13,14 @@ class StoredEventTest extends TestCase
     {
         config()->set('events.connection', 'mongodb');
         config()->set('events.eventsourcing.collection', 'stored_events');
-        $model = new StoredEvent;
+        $model = new StoredEvent();
         $this->assertSame('mongodb', $model->getConnectionName());
         $this->assertSame('stored_events', $model->getTable());
     }
 
     public function test_fillable_attributes(): void
     {
-        $model = new StoredEvent;
+        $model = new StoredEvent();
         $this->assertSame(
             [
                 'event_class',
@@ -38,7 +38,7 @@ class StoredEventTest extends TestCase
                 'user_id',
                 'occurred_at',
             ],
-            $model->getFillable()
+            $model->getFillable(),
         );
     }
 }

@@ -13,6 +13,7 @@ Package name: `jooservices/laravel-events`
 
 - **Laravel 12/13** · **PHP 8.5+**
 - **MongoDB** via [mongodb/laravel-mongodb](https://github.com/mongodb/laravel-mongodb)
+- **DTO / exceptions** via [jooservices/dto](https://github.com/jooservices/dto) and [jooservices/exceptions](https://github.com/jooservices/exceptions)
 
 ---
 
