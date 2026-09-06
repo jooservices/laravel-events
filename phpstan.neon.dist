@@ -1,16 +1,31 @@
 includes:
     - vendor/larastan/larastan/extension.neon
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+    - vendor/phpstan/phpstan-phpunit/extension.neon
+    - vendor/phpstan/phpstan-phpunit/rules.neon
 
 parameters:
     paths:
         - src
         - tests
-    level: 7
+    level: max
+    treatPhpDocTypesAsCertain: false
+    checkMissingCallableSignature: true
+    reportUnmatchedIgnoredErrors: false
     ignoreErrors:
-        # Mockery: MockInterface passed where concrete type expected
-        - '~Parameter #\d+ .+ expects .+, Mockery\\(MockInterface|LegacyMockInterface) given\.~'
-        # Mockery expectation fluent API
-        - '~Call to an undefined method Mockery\\.*~'
+        # Mockery: MockInterface passed where concrete type expected (positional or named)
+        - '~Parameter (#\d+|\$\w+) .+ expects .+, Mockery\\(MockInterface|LegacyMockInterface) given\.~'
+        # Mockery expectation fluent API — reported on some CI/OS PHPStan runs, not all local setups
+        -
+            message: '~Call to an undefined method Mockery\\.*~'
+            path: tests/*
+        # Mockery shouldReceive()/with() chains are typed as mixed without dedicated stubs
+        -
+            identifier: method.nonObject
+            path: tests/*
+        -
+            identifier: offsetAccess.nonOffsetAccessible
+            path: tests/*
         # Anonymous event in tests: aggregateId() return type
         - '~never returns null so it can be removed from the return type~'
         # env() in tests is acceptable (config not cached)
@@ -21,3 +36,14 @@ parameters:
         -
             message: '~Trait .+ is used zero times and is not analysed\.~'
             path: src/*/Concerns/*.php
+        # Eloquent Builder / Auth Guard instance methods mis-reported as static under strict-rules + Larastan
+        -
+            identifier: staticMethod.dynamicCall
+            message: '~Illuminate\\Database\\Eloquent\\Builder~'
+        -
+            identifier: staticMethod.dynamicCall
+            message: '~Illuminate\\Contracts\\Auth\\Guard::id~'
+        # PHPUnit assertInstanceOf after typed construction
+        -
+            identifier: staticMethod.alreadyNarrowedType
+            path: tests/*

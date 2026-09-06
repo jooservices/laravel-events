@@ -10,8 +10,10 @@
 ## Composer
 
 ```bash
-composer require jooservices/laravel-events
+composer require jooservices/laravel-events:^4.0
 ```
+
+Upgrading from `1.x`? Follow [`UPGRADE-4.0.md`](../../UPGRADE-4.0.md).
 
 ## Laravel Setup
 
@@ -48,8 +50,8 @@ Create recommended indexes (and optional TTL) for both collections:
 php artisan events:install-indexes
 ```
 
-- **stored_events:** `aggregate_id`, `aggregate_id + created_at`, `event_class`, `event_class + created_at`, `user_id`, `created_at` (plus optional TTL)
-- **event_logs:** `(entity_type, entity_id)`, `(entity_type, entity_id, created_at)`, `action`, `action + created_at`, `user_id`, `created_at` (plus optional TTL)
+- **stored_events:** `aggregate_id + created_at`, `event_class + created_at`, `event_name + created_at`, sparse unique `event_id`, `event_category`, correlation/causation (metadata + top-level), `user_id`, `created_at` (plus optional TTL)
+- **event_logs:** `(entity_type, entity_id, created_at)`, `action + created_at`, `meta.correlation_id` / `causation_id`, `user_id`, `created_at` (plus optional TTL)
 
 To drop indexes (data is not deleted):
 

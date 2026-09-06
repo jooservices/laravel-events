@@ -25,7 +25,6 @@ Use repository Composer scripts:
 
 ```bash
 composer lint
-composer lint:all
 composer lint:fix
 composer test
 composer test:coverage

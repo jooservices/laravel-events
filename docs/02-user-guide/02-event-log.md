@@ -105,11 +105,13 @@ For corrections or reversions, use the `corrected` action and metadata keys such
 - `created_at`: set by MongoDB/Eloquent
 
 `EventLogSubscriber` treats `getChanged()` as the values being applied to the
-previous state. Internally it merges `prev + changed` before diffing, so explicit
-null values are recorded as changes. Removed fields are only visible when the
-application represents the removal explicitly, for example by setting the field
-to `null` or by storing a direct `EventService::logChange()` record with a custom
-diff.
+previous state. Internally it merges `prev + changed` before diffing for normal
+actions, so explicit null values are recorded as changes. Keys present in `prev`
+but absent from the merged current state appear as removals
+(`['old' => …, 'new' => null]`).
+
+For `action = deleted` with an empty `getChanged()`, the subscriber diffs against
+an empty current state so every previous attribute appears as removed.
 
 ## Querying History for an Entity
 

@@ -6,13 +6,24 @@ namespace JOOservices\LaravelEvents\Query;
 
 use DateTimeInterface;
 use Illuminate\Support\Collection;
-use InvalidArgumentException;
 use JOOservices\LaravelEvents\Data\EventLogData;
 use JOOservices\LaravelEvents\EventLog\Models\EventLogEntry;
 
-class EventLogQueryService
+final class EventLogQueryService
 {
-    public function __construct(private readonly EventLogEntry $model) {}
+    /** @var list<string> */
+    private const ALLOWED_FILTERS = [
+        'entity_type',
+        'entity_id',
+        'action',
+        'user_id',
+        'meta.correlation_id',
+        'meta.causation_id',
+    ];
+
+    public function __construct(private readonly EventLogEntry $model)
+    {
+    }
 
     /** @return Collection<int, EventLogData> */
     public function byEntity(string $entityType, string $entityId, int $limit = 50): Collection
@@ -35,6 +46,8 @@ class EventLogQueryService
     /** @return Collection<int, EventLogData> */
     public function between(DateTimeInterface $from, DateTimeInterface $to, int $limit = 50): Collection
     {
+        QueryGuard::assertDateRange($from, $to);
+
         return $this->run($limit, [], $from, $to);
     }
 
@@ -57,30 +70,12 @@ class EventLogQueryService
         ?DateTimeInterface $from = null,
         ?DateTimeInterface $to = null,
     ): Collection {
-        $this->assertLimit($limit);
+        QueryGuard::assertLimit($limit);
+        QueryGuard::assertFilters($filters, self::ALLOWED_FILTERS);
 
         $query = $this->model->newQuery();
-        foreach ($filters as $key => $value) {
-            $query->where($key, $value);
-        }
-        if ($from !== null) {
-            $query->where('created_at', '>=', $from);
-        }
-        if ($to !== null) {
-            $query->where('created_at', '<=', $to);
-        }
+        QueryExecutor::applyFilters($query, $filters);
 
-        return $query->orderByDesc('created_at')
-            ->limit($limit)
-            ->get()
-            ->map(fn (EventLogEntry $entry): EventLogData => EventLogData::fromArray($entry->toArray()))
-            ->values();
-    }
-
-    private function assertLimit(int $limit): void
-    {
-        if ($limit < 1 || $limit > 500) {
-            throw new InvalidArgumentException('Query limit must be between 1 and 500.');
-        }
+        return QueryExecutor::fetchEventLogs($query, $limit, $from, $to);
     }
 }

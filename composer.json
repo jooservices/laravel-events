@@ -4,19 +4,25 @@
     "type": "library",
     "license": "MIT",
     "keywords": [
-        "laravel",
-        "events",
-        "event-sourcing",
-        "event-log",
         "audit-log",
-        "mongodb",
+        "dto",
         "eloquent",
-        "persistence"
+        "event-log",
+        "event-sourcing",
+        "events",
+        "jooservices",
+        "laravel",
+        "laravel12",
+        "laravel13",
+        "mongodb",
+        "persistence",
+        "php",
+        "php85"
     ],
     "authors": [
         {
-            "name": "JOOservices",
-            "email": "admin@jooservices.com"
+            "name": "Viet Vu",
+            "email": "jooservices@gmail.com"
         }
     ],
     "support": {
@@ -25,18 +31,25 @@
     },
     "require": {
         "php": "^8.5",
+        "jooservices/dto": "^3.2",
+        "jooservices/exceptions": "^4.0",
         "laravel/framework": "^12.0|^13.0",
-        "mongodb/laravel-mongodb": "^5.7"
+        "mongodb/laravel-mongodb": "^5.7",
+        "psr/clock": "^1.0",
+        "psr/log": "^3.0"
     },
     "require-dev": {
         "captainhook/captainhook": "^5.23",
         "captainhook/plugin-composer": "^5.3",
+        "fakerphp/faker": "^1.24",
         "friendsofphp/php-cs-fixer": "^3.65",
         "larastan/larastan": "^3.9",
         "laravel/pint": "^1.27",
         "orchestra/testbench": "^10.0|^11.0",
         "phpmd/phpmd": "^2.15",
         "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-phpunit": "^2.0",
+        "phpstan/phpstan-strict-rules": "^2.0",
         "phpunit/phpunit": "^12.0 || ^13.0",
         "squizlabs/php_codesniffer": "^4.0"
     },
@@ -70,10 +83,7 @@
         "lint": [
             "@lint:pint",
             "@lint:phpcs",
-            "@lint:phpstan"
-        ],
-        "lint:all": [
-            "@lint",
+            "@lint:phpstan",
             "@lint:phpmd",
             "@lint:cs"
         ],
@@ -82,20 +92,15 @@
             "@lint:cs:fix"
         ],
         "check": [
-            "@lint:all",
+            "@lint",
             "@test"
         ],
         "ci": [
-            "@lint:all",
+            "@lint",
             "@test:coverage"
         ],
         "post-install-cmd": "captainhook install --force --skip-existing",
-        "post-update-cmd": "captainhook install --force --skip-existing",
-        "pint": "@lint:pint:fix",
-        "pint:fix": "@lint:pint:fix",
-        "phpstan": "@lint:phpstan",
-        "phpmd": "@lint:phpmd",
-        "phpcs": "@lint:phpcs"
+        "post-update-cmd": "captainhook install --force --skip-existing"
     },
     "config": {
         "sort-packages": true,

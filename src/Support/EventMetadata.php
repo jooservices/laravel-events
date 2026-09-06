@@ -42,7 +42,7 @@ final class EventMetadata
 
     public static function make(): EventMetadataBuilder
     {
-        return new EventMetadataBuilder;
+        return new EventMetadataBuilder();
     }
 
     /**
@@ -78,8 +78,10 @@ final class EventMetadata
     /**
      * @return array<string, mixed>
      */
-    public static function version(int|string|null $schemaVersion = null, int|string|null $eventVersion = null): array
-    {
+    public static function version(
+        int | string | null $schemaVersion = null,
+        int | string | null $eventVersion = null,
+    ): array {
         return self::withoutNulls([
             self::SCHEMA_VERSION => $schemaVersion,
             self::EVENT_VERSION => $eventVersion,
@@ -89,7 +91,7 @@ final class EventMetadata
     /**
      * @return array<string, mixed>
      */
-    public static function tenant(int|string|null $tenantId = null): array
+    public static function tenant(int | string | null $tenantId = null): array
     {
         return self::withoutNulls([self::TENANT_ID => $tenantId]);
     }
@@ -134,6 +136,6 @@ final class EventMetadata
      */
     public static function withoutNulls(array $metadata): array
     {
-        return array_filter($metadata, static fn (mixed $value): bool => $value !== null);
+        return array_filter($metadata, static fn(mixed $value): bool => $value !== null);
     }
 }

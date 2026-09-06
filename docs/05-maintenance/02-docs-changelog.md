@@ -1,5 +1,12 @@
 # Docs changelog
 
+## 2026-09-06
+
+- Documented `v4.0.0` release: Breaking / upgrade notes in `CHANGELOG.md` and
+  root [`UPGRADE-4.0.md`](../../UPGRADE-4.0.md).
+- README badges aligned with `dto` / `client` (CI on `develop`, version `4.0.0`,
+  Sonar, Scorecard, Packagist).
+
 ## 2026-05-06
 
 - Adopted the current DTO-style documentation tree:

@@ -12,7 +12,7 @@ final class PayloadRedactor
      */
     public function redact(array $values): array
     {
-        if (! config('events.redaction.enabled', true)) {
+        if (! $this->redactionEnabled()) {
             return $values;
         }
 
@@ -32,24 +32,47 @@ final class PayloadRedactor
     }
 
     /**
-     * @param  array<mixed>  $values
+     * @param  array<string, mixed>  $values
      * @param  list<string>  $keys
-     * @return array<mixed>
+     * @return array<string, mixed>
      */
     private function redactArray(array $values, array $keys, mixed $replacement): array
     {
+        $redacted = [];
         foreach ($values as $key => $value) {
-            if (is_string($key) && in_array(strtolower($key), $keys, true)) {
-                $values[$key] = $replacement;
+            if (! is_string($key)) {
+                continue;
+            }
+
+            if (in_array(strtolower($key), $keys, true)) {
+                $redacted[$key] = $replacement;
 
                 continue;
             }
 
             if (is_array($value)) {
-                $values[$key] = $this->redactArray($value, $keys, $replacement);
+                /** @var array<string, mixed> $nested */
+                $nested = [];
+                foreach ($value as $nestedKey => $nestedValue) {
+                    if (is_string($nestedKey)) {
+                        $nested[$nestedKey] = $nestedValue;
+                    }
+                }
+                $redacted[$key] = $this->redactArray($nested, $keys, $replacement);
+
+                continue;
             }
+
+            $redacted[$key] = $value;
         }
 
-        return $values;
+        return $redacted;
+    }
+
+    private function redactionEnabled(): bool
+    {
+        $enabled = config('events.redaction.enabled', true);
+
+        return is_bool($enabled) ? $enabled : filter_var($enabled, FILTER_VALIDATE_BOOLEAN);
     }
 }

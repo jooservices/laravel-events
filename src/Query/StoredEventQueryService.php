@@ -6,13 +6,28 @@ namespace JOOservices\LaravelEvents\Query;
 
 use DateTimeInterface;
 use Illuminate\Support\Collection;
-use InvalidArgumentException;
 use JOOservices\LaravelEvents\Data\StoredEventData;
 use JOOservices\LaravelEvents\EventSourcing\Models\StoredEvent;
 
-class StoredEventQueryService
+final class StoredEventQueryService
 {
-    public function __construct(private readonly StoredEvent $model) {}
+    /** @var list<string> */
+    private const ALLOWED_FILTERS = [
+        'aggregate_id',
+        'event_class',
+        'event_name',
+        'event_category',
+        'event_id',
+        'user_id',
+        'correlation_id',
+        'causation_id',
+        'metadata.correlation_id',
+        'metadata.causation_id',
+    ];
+
+    public function __construct(private readonly StoredEvent $model)
+    {
+    }
 
     /** @return Collection<int, StoredEventData> */
     public function byAggregateId(string $aggregateId, int $limit = 50): Collection
@@ -23,7 +38,13 @@ class StoredEventQueryService
     /** @return Collection<int, StoredEventData> */
     public function byEventName(string $eventName, int $limit = 50): Collection
     {
-        return $this->latest($limit, ['event_class' => $eventName]);
+        return $this->latest($limit, ['event_name' => $eventName]);
+    }
+
+    /** @return Collection<int, StoredEventData> */
+    public function byEventClass(string $eventClass, int $limit = 50): Collection
+    {
+        return $this->latest($limit, ['event_class' => $eventClass]);
     }
 
     /** @return Collection<int, StoredEventData> */
@@ -33,20 +54,28 @@ class StoredEventQueryService
     }
 
     /** @return Collection<int, StoredEventData> */
+    public function byEventId(string $eventId, int $limit = 50): Collection
+    {
+        return $this->latest($limit, ['event_id' => $eventId]);
+    }
+
+    /** @return Collection<int, StoredEventData> */
     public function byCorrelationId(string $correlationId, int $limit = 50): Collection
     {
-        return $this->latest($limit, ['metadata.correlation_id' => $correlationId]);
+        return $this->latest($limit, ['correlation_id' => $correlationId]);
     }
 
     /** @return Collection<int, StoredEventData> */
     public function byCausationId(string $causationId, int $limit = 50): Collection
     {
-        return $this->latest($limit, ['metadata.causation_id' => $causationId]);
+        return $this->latest($limit, ['causation_id' => $causationId]);
     }
 
     /** @return Collection<int, StoredEventData> */
     public function between(DateTimeInterface $from, DateTimeInterface $to, int $limit = 50): Collection
     {
+        QueryGuard::assertDateRange($from, $to);
+
         return $this->run($limit, [], $from, $to);
     }
 
@@ -69,30 +98,12 @@ class StoredEventQueryService
         ?DateTimeInterface $from = null,
         ?DateTimeInterface $to = null,
     ): Collection {
-        $this->assertLimit($limit);
+        QueryGuard::assertLimit($limit);
+        QueryGuard::assertFilters($filters, self::ALLOWED_FILTERS);
 
         $query = $this->model->newQuery();
-        foreach ($filters as $key => $value) {
-            $query->where($key, $value);
-        }
-        if ($from !== null) {
-            $query->where('created_at', '>=', $from);
-        }
-        if ($to !== null) {
-            $query->where('created_at', '<=', $to);
-        }
+        QueryExecutor::applyFilters($query, $filters, QueryExecutor::STORED_EVENT_DUAL_PATHS);
 
-        return $query->orderByDesc('created_at')
-            ->limit($limit)
-            ->get()
-            ->map(fn (StoredEvent $event): StoredEventData => StoredEventData::fromArray($event->toArray()))
-            ->values();
-    }
-
-    private function assertLimit(int $limit): void
-    {
-        if ($limit < 1 || $limit > 500) {
-            throw new InvalidArgumentException('Query limit must be between 1 and 500.');
-        }
+        return QueryExecutor::fetchStoredEvents($query, $limit, $from, $to);
     }
 }

@@ -10,7 +10,7 @@ features are not copied into this package.
 - Package metadata, MIT license, Composer package type, support links, and
   author metadata are present.
 - PHP 8.5 and Laravel 12 package compatibility are declared.
-- Composer scripts cover `test`, `test:coverage`, `lint`, `lint:all`,
+- Composer scripts cover `test`, `test:coverage`, `lint`,
   `lint:fix`, `check`, and `ci`.
 - CaptainHook install hooks are wired through Composer install and update
   scripts.

@@ -1,18 +1,27 @@
 # Laravel Events
 
-[![codecov](https://codecov.io/gh/jooservices/laravel-events/branch/master/graph/badge.svg)](https://codecov.io/gh/jooservices/laravel-events)
-[![CI](https://github.com/jooservices/laravel-events/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jooservices/laravel-events/actions/workflows/ci.yml)
+[![CI](https://github.com/jooservices/laravel-events/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/jooservices/laravel-events/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/jooservices/laravel-events/graph/badge.svg)](https://codecov.io/gh/jooservices/laravel-events)
+[![Quality gate status](https://sonarcloud.io/api/project_badges/measure?project=jooservices_laravel-events&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=jooservices_laravel-events)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/jooservices/laravel-events/badge)](https://securityscorecards.dev/viewer/?uri=github.com/jooservices/laravel-events)
 [![PHP Version](https://img.shields.io/badge/PHP-8.5%2B-blue.svg)](https://www.php.net/)
+[![Release](https://img.shields.io/badge/version-4.0.0-blue.svg)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Packagist Version](https://img.shields.io/packagist/v/jooservices/laravel-events)](https://packagist.org/packages/jooservices/laravel-events)
 
-Lightweight Event Sourcing and Event Log persistence for Laravel with **MongoDB** storage. Store domain event payloads by aggregate and/or model change audit trails (prev/changed/diff) via Laravel's native event dispatcher.
+Lightweight domain-event and model-change persistence for Laravel with **MongoDB** storage. Store domain event payloads by aggregate and/or model change audit trails (prev/changed/diff) via Laravel's native event dispatcher.
+
+> [!WARNING]
+> **`v4.0.0` includes breaking API changes from `1.x`** (backed enums, `final` concretes, removed bag DTOs, new indexes).
+> See [`UPGRADE-4.0.md`](UPGRADE-4.0.md) and the [changelog](CHANGELOG.md) before upgrading.
+
+This is **not** a full event store: there is no stream version, optimistic concurrency, replay command, or outbox. Ordering is `created_at` (and optional `occurred_at`); treat “event sourcing” here as aggregate-oriented append + query helpers.
 
 Package name: `jooservices/laravel-events`
 
-- **Laravel 12/13** · **PHP 8.5+**
+- **Laravel 12/13** · **PHP 8.5+** · **Current release: `4.0.0`**
 - **MongoDB** via [mongodb/laravel-mongodb](https://github.com/mongodb/laravel-mongodb)
+- **DTO / exceptions** via [jooservices/dto](https://github.com/jooservices/dto) and [jooservices/exceptions](https://github.com/jooservices/exceptions)
 
 ---
 
@@ -20,10 +29,10 @@ Package name: `jooservices/laravel-events`
 
 This package adds two persistence features on top of Laravel's event system:
 
-1. **Event Sourcing** — Events implementing `EventSourcingInterface` are stored in a `stored_events` MongoDB collection (payload, aggregate id, metadata, user, time). Use for aggregate history, replay-oriented records, or audit by aggregate.
+1. **Event Sourcing (lightweight)** — Events implementing `EventSourcingInterface` are stored in a `stored_events` MongoDB collection (payload, aggregate id, envelope, metadata, user, time). Use for aggregate history and audit by aggregate — not replay/outbox.
 2. **Event Log** — Events implementing `LoggableModelInterface` are stored in an `event_logs` collection with previous/changed state and a per-field diff. Use for audit trails and compliance.
 
-You dispatch events as usual; package subscribers persist them to MongoDB. No custom bus or queue required.
+You dispatch events as usual; package subscribers persist them to MongoDB **synchronously** when the event is dispatched (unless you use Laravel after-commit / queue features yourself — see Operations). No custom bus required.
 
 ## Scope
 
@@ -153,10 +162,10 @@ $domainEvents = app(StoredEventQueryService::class)->byEventCategory('domain');
 $audit = app(EventLogQueryService::class)->byEntity('orders', 'ORD-001');
 ```
 
-Query services return typed package data records and intentionally stay small.
+Query services return typed package data records (including storage `id` / `created_at` when present) and intentionally stay small.
 Build dashboards, projections, and reporting in your application.
 
-`JOOservices\...` is the canonical package namespace in `1.2.0`. The legacy `JOOservices\...` namespace remains available for backward compatibility.
+The public PHP namespace is `JOOservices\LaravelEvents` only (alternate casing removed in `1.5.0`). See [`UPGRADE-4.0.md`](UPGRADE-4.0.md) for `4.0.0` breaking changes (enums, `final`, indexes).
 
 ## Redaction
 
@@ -165,7 +174,16 @@ Recursive redaction is enabled by default for common secret keys:
 ```php
 'redaction' => [
     'enabled' => true,
-    'keys' => ['password', 'token', 'authorization'],
+    'keys' => [
+        'password',
+        'password_hash',
+        'token',
+        'secret',
+        'client_secret',
+        'private_key',
+        'api_key',
+        'authorization',
+    ],
     'replacement' => '[REDACTED]',
 ],
 ```
@@ -229,11 +247,10 @@ Full documentation is in the **`./docs`** folder:
 ```bash
 composer test
 composer test:coverage
-composer lint       # Pint, PHPCS, PHPStan
-composer lint:all   # lint + PHPMD + PHP-CS-Fixer
+composer lint       # Pint, PHPCS, PHPStan, PHPMD, PHP-CS-Fixer
 composer lint:fix   # Pint fix + PHP-CS-Fixer fix
-composer check      # lint:all + test
-composer ci         # lint:all + test:coverage
+composer check      # lint + test
+composer ci         # lint + test:coverage
 ```
 
 ## Git Hooks
@@ -292,7 +309,7 @@ Configured workflows:
 - `OpenSSF Scorecard`: publish security posture results as SARIF
 - `Secret Scanning`: run Gitleaks on pushes, pull requests, and manual dispatches
 
-Coverage is archived as a workflow artifact. Codecov and SonarQube Cloud are optional and only run when repository secrets are configured, so README badges do not claim those services as mandatory package support.
+Coverage is archived as a workflow artifact. Codecov and SonarQube Cloud run when repository secrets are configured; README badges mirror `dto` / `client` (CI on `develop`, version → CHANGELOG, Sonar, Scorecard).
 
 ---
 

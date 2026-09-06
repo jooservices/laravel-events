@@ -1,4 +1,71 @@
+# Changelog
+
+All notable changes to this package are documented in this file.
+Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
+versioning follows [Semantic Versioning](https://semver.org/).
+
 ## [Unreleased]
+
+## [4.0.0] - 2026-09-06
+
+Major quality and correctness release for Laravel 12/13 + MongoDB event
+persistence. Treat upgrades from `1.x` as a breaking change — see
+[`UPGRADE-4.0.md`](UPGRADE-4.0.md).
+
+### Breaking
+
+- `EventLogAction` and `EventCategory` are string-backed enums. Call sites that
+  compared or returned `EventLogAction::UPDATED` as a string must use
+  `EventLogAction::UPDATED->value` (and the same pattern for other cases).
+  `::all()` still returns `list<string>`.
+- Concrete package classes are `final` (`EventService`, subscribers, query
+  services, serializer, DiffHelper, console command, etc.). Eloquent models and
+  `EventsServiceProvider` remain open. Prefer composition / `EventPersisterInterface`
+  over subclassing.
+- Removed unused bag DTOs `EventDiffData` and `EventMetadataData`. Record DTOs
+  keep `diff` / `meta` / `metadata` as arrays.
+- `EventSerializerInterface` requires `ensureEnvelope()`.
+- Mongo index set changed (sparse unique `event_id`, `event_name`, top-level
+  correlation/causation). Re-run `php artisan events:install-indexes` after
+  upgrade.
+- Runtime dependencies now include `jooservices/dto` `^3.2`,
+  `jooservices/exceptions` `^4.0`, `psr/clock` `^1.0`, and `psr/log` `^3.0`.
+
+### Upgrade
+
+1. `composer require jooservices/laravel-events:^4.0`
+2. Update action/category call sites to `->value` where a `string` is required.
+3. Publish config if you customize it; re-run `php artisan events:install-indexes`.
+4. Prefer `ShouldDispatchAfterCommit` for domain events that must not outlive a
+   rolled-back SQL transaction; embed `user_id` / correlation on queued events.
+5. Type-hint `EventPersisterInterface` in tests instead of mocking `final`
+   `EventService` directly.
+
+### Added
+
+- `EventPersisterInterface` for subscriber DIP
+- Optional PSR-20 `ClockInterface` and PSR-3 `LoggerInterface` on `EventService`
+- `InvalidEventDataException`, `InvalidQueryException`,
+  `InvalidConfigurationException`
+- `QueryGuard` / `QueryExecutor`, `DateTimeParser`, `DocumentIdentity`
+- Dockerfile / docker-compose / Makefile (PHP 8.5 + MongoDB)
+- Dual-path correlation queries; invokable `context_provider` class-strings
+
+### Changed
+
+- PHPStan `max` + `phpstan-strict-rules` / `phpstan-phpunit`; PHPMD cleancode
+- Pint `per` (PER-CS 3.0); CaptainHook uppercase Conventional Commit subjects
+- JOOservices CI baseline (`ci.yml` PR gate, commitlint, CodeQL, workflow audit)
+- Non-callable `context_provider` throws `InvalidConfigurationException`
+
+### Fixed
+
+- Query DTO date hydration from Eloquent/Mongo strings
+- `byEventName()` filters `event_name`; added `byEventClass()` / `byEventId()`
+- Diff removals; deleted EventLog empty `changed` → full removal diff
+- Bulk `recordManyStoredEvents()` always runs `ensureEnvelope()`
+- Guest EventLog does not overwrite context `user_id` with null
+- Allowlisted query filters; inverted `between()` rejected
 
 ## [1.5.0] - 2026-07-26
 
@@ -71,7 +138,8 @@
 - Laravel ^12.0
 - mongodb/laravel-mongodb ^5.6
 
-[Unreleased]: https://github.com/jooservices/laravel-events/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/jooservices/laravel-events/compare/v4.0.0...HEAD
+[4.0.0]: https://github.com/jooservices/laravel-events/releases/tag/v4.0.0
 [1.5.0]: https://github.com/jooservices/laravel-events/releases/tag/v1.5.0
 [1.4.0]: https://github.com/jooservices/laravel-events/releases/tag/v1.4.0
 [1.3.0]: https://github.com/jooservices/laravel-events/releases/tag/v1.3.0

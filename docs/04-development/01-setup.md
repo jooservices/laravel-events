@@ -5,16 +5,23 @@ This guide describes the repository workflow for contributors to `jooservices/la
 ## Command Map
 
 ```bash
-composer lint          # Pint, PHPCS, PHPStan
-composer lint:all      # lint + PHPMD + PHP-CS-Fixer
+composer lint          # Pint, PHPCS, PHPStan, PHPMD, PHP-CS-Fixer
 composer lint:fix      # Pint fix + PHP-CS-Fixer fix
 composer test          # PHPUnit
 composer test:coverage # PHPUnit coverage reports in build/coverage
-composer check         # lint:all + test
-composer ci            # lint:all + test:coverage
+composer check         # lint + test
+composer ci            # lint + test:coverage
 ```
 
-Prefer the `lint:*` commands in automation and docs:
+Prefer the `lint:*` commands in automation and docs. Host PHP 8.5 is fine when
+it matches; otherwise use Docker:
+
+```bash
+make build
+make install
+make lint
+make test
+```
 
 ```bash
 composer lint:pint
@@ -25,8 +32,6 @@ composer lint:phpmd
 composer lint:cs
 composer lint:cs:fix
 ```
-
-Legacy aliases such as `composer phpstan`, `composer phpcs`, and `composer phpmd` remain for contributor convenience.
 
 ## Git Hooks
 

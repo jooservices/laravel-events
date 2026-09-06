@@ -17,8 +17,13 @@ interface EventSerializerInterface
         object $event,
         array $payload,
         ?string $aggregateId = null,
-        int|string|null $userId = null,
+        int | string | null $userId = null,
         ?CarbonInterface $occurredAt = null,
         array $metadata = [],
     ): StoredEventData;
+
+    /**
+     * Fill missing envelope fields (event_id, event_name, …) for bulk/direct records.
+     */
+    public function ensureEnvelope(StoredEventData $data): StoredEventData;
 }

@@ -10,9 +10,13 @@ Stored event records contain:
 - `metadata`
 - `user_id`
 - `occurred_at`
-- Laravel model timestamps
+- Envelope (nullable/additive): `event_id`, `event_name`, `event_category`,
+  `aggregate_type`, `schema_version`, `event_version`, `correlation_id`,
+  `causation_id`
+- Laravel model timestamps (`created_at`, `updated_at`)
 
-Recommended indexes are installed by `php artisan events:install-indexes`.
+Recommended indexes are installed by `php artisan events:install-indexes`
+(including sparse unique `event_id` and `event_name + created_at`).
 
 ## event_logs
 
@@ -30,6 +34,7 @@ Event log records contain:
 
 ## Retention
 
-Optional TTL indexes can be configured for each collection. MongoDB performs TTL
-deletion asynchronously, so expired records are not deleted immediately at the
-exact configured age.
+Optional TTL indexes can be configured for each collection. Prefer
+`retention.*_days`; legacy `eventsourcing.ttl_days` / `event_log.ttl_days` use
+the same positive-integer env parsing. MongoDB performs TTL deletion
+asynchronously.

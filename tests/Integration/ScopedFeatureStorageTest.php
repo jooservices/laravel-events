@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace JOOservices\LaravelEvents\Tests\Integration;
 
+use DateTimeInterface;
 use Illuminate\Testing\PendingCommand;
 use JOOservices\LaravelEvents\Data\EventLogData;
 use JOOservices\LaravelEvents\Data\StoredEventData;
@@ -13,6 +14,8 @@ use JOOservices\LaravelEvents\EventSourcing\Models\StoredEvent;
 use JOOservices\LaravelEvents\Query\EventLogQueryService;
 use JOOservices\LaravelEvents\Query\StoredEventQueryService;
 use MongoDB\Laravel\Connection;
+use stdClass;
+use Throwable;
 
 class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
 {
@@ -20,16 +23,16 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
     {
         parent::setUp();
 
-        $this->assertNotNull($this->app);
+        self::assertNotNull($this->app);
         $connection = $this->app->make('db')->connection('mongodb');
         if (! $connection instanceof Connection) {
-            $this->markTestSkipped('MongoDB is not available.');
+            self::markTestSkipped('MongoDB is not available.');
         }
 
         try {
             $connection->getDatabase()->command(['ping' => 1]);
-        } catch (\Throwable) {
-            $this->markTestSkipped('MongoDB is not available.');
+        } catch (Throwable) {
+            self::markTestSkipped('MongoDB is not available.');
         }
 
         StoredEvent::on('mongodb')->delete();
@@ -40,7 +43,7 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
     {
         $service = app(EventService::class);
         $service->storeEvent(
-            new \stdClass,
+            new stdClass(),
             ['order_id' => 'ORD-Q'],
             'ORD-Q',
             metadata: ['correlation_id' => 'corr-q', 'causation_id' => 'cmd-q'],
@@ -58,14 +61,14 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
         $stored = app(StoredEventQueryService::class)->byCorrelationId('corr-q');
         $logs = app(EventLogQueryService::class)->byEntity('orders', 'ORD-Q');
 
-        $this->assertSame('ORD-Q', $stored->first()?->aggregateId);
-        $this->assertSame('orders', $logs->first()?->entityType);
+        self::assertSame('ORD-Q', $stored->first()?->aggregateId);
+        self::assertSame('orders', $logs->first()?->entityType);
     }
 
     public function test_redaction_applies_to_persisted_event_and_log_records(): void
     {
         $service = app(EventService::class);
-        $service->storeEvent(new \stdClass, ['password' => 'secret', 'nested' => ['token' => 'abc']], 'redact-1');
+        $service->storeEvent(new stdClass(), ['password' => 'secret', 'nested' => ['token' => 'abc']], 'redact-1');
         $service->logChange(
             'users',
             '1',
@@ -79,14 +82,14 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
         $stored = StoredEvent::on('mongodb')->where('aggregate_id', 'redact-1')->first();
         $entry = EventLogEntry::on('mongodb')->where('entity_type', 'users')->where('entity_id', '1')->first();
 
-        $this->assertNotNull($stored);
-        $this->assertNotNull($entry);
-        $this->assertSame('[REDACTED]', $stored->payload['password']);
+        self::assertNotNull($stored);
+        self::assertNotNull($entry);
+        self::assertSame('[REDACTED]', $stored->payload['password']);
         $nestedPayload = $stored->payload['nested'] ?? null;
-        $this->assertIsArray($nestedPayload);
-        $this->assertSame('[REDACTED]', $nestedPayload['token'] ?? null);
-        $this->assertSame('[REDACTED]', $entry->prev['password']);
-        $this->assertSame('[REDACTED]', $entry->meta['authorization']);
+        self::assertIsArray($nestedPayload);
+        self::assertSame('[REDACTED]', $nestedPayload['token'] ?? null);
+        self::assertSame('[REDACTED]', $entry->prev['password']);
+        self::assertSame('[REDACTED]', $entry->meta['authorization']);
     }
 
     public function test_bulk_record_support_persists_many_records(): void
@@ -101,13 +104,13 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
             new EventLogData('bulk', '2', 'created', changed: ['id' => 2]),
         ]);
 
-        $this->assertSame(2, StoredEvent::on('mongodb')->whereIn('aggregate_id', ['bulk-1', 'bulk-2'])->count());
-        $this->assertSame(2, EventLogEntry::on('mongodb')->where('entity_type', 'bulk')->count());
+        self::assertSame(2, StoredEvent::on('mongodb')->whereIn('aggregate_id', ['bulk-1', 'bulk-2'])->count());
+        self::assertSame(2, EventLogEntry::on('mongodb')->where('entity_type', 'bulk')->count());
     }
 
     public function test_bulk_record_support_merges_context_and_user_attribution(): void
     {
-        config()->set('events.context_provider', fn (): array => [
+        config()->set('events.context_provider', fn(): array => [
             'correlation_id' => 'bulk-context',
             'user_id' => 'context-user',
         ]);
@@ -123,11 +126,11 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
         $stored = StoredEvent::on('mongodb')->where('aggregate_id', 'bulk-context-1')->first();
         $log = EventLogEntry::on('mongodb')->where('entity_type', 'bulk-context')->first();
 
-        $this->assertSame('bulk-context', $stored?->metadata['correlation_id'] ?? null);
-        $this->assertSame('context-user', $stored?->metadata['user_id'] ?? null);
-        $this->assertNull($stored?->user_id);
-        $this->assertSame('bulk-context', $log?->meta['correlation_id'] ?? null);
-        $this->assertSame('context-user', $log?->user_id);
+        self::assertSame('bulk-context', $stored?->metadata['correlation_id'] ?? null);
+        self::assertSame('context-user', $stored?->metadata['user_id'] ?? null);
+        self::assertSame('context-user', $stored?->user_id);
+        self::assertSame('bulk-context', $log?->meta['correlation_id'] ?? null);
+        self::assertSame('context-user', $log?->user_id);
     }
 
     public function test_install_indexes_command_creates_ttl_indexes_when_configured(): void
@@ -139,7 +142,7 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
         if ($result instanceof PendingCommand) {
             $result->assertSuccessful();
         } else {
-            $this->assertSame(0, $result);
+            self::assertSame(0, $result);
         }
 
         config()->set('events.retention.stored_events_days', 31);
@@ -149,7 +152,7 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
         if ($rerun instanceof PendingCommand) {
             $rerun->assertSuccessful();
         } else {
-            $this->assertSame(0, $rerun);
+            self::assertSame(0, $rerun);
         }
     }
 
@@ -159,7 +162,7 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
         $from = now()->subMinute();
 
         $service->storeEvent(
-            new \stdClass,
+            new stdClass(),
             ['order_id' => 'ORD-Q2'],
             'ORD-Q2',
             metadata: [
@@ -181,28 +184,61 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
         $storedQueries = app(StoredEventQueryService::class);
         $eventQueries = app(EventLogQueryService::class);
 
-        $this->assertSame('ORD-Q2', $storedQueries->byAggregateId('ORD-Q2')->first()?->aggregateId);
-        $this->assertSame(\stdClass::class, $storedQueries->byEventName(\stdClass::class)->first()?->eventClass);
-        $this->assertSame('domain', $storedQueries->byEventCategory('domain')->first()?->envelope?->eventCategory);
-        $this->assertSame(
+        self::assertSame('ORD-Q2', $storedQueries->byAggregateId('ORD-Q2')->first()?->aggregateId);
+        $queried = $storedQueries->byAggregateId('ORD-Q2')->first();
+        self::assertNotNull($queried->documentId());
+        self::assertInstanceOf(DateTimeInterface::class, $queried->createdAt());
+        self::assertSame(stdClass::class, $storedQueries->byEventClass(stdClass::class)->first()?->eventClass);
+        self::assertSame(stdClass::class, $storedQueries->byEventName('stdClass')->first()?->eventClass);
+        self::assertSame('domain', $storedQueries->byEventCategory('domain')->first()?->envelope?->eventCategory);
+        self::assertSame(
             'corr-q2',
-            $storedQueries->byCorrelationId('corr-q2')->first()?->metadata['correlation_id'] ?? null
+            $storedQueries->byCorrelationId('corr-q2')->first()?->metadata['correlation_id'] ?? null,
         );
-        $this->assertSame(
+        self::assertSame(
             'cmd-q2',
-            $storedQueries->byCausationId('cmd-q2')->first()?->metadata['causation_id'] ?? null
+            $storedQueries->byCausationId('cmd-q2')->first()?->metadata['causation_id'] ?? null,
         );
-        $this->assertGreaterThanOrEqual(1, $storedQueries->between($from, now())->count());
-        $this->assertGreaterThanOrEqual(1, $storedQueries->latest(10)->count());
+        self::assertGreaterThanOrEqual(1, $storedQueries->between($from, now())->count());
+        self::assertGreaterThanOrEqual(1, $storedQueries->latest(10)->count());
 
-        $this->assertSame('ORD-Q2', $eventQueries->byEntity('orders', 'ORD-Q2')->first()?->entityId);
-        $this->assertSame(
+        self::assertSame('ORD-Q2', $eventQueries->byEntity('orders', 'ORD-Q2')->first()?->entityId);
+        self::assertSame(
             'corr-q2',
-            $eventQueries->byCorrelationId('corr-q2')->first()?->meta['correlation_id'] ?? null
+            $eventQueries->byCorrelationId('corr-q2')->first()?->meta['correlation_id'] ?? null,
         );
-        $this->assertSame('cmd-q2', $eventQueries->byCausationId('cmd-q2')->first()?->meta['causation_id'] ?? null);
-        $this->assertGreaterThanOrEqual(1, $eventQueries->between($from, now())->count());
-        $this->assertGreaterThanOrEqual(1, $eventQueries->latest(10)->count());
+        self::assertSame('cmd-q2', $eventQueries->byCausationId('cmd-q2')->first()?->meta['causation_id'] ?? null);
+        self::assertGreaterThanOrEqual(1, $eventQueries->between($from, now())->count());
+        self::assertGreaterThanOrEqual(1, $eventQueries->latest(10)->count());
+    }
+
+    public function test_by_correlation_id_matches_top_level_envelope_without_metadata_copy(): void
+    {
+        StoredEvent::on('mongodb')->newQuery()->insert([
+            [
+                'event_class' => 'TopLevelCorr',
+                'aggregate_id' => 'corr-top-1',
+                'payload' => ['ok' => true],
+                'metadata' => [],
+                'correlation_id' => 'corr-top-only',
+                'causation_id' => 'cmd-top-only',
+                'event_id' => 'evt-top-corr',
+                'event_name' => 'TopLevelCorr',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+
+        $storedQueries = app(StoredEventQueryService::class);
+
+        self::assertSame(
+            'corr-top-1',
+            $storedQueries->byCorrelationId('corr-top-only')->first()?->aggregateId,
+        );
+        self::assertSame(
+            'corr-top-1',
+            $storedQueries->byCausationId('cmd-top-only')->first()?->aggregateId,
+        );
     }
 
     public function test_install_indexes_command_can_drop_existing_indexes(): void
@@ -214,14 +250,14 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
         if ($createResult instanceof PendingCommand) {
             $createResult->assertSuccessful();
         } else {
-            $this->assertSame(0, $createResult);
+            self::assertSame(0, $createResult);
         }
 
         $dropResult = $this->artisan('events:install-indexes', ['--drop' => true, '--force' => true]);
         if ($dropResult instanceof PendingCommand) {
             $dropResult->assertSuccessful();
         } else {
-            $this->assertSame(0, $dropResult);
+            self::assertSame(0, $dropResult);
         }
 
         $this->addToAssertionCount(1);

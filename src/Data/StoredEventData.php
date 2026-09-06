@@ -5,62 +5,64 @@ declare(strict_types=1);
 namespace JOOservices\LaravelEvents\Data;
 
 use DateTimeInterface;
-use InvalidArgumentException;
+use JOOservices\Dto\Attributes\MapFrom;
+use JOOservices\Dto\Attributes\MapTo;
+use JOOservices\Dto\Core\Context;
+use JOOservices\Dto\Core\Dto;
+use JOOservices\LaravelEvents\Exceptions\InvalidEventDataException;
+use JOOservices\LaravelEvents\Support\DateTimeParser;
 
-final readonly class StoredEventData
+final class StoredEventData extends Dto
 {
     /**
      * @param  array<string, mixed>  $payload
      * @param  array<string, mixed>  $metadata
      */
     public function __construct(
-        public string $eventClass,
-        public array $payload,
-        public ?string $aggregateId = null,
-        public int|string|null $userId = null,
-        public ?DateTimeInterface $occurredAt = null,
-        public array $metadata = [],
-        public ?EventEnvelopeData $envelope = null,
+        #[MapFrom('event_class')]
+        #[MapTo('event_class')]
+        public readonly string $eventClass,
+        public readonly array $payload,
+        #[MapFrom('aggregate_id')]
+        #[MapTo('aggregate_id')]
+        public readonly ?string $aggregateId = null,
+        #[MapFrom('user_id')]
+        #[MapTo('user_id')]
+        public readonly int | string | null $userId = null,
+        #[MapFrom('occurred_at')]
+        #[MapTo('occurred_at')]
+        public readonly ?DateTimeInterface $occurredAt = null,
+        public readonly array $metadata = [],
+        public readonly ?EventEnvelopeData $envelope = null,
+        public readonly ?DocumentIdentity $identity = null,
     ) {
         if ($this->eventClass === '') {
-            throw new InvalidArgumentException('Stored event class cannot be empty.');
+            throw InvalidEventDataException::emptyEventClass();
         }
     }
 
-    /** @param array<string, mixed> $values */
-    public static function fromArray(array $values): self
+    public function documentId(): mixed
     {
-        $eventClass = $values['event_class'] ?? $values['eventClass'] ?? null;
-        if (! is_string($eventClass)) {
-            throw new InvalidArgumentException('Stored event data requires an event_class string.');
-        }
+        return $this->identity?->id;
+    }
 
-        $payload = $values['payload'] ?? [];
-        $metadata = $values['metadata'] ?? [];
-
-        if (! is_array($payload) || ! is_array($metadata)) {
-            throw new InvalidArgumentException('Stored event payload and metadata must be arrays.');
-        }
-
-        $occurredAt = $values['occurred_at'] ?? $values['occurredAt'] ?? null;
-        if ($occurredAt !== null && ! $occurredAt instanceof DateTimeInterface) {
-            throw new InvalidArgumentException('Stored event occurred_at must be a DateTimeInterface or null.');
-        }
-
-        return new self(
-            eventClass: $eventClass,
-            payload: $payload,
-            aggregateId: isset($values['aggregate_id'])
-                ? (string) $values['aggregate_id']
-                : (isset($values['aggregateId']) ? (string) $values['aggregateId'] : null),
-            userId: $values['user_id'] ?? $values['userId'] ?? null,
-            occurredAt: $occurredAt,
-            metadata: $metadata,
-            envelope: EventEnvelopeData::fromArray($values),
-        );
+    public function createdAt(): ?DateTimeInterface
+    {
+        return $this->identity?->createdAt;
     }
 
     /**
+     * @param  array<string, mixed>  $data
+     */
+    public static function fromArray(array $data, ?Context $ctx = null): static
+    {
+        return parent::fromArray(self::normalizeInput($data), $ctx);
+    }
+
+    /**
+     * Persist as a flat MongoDB document (envelope fields at the top level).
+     * Query identity fields are omitted so writes stay insert-safe.
+     *
      * @return array{
      *     event_class: string,
      *     aggregate_id: string|null,
@@ -78,7 +80,7 @@ final readonly class StoredEventData
      *     causation_id: string|null
      * }
      */
-    public function toArray(): array
+    public function toArray(?Context $ctx = null): array
     {
         return [
             'event_class' => $this->eventClass,
@@ -96,5 +98,81 @@ final readonly class StoredEventData
             'correlation_id' => $this->envelope?->correlationId,
             'causation_id' => $this->envelope?->causationId,
         ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $values
+     * @return array<string, mixed>
+     */
+    private static function normalizeInput(array $values): array
+    {
+        $eventClass = $values['event_class'] ?? $values['eventClass'] ?? null;
+        if (! is_string($eventClass)) {
+            throw InvalidEventDataException::missingField('event_class');
+        }
+
+        $payload = $values['payload'] ?? [];
+        $metadata = $values['metadata'] ?? [];
+        if (! is_array($payload) || ! is_array($metadata)) {
+            throw InvalidEventDataException::invalidType('payload and metadata', 'arrays');
+        }
+
+        $occurredAt = self::optionalDateTime($values, 'occurred_at', 'occurredAt');
+        $aggregateId = $values['aggregate_id'] ?? $values['aggregateId'] ?? null;
+        $aggId = null;
+        if (is_string($aggregateId) || is_int($aggregateId)) {
+            $aggId = (string) $aggregateId;
+        }
+
+        return [
+            'event_class' => $eventClass,
+            'payload' => self::stringKeyed($payload),
+            'aggregate_id' => $aggId,
+            'user_id' => $values['user_id'] ?? $values['userId'] ?? null,
+            'occurred_at' => $occurredAt,
+            'metadata' => self::stringKeyed($metadata),
+            'envelope' => self::resolveEnvelope($values),
+            'identity' => DocumentIdentity::fromStorageArray($values),
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $values
+     */
+    private static function resolveEnvelope(array $values): EventEnvelopeData
+    {
+        $envelope = $values['envelope'] ?? null;
+        if ($envelope instanceof EventEnvelopeData) {
+            return $envelope;
+        }
+        if (is_array($envelope)) {
+            return EventEnvelopeData::fromArray(self::stringKeyed($envelope));
+        }
+
+        return EventEnvelopeData::fromArray($values);
+    }
+
+    /**
+     * @param  array<mixed>  $values
+     * @return array<string, mixed>
+     */
+    private static function stringKeyed(array $values): array
+    {
+        $normalized = [];
+        foreach ($values as $key => $value) {
+            if (is_string($key)) {
+                $normalized[$key] = $value;
+            }
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * @param  array<string, mixed>  $values
+     */
+    private static function optionalDateTime(array $values, string $snake, string $camel): ?DateTimeInterface
+    {
+        return DateTimeParser::optional($values[$snake] ?? $values[$camel] ?? null, $snake);
     }
 }

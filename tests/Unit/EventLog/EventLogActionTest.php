@@ -12,7 +12,7 @@ class EventLogActionTest extends TestCase
 {
     public function test_all_returns_recommended_action_taxonomy(): void
     {
-        $this->assertSame([
+        self::assertSame([
             'created',
             'updated',
             'deleted',
@@ -26,11 +26,10 @@ class EventLogActionTest extends TestCase
 
     public function test_defaults_to_updated_action_uses_taxonomy_constant(): void
     {
-        $event = new class
-        {
+        $event = new class {
             use DefaultsToUpdatedAction;
         };
 
-        $this->assertSame(EventLogAction::UPDATED, $event->getAction());
+        self::assertSame(EventLogAction::UPDATED->value, $event->getAction());
     }
 }

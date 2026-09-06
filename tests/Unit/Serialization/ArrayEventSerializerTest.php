@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace JOOservices\LaravelEvents\Tests\Unit\Serialization;
 
+use JOOservices\LaravelEvents\Data\StoredEventData;
 use JOOservices\LaravelEvents\Serialization\ArrayEventSerializer;
 use JOOservices\LaravelEvents\Support\EventMetadata;
 use PHPUnit\Framework\TestCase;
@@ -13,7 +14,7 @@ class ArrayEventSerializerTest extends TestCase
     public function test_serializer_builds_additive_event_envelope_fields_from_metadata(): void
     {
         $event = new class {};
-        $serializer = new ArrayEventSerializer;
+        $serializer = new ArrayEventSerializer();
 
         $data = $serializer->serializeStoredEvent(
             $event,
@@ -32,25 +33,54 @@ class ArrayEventSerializerTest extends TestCase
             ],
         );
 
-        $this->assertNotNull($data->envelope);
-        $this->assertSame('evt-1', $data->envelope->eventId);
-        $this->assertSame('order.created', $data->envelope->eventName);
-        $this->assertSame('domain', $data->envelope->eventCategory);
-        $this->assertSame('orders', $data->envelope->aggregateType);
-        $this->assertSame(2, $data->envelope->schemaVersion);
-        $this->assertSame('2026-05', $data->envelope->eventVersion);
-        $this->assertSame('corr-1', $data->envelope->correlationId);
-        $this->assertSame('cmd-1', $data->envelope->causationId);
+        self::assertNotNull($data->envelope);
+        self::assertSame('evt-1', $data->envelope->eventId);
+        self::assertSame('order.created', $data->envelope->eventName);
+        self::assertSame('domain', $data->envelope->eventCategory);
+        self::assertSame('orders', $data->envelope->aggregateType);
+        self::assertSame(2, $data->envelope->schemaVersion);
+        self::assertSame('2026-05', $data->envelope->eventVersion);
+        self::assertSame('corr-1', $data->envelope->correlationId);
+        self::assertSame('cmd-1', $data->envelope->causationId);
     }
 
     public function test_serializer_generates_event_id_and_uses_class_basename_when_metadata_is_missing(): void
     {
         $event = new class {};
-        $data = (new ArrayEventSerializer)->serializeStoredEvent($event, []);
+        $data = (new ArrayEventSerializer())->serializeStoredEvent($event, []);
 
-        $this->assertNotNull($data->envelope);
-        $this->assertNotNull($data->envelope->eventId);
-        $this->assertNotSame('', $data->envelope->eventId);
-        $this->assertStringStartsWith('class@anonymous', (string) $data->envelope->eventName);
+        self::assertNotNull($data->envelope);
+        self::assertNotNull($data->envelope->eventId);
+        self::assertNotSame('', $data->envelope->eventId);
+        self::assertStringStartsWith('class@anonymous', (string) $data->envelope->eventName);
+    }
+
+    public function test_ensure_envelope_fills_missing_event_id_and_name_for_bulk_records(): void
+    {
+        $data = (new ArrayEventSerializer())->ensureEnvelope(
+            new StoredEventData('App\\OrderCreated', ['id' => 1]),
+        );
+
+        self::assertNotNull($data->envelope);
+        self::assertNotNull($data->envelope->eventId);
+        self::assertSame('OrderCreated', $data->envelope->eventName);
+    }
+
+    public function test_ensure_envelope_copies_top_level_correlation_into_metadata(): void
+    {
+        $data = (new ArrayEventSerializer())->ensureEnvelope(
+            StoredEventData::fromArray([
+                'event_class' => 'OrderCreated',
+                'payload' => [],
+                'correlation_id' => 'corr-top',
+                'causation_id' => 'cmd-top',
+            ]),
+        );
+
+        self::assertNotNull($data->envelope);
+        self::assertSame('corr-top', $data->envelope->correlationId);
+        self::assertSame('cmd-top', $data->envelope->causationId);
+        self::assertSame('corr-top', $data->metadata[EventMetadata::CORRELATION_ID] ?? null);
+        self::assertSame('cmd-top', $data->metadata[EventMetadata::CAUSATION_ID] ?? null);
     }
 }

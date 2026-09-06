@@ -1,29 +1,35 @@
+# Dedicated CI for jooservices/laravel-events — GitHub-hosted runners
+# Pull-request quality gate: full pipeline. Post-merge heads run ci-post-merge.yml.
 name: CI
 
 on:
-  push:
-    branches: [master, develop]
   pull_request:
     branches: [master, develop]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.ref }}
   cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: read
+  actions: read
 
 env:
   PHP_VERSION: '8.5'
   MONGODB_URI: mongodb://127.0.0.1:27017
   MONGODB_DATABASE: laravel_events_test
-  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
 jobs:
-  security:
-    name: Security Checks
+  validate:
+    name: Validate
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6.0.2
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -35,20 +41,18 @@ jobs:
       - name: Install Composer dependencies
         uses: ramsey/composer-install@v4
 
-      - name: Validate Composer metadata
+      - name: Composer validate
         run: composer validate --strict
 
-      - name: Run Composer Audit
-        run: composer audit
-
   lint:
-    name: Lint - ${{ matrix.tool.name }}
+    name: Lint (${{ matrix.name }})
+    needs: [validate]
     runs-on: ubuntu-latest
-    needs: [security]
+    timeout-minutes: 30
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
-        tool:
+        include:
           - name: Pint
             command: lint:pint
           - name: PHPCS
@@ -60,8 +64,10 @@ jobs:
           - name: PHP-CS-Fixer
             command: lint:cs
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6.0.2
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -73,35 +79,88 @@ jobs:
       - name: Install Composer dependencies
         uses: ramsey/composer-install@v4
 
-      - name: Run ${{ matrix.tool.name }}
-        run: composer ${{ matrix.tool.command }}
+      - name: Run linter
+        run: composer ${{ matrix.command }}
 
-  dependency-review:
-    name: Dependency Review
+  security:
+    name: Security (${{ matrix.name }})
+    needs: [lint]
     runs-on: ubuntu-latest
-    needs: [security]
-    if: github.event_name == 'pull_request'
-    continue-on-error: true
+    timeout-minutes: 30
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - name: Dependencies
+          - name: Secrets
+          - name: SAST
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6.0.2
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup PHP
+        if: matrix.name == 'Dependencies'
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: mbstring, json, mongodb
+          coverage: none
+
+      - name: Install Composer dependencies
+        if: matrix.name == 'Dependencies'
+        uses: ramsey/composer-install@v4
+
+      - name: Composer audit
+        if: matrix.name == 'Dependencies'
+        run: composer audit
+
+      - name: OSV Scanner
+        if: matrix.name == 'Dependencies'
+        uses: google/osv-scanner-action/osv-scanner-action@6e4298ebc4db23e847df9b2e2de2939d6f066c67 # v2.5.1
+        with:
+          scan-args: |-
+            --recursive
+            .
 
       - name: Dependency Review
+        if: matrix.name == 'Dependencies'
         uses: actions/dependency-review-action@v5
 
-  tests-matrix:
-    name: Tests & Coverage (Laravel ${{ matrix.laravel }})
-    runs-on: ubuntu-latest
+      - name: Gitleaks OSS CLI
+        if: matrix.name == 'Secrets'
+        run: |
+          docker run --rm \
+            --volume "${GITHUB_WORKSPACE}:/repo:ro" \
+            --workdir /repo \
+            ghcr.io/gitleaks/gitleaks:v8.30.1@sha256:b109bc5f8f76a38196a3e413704fc5b9e3c32360bce4e4b603bd6f45b3721dbb \
+            detect --source . --config .gitleaks.toml --redact --exit-code 1
+
+      - name: Semgrep (OSS)
+        if: matrix.name == 'SAST'
+        run: |
+          docker run --rm \
+            --volume "${GITHUB_WORKSPACE}:/src:ro" \
+            semgrep/semgrep@sha256:67319956da3dcb58baf5b322899c15458e3963e7018a86aeeb5cd224e69cb77a \
+            semgrep scan --config p/php --error
+
+  test:
+    name: Test (${{ matrix.name }})
     needs: [lint]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
-        laravel: ['12', '13']
         include:
-          - laravel: '12'
+          - name: Laravel 12
+            laravel: '12'
             testbench: '^10.0'
             coverage: true
-          - laravel: '13'
+          - name: Laravel 13
+            laravel: '13'
             testbench: '^11.0'
             coverage: false
     services:
@@ -115,8 +174,10 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6.0.2
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -136,91 +197,98 @@ jobs:
 
       - name: Run tests with coverage
         if: matrix.coverage
-        run: composer test:coverage
+        run: |
+          mkdir -p build/coverage
+          ./vendor/bin/phpunit --coverage-clover=build/coverage/clover-Laravel${{ matrix.laravel }}.xml
 
       - name: Run tests
         if: ${{ !matrix.coverage }}
         run: composer test -- --no-coverage
 
-      - name: Check coverage threshold
-        if: matrix.coverage
-        run: |
-          php -r '
-          $xml = simplexml_load_file("build/coverage/clover.xml");
-          $metrics = $xml->project->metrics;
-          $statements = (int) $metrics["statements"];
-          $covered = (int) $metrics["coveredstatements"];
-          $percent = $statements > 0 ? round(($covered / $statements) * 100, 2) : 0.0;
-          echo "Code coverage: {$percent}%\n";
-            if ($percent < 95) {
-              fwrite(STDERR, "Code coverage {$percent}% is below minimum threshold of 95%\n");
-              exit(1);
-          }
-          '
-
-      - name: Upload coverage to Codecov
-        if: matrix.coverage && env.CODECOV_TOKEN != ''
-        uses: codecov/codecov-action@v6
-        with:
-          token: ${{ env.CODECOV_TOKEN }}
-          files: ./build/coverage/clover.xml
-          flags: unittests
-          name: laravel-events
-          fail_ci_if_error: true
-
-      - name: Upload coverage artifacts
+      - name: Upload coverage artifact
         if: matrix.coverage
         uses: actions/upload-artifact@v7
         with:
-          name: coverage-report
-          path: |
-            build/coverage/
-          retention-days: 30
+          name: coverage-Laravel${{ matrix.laravel }}
+          path: build/coverage/clover-Laravel${{ matrix.laravel }}.xml
+          if-no-files-found: error
 
-  tests:
-    name: Tests & Coverage
+  coverage:
+    name: Coverage upload
+    needs: [test, security]
     runs-on: ubuntu-latest
-    needs: [tests-matrix]
-    if: always()
+    timeout-minutes: 20
     steps:
-      - name: Check matrix result
-        run: |
-          if [ "${{ needs.tests-matrix.result }}" != "success" ]; then
-            echo "::error::Tests & Coverage matrix did not succeed"
-            exit 1
-          fi
-
-  sonarcloud:
-    name: SonarQube Cloud Analysis
-    runs-on: ubuntu-latest
-    needs: [tests]
-    if: >-
-      needs.tests.result == 'success' &&
-      (
-        github.event_name != 'pull_request' ||
-        github.event.pull_request.head.repo.full_name == github.repository
-      )
-    steps:
-      - name: Checkout code
-        if: env.SONAR_TOKEN != ''
-        uses: actions/checkout@v6.0.2
+      - name: Checkout
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          persist-credentials: false
 
-      - name: Download coverage artifact
-        if: env.SONAR_TOKEN != ''
+      - name: Download coverage artifacts
         uses: actions/download-artifact@v8
         with:
-          name: coverage-report
-          path: build/coverage
+          pattern: coverage-*
+          path: build/coverage/matrix
+          merge-multiple: true
 
-      - name: Skip SonarQube Cloud Scan
-        if: env.SONAR_TOKEN == ''
-        run: echo "SONAR_TOKEN is not configured; skipping optional SonarQube Cloud analysis."
+      - name: Enforce coverage threshold
+        run: |
+          set -euo pipefail
+          clover="build/coverage/matrix/clover-Laravel12.xml"
+          php tools/coverage-enforce.php "$clover" 95
+          mkdir -p build/coverage
+          cp "$clover" build/coverage/clover-combined.xml
 
-      - name: SonarQube Cloud Scan
-        if: env.SONAR_TOKEN != ''
-        uses: SonarSource/sonarqube-scan-action@v8
+      - name: Upload to Codecov
+        if: github.event.pull_request.user.type != 'Bot' && env.CODECOV_TOKEN != ''
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        uses: codecov/codecov-action@v7
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: build/coverage/clover-combined.xml
+          fail_ci_if_error: true
+          verbose: true
+
+      - name: Skip Codecov
+        if: env.CODECOV_TOKEN == ''
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        run: echo "CODECOV_TOKEN is not configured; skipping Codecov upload."
+
+      - name: Resolve SonarQube host URL
+        if: github.event.pull_request.user.type != 'Bot' && env.SONAR_TOKEN != ''
+        id: sonar-config
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: |
+          set -euo pipefail
+          host_url="${SONAR_HOST_URL:-https://sonarcloud.io}"
+          host_url="${host_url%/}"
+          case "${host_url}" in
+            http://*|https://*) ;;
+            *) host_url="https://${host_url}" ;;
+          esac
+          if [[ ! "${host_url}" =~ ^https?://[^[:space:]/]+ ]]; then
+            echo "SONAR_HOST_URL must be a valid HTTP(S) URL"
+            exit 1
+          fi
+          echo "host_url=${host_url}" >> "${GITHUB_OUTPUT}"
+
+      - name: Upload SonarQube analysis
+        if: github.event.pull_request.user.type != 'Bot' && env.SONAR_TOKEN != ''
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ steps.sonar-config.outputs.host_url }}
+        uses: SonarSource/sonarqube-scan-action@v8
+        with:
+          args: >
+            -Dsonar.php.coverage.reportPaths=build/coverage/clover-combined.xml
+
+      - name: Skip SonarQube
+        if: env.SONAR_TOKEN == ''
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: echo "SONAR_TOKEN is not configured; skipping SonarQube analysis."

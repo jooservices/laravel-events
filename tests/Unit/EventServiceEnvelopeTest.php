@@ -7,9 +7,11 @@ namespace JOOservices\LaravelEvents\Tests\Unit;
 use JOOservices\LaravelEvents\EventLog\Models\EventLogEntry;
 use JOOservices\LaravelEvents\EventService;
 use JOOservices\LaravelEvents\EventSourcing\Models\StoredEvent;
+use JOOservices\LaravelEvents\Exceptions\InvalidConfigurationException;
 use JOOservices\LaravelEvents\Support\EventMetadata;
 use JOOservices\LaravelEvents\Tests\TestCase;
 use Mockery;
+use stdClass;
 
 class EventServiceEnvelopeTest extends TestCase
 {
@@ -34,10 +36,10 @@ class EventServiceEnvelopeTest extends TestCase
                     && $arg['correlation_id'] === 'corr-123'
                     && $arg['causation_id'] === 'cmd-123';
             }))
-            ->andReturn(new StoredEvent);
+            ->andReturn(new StoredEvent());
 
         $service = new EventService($storedEventModel, Mockery::mock(EventLogEntry::class));
-        $service->storeEvent(new \stdClass, [], 'ORD-1', metadata: [
+        $service->storeEvent(new stdClass(), [], 'ORD-1', metadata: [
             EventMetadata::EVENT_ID => 'evt-123',
             EventMetadata::EVENT_NAME => 'order.created',
             EventMetadata::AGGREGATE_TYPE => 'orders',
@@ -82,5 +84,124 @@ class EventServiceEnvelopeTest extends TestCase
             ],
         ]);
         $this->addToAssertionCount(1);
+    }
+
+    public function test_record_many_stored_events_generates_envelope_when_missing(): void
+    {
+        $storedEventModel = Mockery::mock(StoredEvent::class)->makePartial();
+        $storedEventModel->shouldReceive('newQuery')->andReturnSelf();
+        $storedEventModel->shouldReceive('insert')
+            ->once()
+            ->with(Mockery::on(function (array $records) {
+                $record = $records[0] ?? [];
+
+                return is_string($record['event_id'] ?? null)
+                    && ($record['event_id'] ?? '') !== ''
+                    && ($record['event_name'] ?? null) === 'BulkEvent'
+                    && ($record['user_id'] ?? null) === 'context-user';
+            }));
+
+        config()->set('events.context_provider', fn(): array => ['user_id' => 'context-user']);
+
+        $service = new EventService($storedEventModel, Mockery::mock(EventLogEntry::class));
+        $service->recordManyStoredEvents([
+            [
+                'event_class' => 'BulkEvent',
+                'payload' => ['id' => 1],
+            ],
+        ]);
+        $this->addToAssertionCount(1);
+    }
+
+    public function test_context_provider_class_string_is_resolved_from_container(): void
+    {
+        $app = $this->app;
+        self::assertNotNull($app);
+        $app->bind(
+            TestEventsContextProvider::class,
+            static fn(): TestEventsContextProvider => new TestEventsContextProvider(),
+        );
+        config()->set('events.context_provider', TestEventsContextProvider::class);
+
+        $storedEventModel = Mockery::mock(StoredEvent::class)->makePartial();
+        $storedEventModel->shouldReceive('newQuery')->andReturnSelf();
+        $storedEventModel->shouldReceive('create')
+            ->once()
+            ->with(Mockery::on(static function (array $arg): bool {
+                return ($arg['user_id'] ?? null) === 'from-provider'
+                    && ($arg['metadata']['user_id'] ?? null) === 'from-provider'
+                    && ($arg['metadata']['source'] ?? null) === 'test';
+            }))
+            ->andReturn(new StoredEvent());
+
+        $service = new EventService($storedEventModel, Mockery::mock(EventLogEntry::class));
+        $service->storeEvent(new stdClass(), ['id' => 1]);
+        $this->addToAssertionCount(1);
+    }
+
+    public function test_log_change_uses_context_user_id_when_meta_omits_user_id(): void
+    {
+        config()->set('events.context_provider', TestEventsContextProvider::class);
+        $app = $this->app;
+        self::assertNotNull($app);
+        $app->bind(
+            TestEventsContextProvider::class,
+            static fn(): TestEventsContextProvider => new TestEventsContextProvider(),
+        );
+
+        $eventLogModel = Mockery::mock(EventLogEntry::class)->makePartial();
+        $eventLogModel->shouldReceive('newQuery')->andReturnSelf();
+        $eventLogModel->shouldReceive('create')
+            ->once()
+            ->with(Mockery::on(
+                static fn(array $arg): bool => ($arg['user_id'] ?? null) === 'from-provider',
+            ))
+            ->andReturn(new EventLogEntry());
+
+        $service = new EventService(Mockery::mock(StoredEvent::class), $eventLogModel);
+        $service->logChange('Order', '1', 'updated', [], [], [], []);
+        $this->addToAssertionCount(1);
+    }
+
+    public function test_context_provider_ignores_non_array_return(): void
+    {
+        config()->set('events.context_provider', static fn(): string => 'not-an-array');
+
+        $storedEventModel = Mockery::mock(StoredEvent::class)->makePartial();
+        $storedEventModel->shouldReceive('newQuery')->andReturnSelf();
+        $storedEventModel->shouldReceive('create')
+            ->once()
+            ->with(Mockery::on(static fn(array $arg): bool => ($arg['metadata'] ?? null) === []))
+            ->andReturn(new StoredEvent());
+
+        $service = new EventService($storedEventModel, Mockery::mock(EventLogEntry::class));
+        $service->storeEvent(new stdClass(), []);
+        $this->addToAssertionCount(1);
+    }
+
+    public function test_non_callable_context_provider_throws_package_exception(): void
+    {
+        config()->set('events.context_provider', 42);
+
+        self::expectException(InvalidConfigurationException::class);
+
+        $service = new EventService(
+            Mockery::mock(StoredEvent::class),
+            Mockery::mock(EventLogEntry::class),
+        );
+        $service->storeEvent(new stdClass(), []);
+    }
+
+    public function test_invalid_context_provider_class_string_throws_package_exception(): void
+    {
+        config()->set('events.context_provider', 'App\\Does\\Not\\ExistContextProvider');
+
+        self::expectException(InvalidConfigurationException::class);
+
+        $service = new EventService(
+            Mockery::mock(StoredEvent::class),
+            Mockery::mock(EventLogEntry::class),
+        );
+        $service->storeEvent(new stdClass(), []);
     }
 }

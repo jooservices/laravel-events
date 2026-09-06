@@ -8,10 +8,12 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use MongoDB\Collection;
 use MongoDB\Laravel\Connection;
+use Throwable;
 
+use function is_string;
 use function str_contains;
 
-class InstallIndexesCommand extends Command
+final class InstallIndexesCommand extends Command
 {
     protected $signature = 'events:install-indexes
                             {--drop : Drop indexes instead of creating them}
@@ -21,7 +23,7 @@ class InstallIndexesCommand extends Command
 
     public function handle(): int
     {
-        $connectionName = config('events.connection', 'mongodb');
+        $connectionName = $this->stringConfig('events.connection', 'mongodb');
         $connection = DB::connection($connectionName);
 
         if (! $connection instanceof Connection) {
@@ -30,8 +32,8 @@ class InstallIndexesCommand extends Command
             return self::FAILURE;
         }
 
-        if ($this->option('drop')) {
-            if (! $this->option('force') && ! $this->confirm('Drop indexes? This does not delete data.')) {
+        if ($this->booleanOption('drop')) {
+            if (! $this->booleanOption('force') && ! $this->confirm('Drop indexes? This does not delete data.')) {
                 return self::SUCCESS;
             }
             $this->dropIndexes($connection);
@@ -48,16 +50,18 @@ class InstallIndexesCommand extends Command
 
     private function createStoredEventsIndexes(Connection $connection): void
     {
-        $collectionName = config('events.eventsourcing.collection', 'stored_events');
+        $collectionName = $this->stringConfig('events.eventsourcing.collection', 'stored_events');
         $collection = $connection->getCollection($collectionName);
 
-        $collection->createIndex(['aggregate_id' => 1]);
         $collection->createIndex(['aggregate_id' => 1, 'created_at' => 1]);
-        $collection->createIndex(['event_class' => 1]);
-        $collection->createIndex(['event_category' => 1]);
         $collection->createIndex(['event_class' => 1, 'created_at' => 1]);
+        $collection->createIndex(['event_name' => 1, 'created_at' => 1]);
+        $collection->createIndex(['event_category' => 1]);
+        $collection->createIndex(['event_id' => 1], ['unique' => true, 'sparse' => true]);
         $collection->createIndex(['metadata.correlation_id' => 1]);
         $collection->createIndex(['metadata.causation_id' => 1]);
+        $collection->createIndex(['correlation_id' => 1]);
+        $collection->createIndex(['causation_id' => 1]);
         $collection->createIndex(['user_id' => 1]);
 
         $ttlDays = config('events.retention.stored_events_days') ?? config('events.eventsourcing.ttl_days');
@@ -68,12 +72,10 @@ class InstallIndexesCommand extends Command
 
     private function createEventLogsIndexes(Connection $connection): void
     {
-        $collectionName = config('events.event_log.collection', 'event_logs');
+        $collectionName = $this->stringConfig('events.event_log.collection', 'event_logs');
         $collection = $connection->getCollection($collectionName);
 
-        $collection->createIndex(['entity_type' => 1, 'entity_id' => 1]);
         $collection->createIndex(['entity_type' => 1, 'entity_id' => 1, 'created_at' => -1]);
-        $collection->createIndex(['action' => 1]);
         $collection->createIndex(['action' => 1, 'created_at' => -1]);
         $collection->createIndex(['meta.correlation_id' => 1]);
         $collection->createIndex(['meta.causation_id' => 1]);
@@ -90,7 +92,7 @@ class InstallIndexesCommand extends Command
         foreach (['ttl_created_at', 'created_at_1'] as $name) {
             try {
                 $collection->dropIndex($name);
-            } catch (\Throwable $exception) {
+            } catch (Throwable $exception) {
                 if (! str_contains(strtolower($exception->getMessage()), 'index not found')) {
                     throw $exception;
                 }
@@ -100,7 +102,7 @@ class InstallIndexesCommand extends Command
         if ($ttlDays !== null && $ttlDays > 0) {
             $collection->createIndex(
                 ['created_at' => 1],
-                ['expireAfterSeconds' => $ttlDays * 86400, 'name' => 'ttl_created_at']
+                ['expireAfterSeconds' => $ttlDays * 86400, 'name' => 'ttl_created_at'],
             );
 
             return;
@@ -111,17 +113,29 @@ class InstallIndexesCommand extends Command
 
     private function dropIndexes(Connection $connection): void
     {
-        $storedCollection = config('events.eventsourcing.collection', 'stored_events');
-        $logCollection = config('events.event_log.collection', 'event_logs');
+        $storedCollection = $this->stringConfig('events.eventsourcing.collection', 'stored_events');
+        $logCollection = $this->stringConfig('events.event_log.collection', 'event_logs');
 
         foreach ([$storedCollection, $logCollection] as $name) {
             try {
                 $collection = $connection->getCollection($name);
                 $collection->dropIndexes();
                 $this->line("  [{$name}] indexes dropped.");
-            } catch (\Throwable $e) {
-                $this->warn("  [{$name}] drop failed: ".$e->getMessage());
+            } catch (Throwable $e) {
+                $this->warn("  [{$name}] drop failed: " . $e->getMessage());
             }
         }
+    }
+
+    private function stringConfig(string $key, string $default): string
+    {
+        $value = config($key, $default);
+
+        return is_string($value) && $value !== '' ? $value : $default;
+    }
+
+    private function booleanOption(string $name): bool
+    {
+        return filter_var($this->option($name), FILTER_VALIDATE_BOOLEAN);
     }
 }
