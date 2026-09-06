@@ -10,9 +10,11 @@ use JOOservices\LaravelEvents\Data\EventLogData;
 use JOOservices\LaravelEvents\Data\StoredEventData;
 use JOOservices\LaravelEvents\EventLog\Models\EventLogEntry;
 use JOOservices\LaravelEvents\EventSourcing\Models\StoredEvent;
+use JOOservices\LaravelEvents\Exceptions\InvalidConfigurationException;
 use JOOservices\LaravelEvents\Serialization\ArrayEventSerializer;
 use JOOservices\LaravelEvents\Serialization\EventSerializerInterface;
 use JOOservices\LaravelEvents\Support\PayloadRedactor;
+use Throwable;
 
 class EventService
 {
@@ -211,7 +213,11 @@ class EventService
         }
 
         if (is_string($provider) && $provider !== '') {
-            $provider = app($provider);
+            try {
+                $provider = app($provider);
+            } catch (Throwable $exception) {
+                throw InvalidConfigurationException::invalidContextProvider($provider, $exception);
+            }
         }
 
         if (! is_callable($provider)) {

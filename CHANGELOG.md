@@ -2,6 +2,8 @@
 
 ### Fixed
 
+- Invalid `context_provider` class-strings throw `InvalidConfigurationException` instead of a raw container error
+- Stored-event `latest()` / named correlation helpers share dual-path `$or` via `QueryExecutor`
 - Resolve invokable `context_provider` class-strings via the container; omit null `user_id` from EventLogSubscriber meta so context can win
 - Query DTO hydration accepts Eloquent/Mongo datetime strings (and UTCDateTime) for `created_at` / `occurred_at`
 - `byCorrelationId` / `byCausationId` match top-level envelope fields as well as `metadata.*`; `ensureEnvelope` copies those ids into metadata
@@ -25,8 +27,8 @@
 
 ### Added
 
-- `InvalidEventDataException` and `InvalidQueryException` with structured context / error codes
-- `QueryGuard` shared limit / range / filter validation
+- `InvalidEventDataException`, `InvalidQueryException`, and `InvalidConfigurationException` with structured context / error codes
+- `QueryGuard` / `QueryExecutor` shared query validation and mapping
 - `DateTimeParser` for Eloquent/Mongo date normalization on query hydration
 
 ## [1.5.0] - 2026-07-26

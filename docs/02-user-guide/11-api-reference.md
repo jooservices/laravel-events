@@ -100,7 +100,7 @@ are normalized, redacted, timestamped, and batch inserted.
 - `byCorrelationId(string $correlationId, int $limit = 50)` — matches `metadata.correlation_id` **or** top-level `correlation_id`
 - `byCausationId(string $causationId, int $limit = 50)` — matches `metadata.causation_id` **or** top-level `causation_id`
 - `between(DateTimeInterface $from, DateTimeInterface $to, int $limit = 50)` — requires `$from <= $to`
-- `latest(int $limit = 50, array $filters = [])` — allowlisted filter keys only
+- `latest(int $limit = 50, array $filters = [])` — allowlisted filter keys only; `correlation_id` / `causation_id` (and metadata aliases) match either top-level or nested field
 
 ### EventLogQueryService
 

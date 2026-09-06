@@ -74,20 +74,9 @@ class EventLogQueryService
         QueryGuard::assertFilters($filters, self::ALLOWED_FILTERS);
 
         $query = $this->model->newQuery();
-        foreach ($filters as $key => $value) {
-            $query->where($key, $value);
-        }
-        if ($from !== null) {
-            $query->where('created_at', '>=', $from);
-        }
-        if ($to !== null) {
-            $query->where('created_at', '<=', $to);
-        }
+        /** @var \Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model> $query */
+        QueryExecutor::applyFilters($query, $filters);
 
-        return $query->orderByDesc('created_at')
-            ->limit($limit)
-            ->get()
-            ->map(fn(EventLogEntry $entry): EventLogData => EventLogData::fromArray($entry->toArray()))
-            ->values();
+        return QueryExecutor::fetchEventLogs($query, $limit, $from, $to);
     }
 }

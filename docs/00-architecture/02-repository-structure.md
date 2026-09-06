@@ -30,12 +30,14 @@ laravel-events/
 │   ├── Exceptions/
 │   ├── Query/
 │   │   ├── EventLogQueryService.php
+│   │   ├── QueryExecutor.php
 │   │   ├── QueryGuard.php
 │   │   └── StoredEventQueryService.php
 │   ├── Serialization/
 │   │   ├── ArrayEventSerializer.php
 │   │   └── EventSerializerInterface.php
 │   ├── Support/
+│   │   ├── DateTimeParser.php
 │   │   ├── DiffHelper.php
 │   │   ├── EventMetadata.php
 │   │   ├── EventMetadataBuilder.php
@@ -67,7 +69,7 @@ laravel-events/
 | `JOOservices\LaravelEvents\Exceptions` | Package validation / query exceptions |
 | `JOOservices\LaravelEvents\Query` | Read helpers with allowlisted filters |
 | `JOOservices\LaravelEvents\Serialization` | Event → StoredEventData mapping |
-| `JOOservices\LaravelEvents\Support` | DiffHelper, redaction, metadata helpers |
+| `JOOservices\LaravelEvents\Support` | DiffHelper, DateTimeParser, redaction, metadata helpers |
 
 ## Key Types
 

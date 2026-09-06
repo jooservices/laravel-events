@@ -7,6 +7,7 @@ namespace JOOservices\LaravelEvents\Tests\Unit;
 use JOOservices\LaravelEvents\EventLog\Models\EventLogEntry;
 use JOOservices\LaravelEvents\EventService;
 use JOOservices\LaravelEvents\EventSourcing\Models\StoredEvent;
+use JOOservices\LaravelEvents\Exceptions\InvalidConfigurationException;
 use JOOservices\LaravelEvents\Support\EventMetadata;
 use JOOservices\LaravelEvents\Tests\TestCase;
 use Mockery;
@@ -181,5 +182,18 @@ class EventServiceEnvelopeTest extends TestCase
             ->andReturn(new StoredEvent());
         $service->storeEvent(new stdClass(), []);
         $this->addToAssertionCount(1);
+    }
+
+    public function test_invalid_context_provider_class_string_throws_package_exception(): void
+    {
+        config()->set('events.context_provider', 'App\\Does\\Not\\ExistContextProvider');
+
+        $this->expectException(InvalidConfigurationException::class);
+
+        $service = new EventService(
+            Mockery::mock(StoredEvent::class),
+            Mockery::mock(EventLogEntry::class),
+        );
+        $service->storeEvent(new stdClass(), []);
     }
 }
