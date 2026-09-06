@@ -13,6 +13,8 @@ use JOOservices\LaravelEvents\EventSourcing\Models\StoredEvent;
 use JOOservices\LaravelEvents\Query\EventLogQueryService;
 use JOOservices\LaravelEvents\Query\StoredEventQueryService;
 use MongoDB\Laravel\Connection;
+use stdClass;
+use Throwable;
 
 class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
 {
@@ -28,7 +30,7 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
 
         try {
             $connection->getDatabase()->command(['ping' => 1]);
-        } catch (\Throwable) {
+        } catch (Throwable) {
             $this->markTestSkipped('MongoDB is not available.');
         }
 
@@ -40,7 +42,7 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
     {
         $service = app(EventService::class);
         $service->storeEvent(
-            new \stdClass,
+            new stdClass(),
             ['order_id' => 'ORD-Q'],
             'ORD-Q',
             metadata: ['correlation_id' => 'corr-q', 'causation_id' => 'cmd-q'],
@@ -65,7 +67,7 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
     public function test_redaction_applies_to_persisted_event_and_log_records(): void
     {
         $service = app(EventService::class);
-        $service->storeEvent(new \stdClass, ['password' => 'secret', 'nested' => ['token' => 'abc']], 'redact-1');
+        $service->storeEvent(new stdClass(), ['password' => 'secret', 'nested' => ['token' => 'abc']], 'redact-1');
         $service->logChange(
             'users',
             '1',
@@ -107,7 +109,7 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
 
     public function test_bulk_record_support_merges_context_and_user_attribution(): void
     {
-        config()->set('events.context_provider', fn (): array => [
+        config()->set('events.context_provider', fn(): array => [
             'correlation_id' => 'bulk-context',
             'user_id' => 'context-user',
         ]);
@@ -159,7 +161,7 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
         $from = now()->subMinute();
 
         $service->storeEvent(
-            new \stdClass,
+            new stdClass(),
             ['order_id' => 'ORD-Q2'],
             'ORD-Q2',
             metadata: [
@@ -182,15 +184,15 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
         $eventQueries = app(EventLogQueryService::class);
 
         $this->assertSame('ORD-Q2', $storedQueries->byAggregateId('ORD-Q2')->first()?->aggregateId);
-        $this->assertSame(\stdClass::class, $storedQueries->byEventName(\stdClass::class)->first()?->eventClass);
+        $this->assertSame(stdClass::class, $storedQueries->byEventName(stdClass::class)->first()?->eventClass);
         $this->assertSame('domain', $storedQueries->byEventCategory('domain')->first()?->envelope?->eventCategory);
         $this->assertSame(
             'corr-q2',
-            $storedQueries->byCorrelationId('corr-q2')->first()?->metadata['correlation_id'] ?? null
+            $storedQueries->byCorrelationId('corr-q2')->first()?->metadata['correlation_id'] ?? null,
         );
         $this->assertSame(
             'cmd-q2',
-            $storedQueries->byCausationId('cmd-q2')->first()?->metadata['causation_id'] ?? null
+            $storedQueries->byCausationId('cmd-q2')->first()?->metadata['causation_id'] ?? null,
         );
         $this->assertGreaterThanOrEqual(1, $storedQueries->between($from, now())->count());
         $this->assertGreaterThanOrEqual(1, $storedQueries->latest(10)->count());
@@ -198,7 +200,7 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
         $this->assertSame('ORD-Q2', $eventQueries->byEntity('orders', 'ORD-Q2')->first()?->entityId);
         $this->assertSame(
             'corr-q2',
-            $eventQueries->byCorrelationId('corr-q2')->first()?->meta['correlation_id'] ?? null
+            $eventQueries->byCorrelationId('corr-q2')->first()?->meta['correlation_id'] ?? null,
         );
         $this->assertSame('cmd-q2', $eventQueries->byCausationId('cmd-q2')->first()?->meta['causation_id'] ?? null);
         $this->assertGreaterThanOrEqual(1, $eventQueries->between($from, now())->count());

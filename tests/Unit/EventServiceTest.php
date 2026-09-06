@@ -10,6 +10,7 @@ use JOOservices\LaravelEvents\EventService;
 use JOOservices\LaravelEvents\EventSourcing\Models\StoredEvent;
 use JOOservices\LaravelEvents\Tests\TestCase;
 use Mockery;
+use stdClass;
 
 class EventServiceTest extends TestCase
 {
@@ -21,8 +22,7 @@ class EventServiceTest extends TestCase
 
     public function test_store_event_creates_stored_event(): void
     {
-        $event = new class
-        {
+        $event = new class {
             public function __toString(): string
             {
                 return 'StubEvent';
@@ -31,7 +31,7 @@ class EventServiceTest extends TestCase
         $payload = ['id' => 1, 'name' => 'test'];
         $aggregateId = 'agg-123';
 
-        $stored = new StoredEvent;
+        $stored = new StoredEvent();
         $stored->event_class = get_class($event);
         $stored->aggregate_id = $aggregateId;
         $stored->payload = $payload;
@@ -61,15 +61,15 @@ class EventServiceTest extends TestCase
 
     public function test_store_event_accepts_null_aggregate_id(): void
     {
-        $event = new \stdClass;
+        $event = new stdClass();
         $payload = [];
 
         $storedEventModel = Mockery::mock(StoredEvent::class)->makePartial();
         $storedEventModel->shouldReceive('newQuery')->andReturnSelf();
         $storedEventModel->shouldReceive('create')
             ->once()
-            ->with(Mockery::on(fn (array $arg) => $arg['aggregate_id'] === null))
-            ->andReturn(new StoredEvent);
+            ->with(Mockery::on(fn(array $arg) => $arg['aggregate_id'] === null))
+            ->andReturn(new StoredEvent());
 
         $service = new EventService($storedEventModel, Mockery::mock(EventLogEntry::class));
         $result = $service->storeEvent($event, $payload, null);
@@ -81,7 +81,7 @@ class EventServiceTest extends TestCase
         $storedEventModel = Mockery::mock(StoredEvent::class);
         $eventLogModel = Mockery::mock(EventLogEntry::class)->makePartial();
         $eventLogModel->shouldReceive('newQuery')->andReturnSelf();
-        $entry = new EventLogEntry;
+        $entry = new EventLogEntry();
         $eventLogModel->shouldReceive('create')
             ->once()
             ->with(Mockery::on(function (array $arg) {
@@ -104,7 +104,7 @@ class EventServiceTest extends TestCase
             ['name' => 'Old'],
             ['name' => 'New'],
             ['name' => ['old' => 'Old', 'new' => 'New']],
-            ['user_id' => 99]
+            ['user_id' => 99],
         );
 
         $this->assertSame($entry, $result);
@@ -116,11 +116,11 @@ class EventServiceTest extends TestCase
         $storedEventModel->shouldReceive('newQuery')->andReturnSelf();
         $storedEventModel->shouldReceive('create')
             ->once()
-            ->with(Mockery::on(fn (array $arg) => $arg['user_id'] === 42))
-            ->andReturn(new StoredEvent);
+            ->with(Mockery::on(fn(array $arg) => $arg['user_id'] === 42))
+            ->andReturn(new StoredEvent());
 
         $service = new EventService($storedEventModel, Mockery::mock(EventLogEntry::class));
-        $service->storeEvent(new \stdClass, [], null, 42);
+        $service->storeEvent(new stdClass(), [], null, 42);
         $this->addToAssertionCount(1);
     }
 
@@ -131,11 +131,11 @@ class EventServiceTest extends TestCase
         $storedEventModel->shouldReceive('newQuery')->andReturnSelf();
         $storedEventModel->shouldReceive('create')
             ->once()
-            ->with(Mockery::on(fn (array $arg) => $arg['user_id'] === null))
-            ->andReturn(new StoredEvent);
+            ->with(Mockery::on(fn(array $arg) => $arg['user_id'] === null))
+            ->andReturn(new StoredEvent());
 
         $service = new EventService($storedEventModel, Mockery::mock(EventLogEntry::class));
-        $service->storeEvent(new \stdClass, [], null);
+        $service->storeEvent(new stdClass(), [], null);
         $this->addToAssertionCount(1);
     }
 
@@ -145,8 +145,8 @@ class EventServiceTest extends TestCase
         $eventLogModel->shouldReceive('newQuery')->andReturnSelf();
         $eventLogModel->shouldReceive('create')
             ->once()
-            ->with(Mockery::on(fn (array $arg) => $arg['user_id'] === 7))
-            ->andReturn(new EventLogEntry);
+            ->with(Mockery::on(fn(array $arg) => $arg['user_id'] === 7))
+            ->andReturn(new EventLogEntry());
 
         $service = new EventService(Mockery::mock(StoredEvent::class), $eventLogModel);
         $service->logChange('Order', '1', 'updated', [], [], [], [], 7);
@@ -159,8 +159,8 @@ class EventServiceTest extends TestCase
         $eventLogModel->shouldReceive('newQuery')->andReturnSelf();
         $eventLogModel->shouldReceive('create')
             ->once()
-            ->with(Mockery::on(fn (array $arg) => $arg['user_id'] === null))
-            ->andReturn(new EventLogEntry);
+            ->with(Mockery::on(fn(array $arg) => $arg['user_id'] === null))
+            ->andReturn(new EventLogEntry());
 
         $service = new EventService(Mockery::mock(StoredEvent::class), $eventLogModel);
         $service->logChange('Order', '1', 'updated', [], [], [], []);
@@ -173,8 +173,8 @@ class EventServiceTest extends TestCase
         $eventLogModel->shouldReceive('newQuery')->andReturnSelf();
         $eventLogModel->shouldReceive('create')
             ->once()
-            ->with(Mockery::on(fn (array $arg) => $arg['user_id'] === 100 && $arg['meta']['user_id'] === 100))
-            ->andReturn(new EventLogEntry);
+            ->with(Mockery::on(fn(array $arg) => $arg['user_id'] === 100 && $arg['meta']['user_id'] === 100))
+            ->andReturn(new EventLogEntry());
 
         $service = new EventService(Mockery::mock(StoredEvent::class), $eventLogModel);
         $service->logChange('Order', '1', 'updated', [], [], [], ['user_id' => 100]);
@@ -194,10 +194,10 @@ class EventServiceTest extends TestCase
                 return $arg['occurred_at'] === $occurredAt
                     && $arg['metadata'] === $metadata;
             }))
-            ->andReturn(new StoredEvent);
+            ->andReturn(new StoredEvent());
 
         $service = new EventService($storedEventModel, Mockery::mock(EventLogEntry::class));
-        $service->storeEvent(new \stdClass, [], null, null, $occurredAt, $metadata);
+        $service->storeEvent(new stdClass(), [], null, null, $occurredAt, $metadata);
         $this->addToAssertionCount(1);
     }
 
@@ -207,8 +207,8 @@ class EventServiceTest extends TestCase
         $eventLogModel->shouldReceive('newQuery')->andReturnSelf();
         $eventLogModel->shouldReceive('create')
             ->once()
-            ->with(Mockery::on(fn (array $arg) => $arg['user_id'] === 'uuid-abc-123'))
-            ->andReturn(new EventLogEntry);
+            ->with(Mockery::on(fn(array $arg) => $arg['user_id'] === 'uuid-abc-123'))
+            ->andReturn(new EventLogEntry());
 
         $service = new EventService(Mockery::mock(StoredEvent::class), $eventLogModel);
         $service->logChange('Order', '1', 'updated', [], [], [], [], 'uuid-abc-123');

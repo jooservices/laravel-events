@@ -8,6 +8,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use MongoDB\Collection;
 use MongoDB\Laravel\Connection;
+use Throwable;
 
 use function str_contains;
 
@@ -90,7 +91,7 @@ class InstallIndexesCommand extends Command
         foreach (['ttl_created_at', 'created_at_1'] as $name) {
             try {
                 $collection->dropIndex($name);
-            } catch (\Throwable $exception) {
+            } catch (Throwable $exception) {
                 if (! str_contains(strtolower($exception->getMessage()), 'index not found')) {
                     throw $exception;
                 }
@@ -100,7 +101,7 @@ class InstallIndexesCommand extends Command
         if ($ttlDays !== null && $ttlDays > 0) {
             $collection->createIndex(
                 ['created_at' => 1],
-                ['expireAfterSeconds' => $ttlDays * 86400, 'name' => 'ttl_created_at']
+                ['expireAfterSeconds' => $ttlDays * 86400, 'name' => 'ttl_created_at'],
             );
 
             return;
@@ -119,8 +120,8 @@ class InstallIndexesCommand extends Command
                 $collection = $connection->getCollection($name);
                 $collection->dropIndexes();
                 $this->line("  [{$name}] indexes dropped.");
-            } catch (\Throwable $e) {
-                $this->warn("  [{$name}] drop failed: ".$e->getMessage());
+            } catch (Throwable $e) {
+                $this->warn("  [{$name}] drop failed: " . $e->getMessage());
             }
         }
     }

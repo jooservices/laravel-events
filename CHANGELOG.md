@@ -1,5 +1,17 @@
 ## [Unreleased]
 
+### Changed
+
+- Migrated event record types to `jooservices/dto` (`^3.2`) and package exceptions to `jooservices/exceptions` (`^4.0`)
+- Switched Pint preset from `laravel` to `per` (PER-CS 3.0)
+- Removed in-repo AI/editor skill trees (workspace-owned); thinned `AGENTS.md`
+- Added `SUPPORT.md`, `GOVERNANCE.md`, and `WORKFLOWS.md`
+- Aligned GitHub Actions with JOOservices baseline (`ci.yml` PR gate, `ci-post-merge.yml`, commitlint, CodeQL, workflow audit)
+
+### Added
+
+- `InvalidEventDataException` and `InvalidQueryException` with structured context / error codes
+
 ## [1.5.0] - 2026-07-26
 
 ### Changed

@@ -26,8 +26,7 @@ class EventLogActionTest extends TestCase
 
     public function test_defaults_to_updated_action_uses_taxonomy_constant(): void
     {
-        $event = new class
-        {
+        $event = new class {
             use DefaultsToUpdatedAction;
         };
 

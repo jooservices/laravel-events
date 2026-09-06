@@ -11,17 +11,18 @@ use JOOservices\LaravelEvents\EventLog\Models\EventLogEntry;
 use JOOservices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
 use JOOservices\LaravelEvents\EventSourcing\Models\StoredEvent;
 use MongoDB\Laravel\Connection;
+use Throwable;
 
 class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
 {
-    private const EVIDENCE_FILE = __DIR__.'/../../build/mongodb_evidence.json';
+    private const EVIDENCE_FILE = __DIR__ . '/../../build/mongodb_evidence.json';
 
     protected function setUp(): void
     {
         parent::setUp();
 
         if (! $this->mongodbAvailable()) {
-            $this->markTestSkipped('MongoDB is not available at '.env('MONGODB_URI', 'mongodb://127.0.0.1:27017'));
+            $this->markTestSkipped('MongoDB is not available at ' . env('MONGODB_URI', 'mongodb://127.0.0.1:27017'));
         }
 
         StoredEvent::on('mongodb')->delete();
@@ -39,7 +40,7 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
             $connection->getDatabase()->command(['ping' => 1]);
 
             return true;
-        } catch (\Throwable) {
+        } catch (Throwable) {
             return false;
         }
     }
@@ -48,8 +49,7 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
     {
         $payload = ['order_id' => 'ORD-999', 'amount' => 99.99, 'at' => now()->toIso8601String()];
 
-        $event = new class implements EventSourcingInterface
-        {
+        $event = new class implements EventSourcingInterface {
             /** @var array<string, mixed> */
             public array $payload = [];
 
@@ -86,8 +86,7 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
 
     public function test_event_log_stored_to_real_mongodb_and_evidence_written(): void
     {
-        $loggableEvent = new class implements LoggableModelInterface
-        {
+        $loggableEvent = new class implements LoggableModelInterface {
             public function getLoggableType(): string
             {
                 return 'Order';
@@ -135,12 +134,11 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
 
     public function test_event_sourcing_stores_user_id_when_logged_in(): void
     {
-        $user = new User;
+        $user = new User();
         $user->id = 100;
         $this->actingAs($user);
 
-        $event = new class implements EventSourcingInterface
-        {
+        $event = new class implements EventSourcingInterface {
             /** @return array<string, mixed> */
             public function payload(): array
             {
@@ -162,12 +160,11 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
 
     public function test_event_log_stores_user_id_when_logged_in(): void
     {
-        $user = new User;
+        $user = new User();
         $user->id = 200;
         $this->actingAs($user);
 
-        $loggableEvent = new class implements LoggableModelInterface
-        {
+        $loggableEvent = new class implements LoggableModelInterface {
             public function getLoggableType(): string
             {
                 return 'Test';
@@ -216,7 +213,7 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
     {
         parent::tearDownAfterClass();
         if (file_exists(self::EVIDENCE_FILE)) {
-            fwrite(STDERR, "\n--- Evidence of MongoDB storage written to: ".realpath(self::EVIDENCE_FILE)." ---\n");
+            fwrite(STDERR, "\n--- Evidence of MongoDB storage written to: " . realpath(self::EVIDENCE_FILE) . " ---\n");
         }
     }
 }

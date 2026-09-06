@@ -29,14 +29,13 @@ class EventSourcingSubscriberTest extends TestCase
         $eventService->shouldReceive('storeEvent')
             ->once()
             ->with(Mockery::type(EventSourcingInterface::class), ['key' => 'value'], 'agg-1', null, null, [])
-            ->andReturn(new StoredEvent);
+            ->andReturn(new StoredEvent());
 
         $subscriber = new EventSourcingSubscriber($eventService);
-        $dispatcher = new Dispatcher;
+        $dispatcher = new Dispatcher();
         $subscriber->subscribe($dispatcher);
 
-        $event = new class implements EventSourcingInterface
-        {
+        $event = new class implements EventSourcingInterface {
             /** @return array<string, mixed> */
             public function payload(): array
             {
@@ -55,8 +54,7 @@ class EventSourcingSubscriberTest extends TestCase
 
     public function test_persist_event_calls_event_service(): void
     {
-        $event = new class implements EventSourcingInterface
-        {
+        $event = new class implements EventSourcingInterface {
             /** @return array<string, mixed> */
             public function payload(): array
             {
@@ -81,12 +79,11 @@ class EventSourcingSubscriberTest extends TestCase
 
     public function test_persist_event_passes_logged_in_user_id(): void
     {
-        $user = new User;
+        $user = new User();
         $user->id = 5;
         $this->actingAs($user);
 
-        $event = new class implements EventSourcingInterface
-        {
+        $event = new class implements EventSourcingInterface {
             /** @return array<string, mixed> */
             public function payload(): array
             {

@@ -42,21 +42,21 @@ final class EventMetadataBuilder
         return $this;
     }
 
-    public function schemaVersion(int|string $version): self
+    public function schemaVersion(int | string $version): self
     {
         $this->metadata[EventMetadata::SCHEMA_VERSION] = $version;
 
         return $this;
     }
 
-    public function eventVersion(int|string $version): self
+    public function eventVersion(int | string $version): self
     {
         $this->metadata[EventMetadata::EVENT_VERSION] = $version;
 
         return $this;
     }
 
-    public function tenantId(int|string $tenantId): self
+    public function tenantId(int | string $tenantId): self
     {
         $this->metadata[EventMetadata::TENANT_ID] = $tenantId;
 

@@ -10,6 +10,7 @@ use JOOservices\LaravelEvents\EventSourcing\Models\StoredEvent;
 use JOOservices\LaravelEvents\Support\EventMetadata;
 use JOOservices\LaravelEvents\Tests\TestCase;
 use Mockery;
+use stdClass;
 
 class EventServiceEnvelopeTest extends TestCase
 {
@@ -34,10 +35,10 @@ class EventServiceEnvelopeTest extends TestCase
                     && $arg['correlation_id'] === 'corr-123'
                     && $arg['causation_id'] === 'cmd-123';
             }))
-            ->andReturn(new StoredEvent);
+            ->andReturn(new StoredEvent());
 
         $service = new EventService($storedEventModel, Mockery::mock(EventLogEntry::class));
-        $service->storeEvent(new \stdClass, [], 'ORD-1', metadata: [
+        $service->storeEvent(new stdClass(), [], 'ORD-1', metadata: [
             EventMetadata::EVENT_ID => 'evt-123',
             EventMetadata::EVENT_NAME => 'order.created',
             EventMetadata::AGGREGATE_TYPE => 'orders',

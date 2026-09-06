@@ -13,17 +13,17 @@ class EventLogEntryTest extends TestCase
     {
         config()->set('events.connection', 'mongodb');
         config()->set('events.event_log.collection', 'event_logs');
-        $model = new EventLogEntry;
+        $model = new EventLogEntry();
         $this->assertSame('mongodb', $model->getConnectionName());
         $this->assertSame('event_logs', $model->getTable());
     }
 
     public function test_fillable_attributes(): void
     {
-        $model = new EventLogEntry;
+        $model = new EventLogEntry();
         $this->assertSame(
             ['entity_type', 'entity_id', 'action', 'prev', 'changed', 'diff', 'meta', 'user_id'],
-            $model->getFillable()
+            $model->getFillable(),
         );
     }
 }

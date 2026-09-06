@@ -18,7 +18,7 @@ class EventsServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__.'/../config/events.php', 'events');
+        $this->mergeConfigFrom(__DIR__ . '/../config/events.php', 'events');
         $this->app->bind(EventSerializerInterface::class, ArrayEventSerializer::class);
         $this->app->singleton(EventService::class);
         $this->app->singleton(StoredEventQueryService::class);
@@ -33,7 +33,7 @@ class EventsServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([InstallIndexesCommand::class]);
             $this->publishes([
-                __DIR__.'/../config/events.php' => config_path('events.php'),
+                __DIR__ . '/../config/events.php' => config_path('events.php'),
             ], 'laravel-events-config');
         }
     }
