@@ -79,19 +79,18 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Generate Changelog
-        id: changelog
-        uses: metcalfc/changelog-generator@v5.0.1
-        with:
-          myToken: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v3
-        with:
-          body: ${{ steps.changelog.outputs.changelog }}
-          draft: false
-          prerelease: false
-          generate_release_notes: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view "${GITHUB_REF_NAME}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            echo "Release ${GITHUB_REF_NAME} already exists; skipping create."
+            exit 0
+          fi
+          gh release create "${GITHUB_REF_NAME}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --title "${GITHUB_REF_NAME}" \
+            --generate-notes
 
   publish:
     name: Publish to Packagist
