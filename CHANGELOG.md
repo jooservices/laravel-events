@@ -1,51 +1,71 @@
+# Changelog
+
+All notable changes to this package are documented in this file.
+Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
+versioning follows [Semantic Versioning](https://semver.org/).
+
 ## [Unreleased]
 
-### Removed
+## [4.0.0] - 2026-09-06
 
-- Unused bag DTOs `EventDiffData` and `EventMetadataData` (`diff` / `meta` / `metadata` stay as arrays on record DTOs)
+Major quality and correctness release for Laravel 12/13 + MongoDB event
+persistence. Treat upgrades from `1.x` as a breaking change — see
+[`UPGRADE-4.0.md`](UPGRADE-4.0.md).
 
-### Changed
+### Breaking
 
-- Direct Composer requires for `psr/clock` and `psr/log`
-- Broader Faker usage in unit tests for free-form values
-- Raise PHPStan to `max` with `phpstan-strict-rules` and `phpstan-phpunit`
-- Enable PHPMD `cleancode` (StaticAccess / ElseExpression excluded for Laravel facades)
-- Convert `EventLogAction` / `EventCategory` to string-backed enums
-- Mark concrete package classes `final` (Eloquent models / service provider remain open for Testbench/Mockery); inject optional PSR-20 `ClockInterface` on `EventService`
-- Introduce `EventPersisterInterface` for subscriber DIP (mockable under `final` EventService)
-- CaptainHook commit subjects require an uppercase first letter
-- Non-callable `context_provider` values throw `InvalidConfigurationException`
-- Add Dockerfile / docker-compose / Makefile (PHP 8.5 + MongoDB) aligned with `dto`
-- Index set: drop redundant prefixes; add `event_name`, sparse unique `event_id`, top-level correlation/causation indexes
-- `EventSerializerInterface` requires `ensureEnvelope()`
-- Migrated event record types to `jooservices/dto` (`^3.2`) and package exceptions to `jooservices/exceptions` (`^4.0`)
-- Switched Pint preset from `laravel` to `per` (PER-CS 3.0)
-- Removed in-repo AI/editor skill trees (workspace-owned); thinned `AGENTS.md`
-- Added `SUPPORT.md`, `GOVERNANCE.md`, and `WORKFLOWS.md`
-- Aligned GitHub Actions with JOOservices baseline (`ci.yml` PR gate, `ci-post-merge.yml`, commitlint, CodeQL, workflow audit)
+- `EventLogAction` and `EventCategory` are string-backed enums. Call sites that
+  compared or returned `EventLogAction::UPDATED` as a string must use
+  `EventLogAction::UPDATED->value` (and the same pattern for other cases).
+  `::all()` still returns `list<string>`.
+- Concrete package classes are `final` (`EventService`, subscribers, query
+  services, serializer, DiffHelper, console command, etc.). Eloquent models and
+  `EventsServiceProvider` remain open. Prefer composition / `EventPersisterInterface`
+  over subclassing.
+- Removed unused bag DTOs `EventDiffData` and `EventMetadataData`. Record DTOs
+  keep `diff` / `meta` / `metadata` as arrays.
+- `EventSerializerInterface` requires `ensureEnvelope()`.
+- Mongo index set changed (sparse unique `event_id`, `event_name`, top-level
+  correlation/causation). Re-run `php artisan events:install-indexes` after
+  upgrade.
+- Runtime dependencies now include `jooservices/dto` `^3.2`,
+  `jooservices/exceptions` `^4.0`, `psr/clock` `^1.0`, and `psr/log` `^3.0`.
 
-### Fixed
+### Upgrade
 
-- Invalid `context_provider` class-strings throw `InvalidConfigurationException` instead of a raw container error
-- Stored-event `latest()` / named correlation helpers share dual-path `$or` via `QueryExecutor`
-- Resolve invokable `context_provider` class-strings via the container; omit null `user_id` from EventLogSubscriber meta so context can win
-- Query DTO hydration accepts Eloquent/Mongo datetime strings (and UTCDateTime) for `created_at` / `occurred_at`
-- `byCorrelationId` / `byCausationId` match top-level envelope fields as well as `metadata.*`; `ensureEnvelope` copies those ids into metadata
-- `StoredEventQueryService::byEventName()` now filters `event_name` (not FQCN); added `byEventClass()` and `byEventId()`
-- DiffHelper records removals; deleted EventLog actions with empty `changed` store a full removal diff
-- Bulk `recordManyStoredEvents()` runs `ensureEnvelope()` (always generates `event_id` / `event_name`)
-- Stored-event `user_id` column now takes metadata/context `user_id` like event logs
-- Query DTOs hydrate storage identity via `DocumentIdentity` (`documentId()` / `createdAt()`); `between()` rejects inverted ranges; `latest()` allowlists filters
-- Legacy TTL env parsing matches retention (positive int only); default redaction keys expanded
-- Runtime-truth docs: removed stale `lint:all` / legacy-namespace claims; architecture tree synced
+1. `composer require jooservices/laravel-events:^4.0`
+2. Update action/category call sites to `->value` where a `string` is required.
+3. Publish config if you customize it; re-run `php artisan events:install-indexes`.
+4. Prefer `ShouldDispatchAfterCommit` for domain events that must not outlive a
+   rolled-back SQL transaction; embed `user_id` / correlation on queued events.
+5. Type-hint `EventPersisterInterface` in tests instead of mocking `final`
+   `EventService` directly.
 
 ### Added
 
-- Optional PSR-3 `LoggerInterface` on `EventService` (debug logs after successful persist)
-- `InvalidEventDataException`, `InvalidQueryException`, and `InvalidConfigurationException` with structured context / error codes
-- `QueryGuard` / `QueryExecutor` shared query validation and mapping
-- `DateTimeParser` for Eloquent/Mongo date normalization on query hydration
-- Unit coverage for `QueryExecutor::applyFilters()` dual-path OR
+- `EventPersisterInterface` for subscriber DIP
+- Optional PSR-20 `ClockInterface` and PSR-3 `LoggerInterface` on `EventService`
+- `InvalidEventDataException`, `InvalidQueryException`,
+  `InvalidConfigurationException`
+- `QueryGuard` / `QueryExecutor`, `DateTimeParser`, `DocumentIdentity`
+- Dockerfile / docker-compose / Makefile (PHP 8.5 + MongoDB)
+- Dual-path correlation queries; invokable `context_provider` class-strings
+
+### Changed
+
+- PHPStan `max` + `phpstan-strict-rules` / `phpstan-phpunit`; PHPMD cleancode
+- Pint `per` (PER-CS 3.0); CaptainHook uppercase Conventional Commit subjects
+- JOOservices CI baseline (`ci.yml` PR gate, commitlint, CodeQL, workflow audit)
+- Non-callable `context_provider` throws `InvalidConfigurationException`
+
+### Fixed
+
+- Query DTO date hydration from Eloquent/Mongo strings
+- `byEventName()` filters `event_name`; added `byEventClass()` / `byEventId()`
+- Diff removals; deleted EventLog empty `changed` → full removal diff
+- Bulk `recordManyStoredEvents()` always runs `ensureEnvelope()`
+- Guest EventLog does not overwrite context `user_id` with null
+- Allowlisted query filters; inverted `between()` rejected
 
 ## [1.5.0] - 2026-07-26
 
@@ -118,7 +138,8 @@
 - Laravel ^12.0
 - mongodb/laravel-mongodb ^5.6
 
-[Unreleased]: https://github.com/jooservices/laravel-events/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/jooservices/laravel-events/compare/v4.0.0...HEAD
+[4.0.0]: https://github.com/jooservices/laravel-events/releases/tag/v4.0.0
 [1.5.0]: https://github.com/jooservices/laravel-events/releases/tag/v1.5.0
 [1.4.0]: https://github.com/jooservices/laravel-events/releases/tag/v1.4.0
 [1.3.0]: https://github.com/jooservices/laravel-events/releases/tag/v1.3.0

@@ -10,8 +10,10 @@
 ## Composer
 
 ```bash
-composer require jooservices/laravel-events
+composer require jooservices/laravel-events:^4.0
 ```
+
+Upgrading from `1.x`? Follow [`UPGRADE-4.0.md`](../../UPGRADE-4.0.md).
 
 ## Laravel Setup
 
