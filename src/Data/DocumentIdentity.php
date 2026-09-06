@@ -9,7 +9,7 @@ use JOOservices\Dto\Attributes\MapFrom;
 use JOOservices\Dto\Attributes\MapTo;
 use JOOservices\Dto\Core\Context;
 use JOOservices\Dto\Core\Dto;
-use JOOservices\LaravelEvents\Exceptions\InvalidEventDataException;
+use JOOservices\LaravelEvents\Support\DateTimeParser;
 
 /**
  * Storage identity for query results. Omitted from persistence toArray() payloads.
@@ -29,14 +29,12 @@ final class DocumentIdentity extends Dto
      */
     public static function fromStorageArray(array $values): self
     {
-        $createdAt = $values['created_at'] ?? $values['createdAt'] ?? null;
-        if ($createdAt !== null && ! $createdAt instanceof DateTimeInterface) {
-            throw InvalidEventDataException::invalidType('created_at', 'a DateTimeInterface or null');
-        }
-
         return new self(
             id: $values['_id'] ?? $values['id'] ?? null,
-            createdAt: $createdAt,
+            createdAt: DateTimeParser::optional(
+                $values['created_at'] ?? $values['createdAt'] ?? null,
+                'created_at',
+            ),
         );
     }
 
@@ -45,9 +43,11 @@ final class DocumentIdentity extends Dto
      */
     public static function fromArray(array $data, ?Context $ctx = null): static
     {
+        $identity = self::fromStorageArray($data);
+
         return parent::fromArray([
-            'id' => $data['id'] ?? $data['_id'] ?? null,
-            'created_at' => $data['created_at'] ?? $data['createdAt'] ?? null,
+            'id' => $identity->id,
+            'created_at' => $identity->createdAt,
         ], $ctx);
     }
 }

@@ -168,7 +168,16 @@ Recursive redaction is enabled by default for common secret keys:
 ```php
 'redaction' => [
     'enabled' => true,
-    'keys' => ['password', 'token', 'authorization'],
+    'keys' => [
+        'password',
+        'password_hash',
+        'token',
+        'secret',
+        'client_secret',
+        'private_key',
+        'api_key',
+        'authorization',
+    ],
     'replacement' => '[REDACTED]',
 ],
 ```

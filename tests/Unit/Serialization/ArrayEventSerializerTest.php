@@ -64,4 +64,22 @@ class ArrayEventSerializerTest extends TestCase
         $this->assertNotNull($data->envelope->eventId);
         $this->assertSame('OrderCreated', $data->envelope->eventName);
     }
+
+    public function test_ensure_envelope_copies_top_level_correlation_into_metadata(): void
+    {
+        $data = (new ArrayEventSerializer())->ensureEnvelope(
+            \JOOservices\LaravelEvents\Data\StoredEventData::fromArray([
+                'event_class' => 'OrderCreated',
+                'payload' => [],
+                'correlation_id' => 'corr-top',
+                'causation_id' => 'cmd-top',
+            ]),
+        );
+
+        $this->assertNotNull($data->envelope);
+        $this->assertSame('corr-top', $data->envelope->correlationId);
+        $this->assertSame('cmd-top', $data->envelope->causationId);
+        $this->assertSame('corr-top', $data->metadata[EventMetadata::CORRELATION_ID] ?? null);
+        $this->assertSame('cmd-top', $data->metadata[EventMetadata::CAUSATION_ID] ?? null);
+    }
 }

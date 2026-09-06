@@ -132,6 +132,32 @@ class EventDataTest extends TestCase
         $this->assertArrayNotHasKey('created_at', $log->toArray());
     }
 
+    public function test_query_identity_accepts_eloquent_serialized_timestamp_strings(): void
+    {
+        $stored = StoredEventData::fromArray([
+            'event_class' => 'OrderCreated',
+            'payload' => [],
+            '_id' => 'mongo-str-1',
+            'created_at' => '2026-05-01T12:00:00.000000Z',
+            'occurred_at' => '2026-05-01 11:59:00',
+        ]);
+        $log = EventLogData::fromArray([
+            'entity_type' => 'orders',
+            'entity_id' => '1',
+            'action' => 'updated',
+            '_id' => 'mongo-str-2',
+            'created_at' => '2026-05-01T12:00:00.000000Z',
+        ]);
+
+        $this->assertSame('mongo-str-1', $stored->documentId());
+        $createdAt = $stored->createdAt();
+        $this->assertInstanceOf(DateTimeImmutable::class, $createdAt);
+        $this->assertSame('2026-05-01T12:00:00+00:00', $createdAt->format(DateTimeImmutable::ATOM));
+        $this->assertInstanceOf(DateTimeImmutable::class, $stored->occurredAt);
+        $this->assertSame('mongo-str-2', $log->documentId());
+        $this->assertInstanceOf(DateTimeImmutable::class, $log->createdAt());
+    }
+
     public function test_event_log_data_requires_required_fields(): void
     {
         $this->expectException(InvalidEventDataException::class);

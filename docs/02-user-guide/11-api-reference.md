@@ -97,8 +97,8 @@ are normalized, redacted, timestamped, and batch inserted.
 - `byEventClass(string $eventClass, int $limit = 50)` — filters `event_class` (FQCN)
 - `byEventId(string $eventId, int $limit = 50)`
 - `byEventCategory(string $eventCategory, int $limit = 50)`
-- `byCorrelationId(string $correlationId, int $limit = 50)`
-- `byCausationId(string $causationId, int $limit = 50)`
+- `byCorrelationId(string $correlationId, int $limit = 50)` — matches `metadata.correlation_id` **or** top-level `correlation_id`
+- `byCausationId(string $causationId, int $limit = 50)` — matches `metadata.causation_id` **or** top-level `causation_id`
 - `between(DateTimeInterface $from, DateTimeInterface $to, int $limit = 50)` — requires `$from <= $to`
 - `latest(int $limit = 50, array $filters = [])` — allowlisted filter keys only
 

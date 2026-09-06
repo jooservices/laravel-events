@@ -103,7 +103,7 @@ sequenceDiagram
 
 | Collection | Purpose | Key Fields |
 |------------|---------|------------|
-| **stored_events** | Event Sourcing: event payloads by aggregate | `event_class`, `aggregate_id`, `payload`, `metadata`, `user_id`, `occurred_at`, `created_at` |
+| **stored_events** | Event Sourcing: event payloads by aggregate | `event_class`, `aggregate_id`, `payload`, `metadata`, `user_id`, `occurred_at`, `created_at`, plus envelope (`event_id`, `event_name`, `event_category`, `aggregate_type`, `schema_version`, `event_version`, `correlation_id`, `causation_id`) |
 | **event_logs** | Event Log: model change audit | `entity_type`, `entity_id`, `action`, `prev`, `changed`, `diff`, `meta`, `user_id`, `created_at` |
 
 ## Design Decisions

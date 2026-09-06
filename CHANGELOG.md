@@ -2,6 +2,8 @@
 
 ### Fixed
 
+- Query DTO hydration accepts Eloquent/Mongo datetime strings (and UTCDateTime) for `created_at` / `occurred_at`
+- `byCorrelationId` / `byCausationId` match top-level envelope fields as well as `metadata.*`; `ensureEnvelope` copies those ids into metadata
 - `StoredEventQueryService::byEventName()` now filters `event_name` (not FQCN); added `byEventClass()` and `byEventId()`
 - DiffHelper records removals; deleted EventLog actions with empty `changed` store a full removal diff
 - Bulk `recordManyStoredEvents()` runs `ensureEnvelope()` (always generates `event_id` / `event_name`)
@@ -24,6 +26,7 @@
 
 - `InvalidEventDataException` and `InvalidQueryException` with structured context / error codes
 - `QueryGuard` shared limit / range / filter validation
+- `DateTimeParser` for Eloquent/Mongo date normalization on query hydration
 
 ## [1.5.0] - 2026-07-26
 

@@ -10,6 +10,7 @@ use JOOservices\Dto\Attributes\MapTo;
 use JOOservices\Dto\Core\Context;
 use JOOservices\Dto\Core\Dto;
 use JOOservices\LaravelEvents\Exceptions\InvalidEventDataException;
+use JOOservices\LaravelEvents\Support\DateTimeParser;
 
 final class StoredEventData extends Dto
 {
@@ -152,11 +153,6 @@ final class StoredEventData extends Dto
      */
     private static function optionalDateTime(array $values, string $snake, string $camel): ?DateTimeInterface
     {
-        $value = $values[$snake] ?? $values[$camel] ?? null;
-        if ($value !== null && ! $value instanceof DateTimeInterface) {
-            throw InvalidEventDataException::invalidType($snake, 'a DateTimeInterface or null');
-        }
-
-        return $value;
+        return DateTimeParser::optional($values[$snake] ?? $values[$camel] ?? null, $snake);
     }
 }

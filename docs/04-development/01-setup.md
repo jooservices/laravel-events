@@ -25,8 +25,6 @@ composer lint:cs
 composer lint:cs:fix
 ```
 
-Legacy aliases such as `composer phpstan`, `composer phpcs`, and `composer phpmd` remain for contributor convenience.
-
 ## Git Hooks
 
 CaptainHook is installed automatically by Composer:
