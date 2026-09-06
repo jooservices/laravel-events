@@ -2,6 +2,7 @@
 
 ### Fixed
 
+- Resolve invokable `context_provider` class-strings via the container; omit null `user_id` from EventLogSubscriber meta so context can win
 - Query DTO hydration accepts Eloquent/Mongo datetime strings (and UTCDateTime) for `created_at` / `occurred_at`
 - `byCorrelationId` / `byCausationId` match top-level envelope fields as well as `metadata.*`; `ensureEnvelope` copies those ids into metadata
 - `StoredEventQueryService::byEventName()` now filters `event_name` (not FQCN); added `byEventClass()` and `byEventId()`

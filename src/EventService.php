@@ -206,7 +206,15 @@ class EventService
     private function getContext(): array
     {
         $provider = config('events.context_provider');
-        if ($provider === null || ! is_callable($provider)) {
+        if ($provider === null) {
+            return [];
+        }
+
+        if (is_string($provider) && $provider !== '') {
+            $provider = app($provider);
+        }
+
+        if (! is_callable($provider)) {
             return [];
         }
 

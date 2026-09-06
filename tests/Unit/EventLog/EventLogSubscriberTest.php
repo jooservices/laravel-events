@@ -57,7 +57,7 @@ class EventLogSubscriberTest extends TestCase
                 ['status' => 'pending'],
                 ['status' => 'completed'],
                 ['status' => ['old' => 'pending', 'new' => 'completed']],
-                Mockery::on(fn(array $meta) => array_key_exists('user_id', $meta)),
+                Mockery::on(fn(array $meta) => $meta === []),
             );
 
         $diffHelper = new DiffHelper();
@@ -77,7 +77,7 @@ class EventLogSubscriberTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function test_log_model_change_passes_null_user_id_when_guest(): void
+    public function test_log_model_change_omits_user_id_meta_when_guest(): void
     {
         $this->assertNull(auth()->id());
         $event = new class implements LoggableModelInterface {
@@ -114,7 +114,7 @@ class EventLogSubscriberTest extends TestCase
                 [],
                 ['name' => 'x'],
                 ['name' => ['old' => null, 'new' => 'x']],
-                ['user_id' => null],
+                [],
             );
 
         $subscriber = new EventLogSubscriber($eventService, new DiffHelper());
@@ -211,7 +211,7 @@ class EventLogSubscriberTest extends TestCase
                 [],
                 ['status' => 'pending'],
                 ['status' => ['old' => null, 'new' => 'pending']],
-                Mockery::on(fn(array $meta) => array_key_exists('user_id', $meta)),
+                Mockery::on(fn(array $meta) => $meta === []),
             );
 
         $subscriber = new EventLogSubscriber($eventService, new DiffHelper());
@@ -263,7 +263,7 @@ class EventLogSubscriberTest extends TestCase
                     'status' => ['old' => 'pending', 'new' => null],
                     'total' => ['old' => 10, 'new' => null],
                 ],
-                Mockery::on(fn(array $meta) => array_key_exists('user_id', $meta)),
+                Mockery::on(fn(array $meta) => $meta === []),
             );
 
         $subscriber = new EventLogSubscriber($eventService, new DiffHelper());

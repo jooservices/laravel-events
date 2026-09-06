@@ -39,6 +39,12 @@ class EventLogSubscriber
             : array_merge($prev, $changed);
         $diff = $this->diffHelper->diff($prev, $current);
 
+        $meta = [];
+        $userId = auth()->id();
+        if ($userId !== null) {
+            $meta['user_id'] = $userId;
+        }
+
         $this->eventService->logChange(
             $event->getLoggableType(),
             $event->getLoggableId(),
@@ -46,7 +52,7 @@ class EventLogSubscriber
             $prev,
             $changed,
             $diff,
-            ['user_id' => auth()->id()],
+            $meta,
         );
     }
 }
