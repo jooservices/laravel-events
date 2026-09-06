@@ -6,6 +6,7 @@ namespace JOOservices\LaravelEvents\Query;
 
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use JOOservices\LaravelEvents\Data\EventLogData;
 use JOOservices\LaravelEvents\Data\StoredEventData;
@@ -24,7 +25,8 @@ final class QueryExecutor
     ];
 
     /**
-     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $query
+     * @template TModel of Model
+     * @param  Builder<TModel>  $query
      * @param  array<string, mixed>  $filters
      * @param  array<string, string>  $dualPaths
      */
@@ -45,7 +47,8 @@ final class QueryExecutor
     }
 
     /**
-     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $query
+     * @template TModel of Model
+     * @param  Builder<TModel>  $query
      * @return Collection<int, StoredEventData>
      */
     public static function fetchStoredEvents(
@@ -56,18 +59,31 @@ final class QueryExecutor
     ): Collection {
         self::applyCreatedAtRange($query, $from, $to);
 
+        $rows = $query->orderBy('created_at', 'desc')
+            ->take($limit)
+            ->get();
+
         /** @var Collection<int, StoredEventData> $mapped */
-        $mapped = $query->orderByDesc('created_at')
-            ->limit($limit)
-            ->get()
-            ->map(static fn($event): StoredEventData => StoredEventData::fromArray($event->toArray()))
+        $mapped = $rows
+            ->map(static function (Model $event): StoredEventData {
+                /** @var array<string, mixed> $attributes */
+                $attributes = [];
+                foreach ($event->toArray() as $key => $value) {
+                    if (is_string($key)) {
+                        $attributes[$key] = $value;
+                    }
+                }
+
+                return StoredEventData::fromArray($attributes);
+            })
             ->values();
 
         return $mapped;
     }
 
     /**
-     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $query
+     * @template TModel of Model
+     * @param  Builder<TModel>  $query
      * @return Collection<int, EventLogData>
      */
     public static function fetchEventLogs(
@@ -78,18 +94,31 @@ final class QueryExecutor
     ): Collection {
         self::applyCreatedAtRange($query, $from, $to);
 
+        $rows = $query->orderBy('created_at', 'desc')
+            ->take($limit)
+            ->get();
+
         /** @var Collection<int, EventLogData> $mapped */
-        $mapped = $query->orderByDesc('created_at')
-            ->limit($limit)
-            ->get()
-            ->map(static fn($entry): EventLogData => EventLogData::fromArray($entry->toArray()))
+        $mapped = $rows
+            ->map(static function (Model $entry): EventLogData {
+                /** @var array<string, mixed> $attributes */
+                $attributes = [];
+                foreach ($entry->toArray() as $key => $value) {
+                    if (is_string($key)) {
+                        $attributes[$key] = $value;
+                    }
+                }
+
+                return EventLogData::fromArray($attributes);
+            })
             ->values();
 
         return $mapped;
     }
 
     /**
-     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $query
+     * @template TModel of Model
+     * @param  Builder<TModel>  $query
      */
     private static function applyCreatedAtRange(
         Builder $query,

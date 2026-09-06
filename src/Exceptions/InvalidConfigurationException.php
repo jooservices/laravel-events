@@ -19,6 +19,13 @@ final class InvalidConfigurationException extends LaravelEventsException
         ))->withContext(['provider' => $provider]);
     }
 
+    public static function nonCallableContextProvider(string $provider): self
+    {
+        return (new self(
+            "events.context_provider must be callable; got '{$provider}'.",
+        ))->withContext(['provider' => $provider]);
+    }
+
     public function errorCode(): string
     {
         return 'events.config.invalid';

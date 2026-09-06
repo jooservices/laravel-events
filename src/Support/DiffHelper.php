@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace JOOservices\LaravelEvents\Support;
 
-class DiffHelper
+final class DiffHelper
 {
     /**
      * Build per-field diff including additions, changes, and removals.

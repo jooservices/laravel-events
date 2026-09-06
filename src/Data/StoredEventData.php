@@ -119,14 +119,18 @@ final class StoredEventData extends Dto
 
         $occurredAt = self::optionalDateTime($values, 'occurred_at', 'occurredAt');
         $aggregateId = $values['aggregate_id'] ?? $values['aggregateId'] ?? null;
+        $aggId = null;
+        if (is_string($aggregateId) || is_int($aggregateId)) {
+            $aggId = (string) $aggregateId;
+        }
 
         return [
             'event_class' => $eventClass,
-            'payload' => $payload,
-            'aggregate_id' => $aggregateId === null ? null : (string) $aggregateId,
+            'payload' => self::stringKeyed($payload),
+            'aggregate_id' => $aggId,
             'user_id' => $values['user_id'] ?? $values['userId'] ?? null,
             'occurred_at' => $occurredAt,
-            'metadata' => $metadata,
+            'metadata' => self::stringKeyed($metadata),
             'envelope' => self::resolveEnvelope($values),
             'identity' => DocumentIdentity::fromStorageArray($values),
         ];
@@ -142,10 +146,26 @@ final class StoredEventData extends Dto
             return $envelope;
         }
         if (is_array($envelope)) {
-            return EventEnvelopeData::fromArray($envelope);
+            return EventEnvelopeData::fromArray(self::stringKeyed($envelope));
         }
 
         return EventEnvelopeData::fromArray($values);
+    }
+
+    /**
+     * @param  array<mixed>  $values
+     * @return array<string, mixed>
+     */
+    private static function stringKeyed(array $values): array
+    {
+        $normalized = [];
+        foreach ($values as $key => $value) {
+            if (is_string($key)) {
+                $normalized[$key] = $value;
+            }
+        }
+
+        return $normalized;
     }
 
     /**

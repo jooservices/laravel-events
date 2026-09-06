@@ -14,6 +14,6 @@ trait DefaultsToUpdatedAction
 {
     public function getAction(): string
     {
-        return EventLogAction::UPDATED;
+        return EventLogAction::UPDATED->value;
     }
 }

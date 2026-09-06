@@ -115,7 +115,9 @@ class EventServiceEnvelopeTest extends TestCase
 
     public function test_context_provider_class_string_is_resolved_from_container(): void
     {
-        $this->app->bind(
+        $app = $this->app;
+        self::assertNotNull($app);
+        $app->bind(
             TestEventsContextProvider::class,
             static fn(): TestEventsContextProvider => new TestEventsContextProvider(),
         );
@@ -140,7 +142,9 @@ class EventServiceEnvelopeTest extends TestCase
     public function test_log_change_uses_context_user_id_when_meta_omits_user_id(): void
     {
         config()->set('events.context_provider', TestEventsContextProvider::class);
-        $this->app->bind(
+        $app = $this->app;
+        self::assertNotNull($app);
+        $app->bind(
             TestEventsContextProvider::class,
             static fn(): TestEventsContextProvider => new TestEventsContextProvider(),
         );
@@ -159,7 +163,7 @@ class EventServiceEnvelopeTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function test_context_provider_ignores_non_array_and_non_callable_values(): void
+    public function test_context_provider_ignores_non_array_return(): void
     {
         config()->set('events.context_provider', static fn(): string => 'not-an-array');
 
@@ -173,22 +177,26 @@ class EventServiceEnvelopeTest extends TestCase
         $service = new EventService($storedEventModel, Mockery::mock(EventLogEntry::class));
         $service->storeEvent(new stdClass(), []);
         $this->addToAssertionCount(1);
+    }
 
+    public function test_non_callable_context_provider_throws_package_exception(): void
+    {
         config()->set('events.context_provider', 42);
-        $storedEventModel->shouldReceive('newQuery')->andReturnSelf();
-        $storedEventModel->shouldReceive('create')
-            ->once()
-            ->with(Mockery::on(static fn(array $arg): bool => ($arg['metadata'] ?? null) === []))
-            ->andReturn(new StoredEvent());
+
+        self::expectException(InvalidConfigurationException::class);
+
+        $service = new EventService(
+            Mockery::mock(StoredEvent::class),
+            Mockery::mock(EventLogEntry::class),
+        );
         $service->storeEvent(new stdClass(), []);
-        $this->addToAssertionCount(1);
     }
 
     public function test_invalid_context_provider_class_string_throws_package_exception(): void
     {
         config()->set('events.context_provider', 'App\\Does\\Not\\ExistContextProvider');
 
-        $this->expectException(InvalidConfigurationException::class);
+        self::expectException(InvalidConfigurationException::class);
 
         $service = new EventService(
             Mockery::mock(StoredEvent::class),

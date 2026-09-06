@@ -22,7 +22,7 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
         parent::setUp();
 
         if (! $this->mongodbAvailable()) {
-            $this->markTestSkipped('MongoDB is not available at ' . env('MONGODB_URI', 'mongodb://127.0.0.1:27017'));
+            self::markTestSkipped('MongoDB is not available at ' . env('MONGODB_URI', 'mongodb://127.0.0.1:27017'));
         }
 
         StoredEvent::on('mongodb')->delete();
@@ -32,7 +32,7 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
     private function mongodbAvailable(): bool
     {
         try {
-            $this->assertNotNull($this->app);
+            self::assertNotNull($this->app);
             $connection = $this->app->make('db')->connection('mongodb');
             if (! $connection instanceof Connection) {
                 return false;
@@ -69,11 +69,11 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
         Event::dispatch($event);
 
         $stored = StoredEvent::on('mongodb')->orderBy('_id', 'desc')->first();
-        $this->assertNotNull($stored, 'StoredEvent should exist in MongoDB');
-        $this->assertSame($event::class, $stored->event_class);
-        $this->assertSame('ORD-999', $stored->aggregate_id);
-        $this->assertSame($payload, $stored->payload);
-        $this->assertNull($stored->user_id, 'Guest: user_id should be null');
+        self::assertNotNull($stored, 'StoredEvent should exist in MongoDB');
+        self::assertSame($event::class, $stored->event_class);
+        self::assertSame('ORD-999', $stored->aggregate_id);
+        self::assertSame($payload, $stored->payload);
+        self::assertNull($stored->user_id, 'Guest: user_id should be null');
 
         $evidence = [
             'test' => 'event_sourcing',
@@ -113,15 +113,15 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
         Event::dispatch($loggableEvent);
 
         $entry = EventLogEntry::on('mongodb')->orderBy('_id', 'desc')->first();
-        $this->assertNotNull($entry, 'EventLogEntry should exist in MongoDB');
-        $this->assertSame('Order', $entry->entity_type);
-        $this->assertSame('42', $entry->entity_id);
-        $this->assertSame('updated', $entry->action);
-        $this->assertEquals(['status' => 'pending', 'total' => 50.00], $entry->prev);
-        $this->assertEquals(['status' => 'completed', 'total' => 75.00], $entry->changed);
-        $this->assertArrayHasKey('status', $entry->diff);
-        $this->assertArrayHasKey('total', $entry->diff);
-        $this->assertNull($entry->user_id, 'Guest: user_id should be null');
+        self::assertNotNull($entry, 'EventLogEntry should exist in MongoDB');
+        self::assertSame('Order', $entry->entity_type);
+        self::assertSame('42', $entry->entity_id);
+        self::assertSame('updated', $entry->action);
+        self::assertEquals(['status' => 'pending', 'total' => 50.00], $entry->prev);
+        self::assertEquals(['status' => 'completed', 'total' => 75.00], $entry->changed);
+        self::assertArrayHasKey('status', $entry->diff);
+        self::assertArrayHasKey('total', $entry->diff);
+        self::assertNull($entry->user_id, 'Guest: user_id should be null');
 
         $evidence = [
             'test' => 'event_log',
@@ -154,8 +154,8 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
         Event::dispatch($event);
 
         $stored = StoredEvent::on('mongodb')->orderBy('_id', 'desc')->first();
-        $this->assertNotNull($stored);
-        $this->assertSame(100, $stored->user_id);
+        self::assertNotNull($stored);
+        self::assertSame(100, $stored->user_id);
     }
 
     public function test_event_log_stores_user_id_when_logged_in(): void
@@ -191,8 +191,8 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
         Event::dispatch($loggableEvent);
 
         $entry = EventLogEntry::on('mongodb')->orderBy('_id', 'desc')->first();
-        $this->assertNotNull($entry);
-        $this->assertSame(200, $entry->user_id);
+        self::assertNotNull($entry);
+        self::assertSame(200, $entry->user_id);
     }
 
     /** @param array<string, mixed> $evidence */
@@ -206,7 +206,7 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
         $existing = file_exists($path) ? (array) json_decode((string) file_get_contents($path), true) : [];
         $existing[$key] = $evidence;
         file_put_contents($path, json_encode($existing, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-        $this->assertFileExists($path, 'Evidence file should be written');
+        self::assertFileExists($path, 'Evidence file should be written');
     }
 
     public static function tearDownAfterClass(): void

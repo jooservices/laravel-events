@@ -13,7 +13,7 @@ class PayloadRedactorTest extends TestCase
     {
         $redacted = (new PayloadRedactor())->redact(['password' => 'secret', 'name' => 'Jane']);
 
-        $this->assertSame(['password' => '[REDACTED]', 'name' => 'Jane'], $redacted);
+        self::assertSame(['password' => '[REDACTED]', 'name' => 'Jane'], $redacted);
     }
 
     public function test_redacts_nested_key(): void
@@ -27,17 +27,17 @@ class PayloadRedactorTest extends TestCase
         ]);
 
         $profile = $redacted['profile'] ?? null;
-        $this->assertIsArray($profile);
+        self::assertIsArray($profile);
         $tokens = $profile['tokens'] ?? null;
-        $this->assertIsArray($tokens);
-        $this->assertSame('[REDACTED]', $tokens['access_token'] ?? null);
+        self::assertIsArray($tokens);
+        self::assertSame('[REDACTED]', $tokens['access_token'] ?? null);
     }
 
     public function test_redaction_keys_are_case_insensitive(): void
     {
         $redacted = (new PayloadRedactor())->redact(['Authorization' => 'Bearer token']);
 
-        $this->assertSame('[REDACTED]', $redacted['Authorization']);
+        self::assertSame('[REDACTED]', $redacted['Authorization']);
     }
 
     public function test_redaction_can_be_disabled(): void
@@ -46,6 +46,6 @@ class PayloadRedactorTest extends TestCase
 
         $redacted = (new PayloadRedactor())->redact(['password' => 'secret']);
 
-        $this->assertSame(['password' => 'secret'], $redacted);
+        self::assertSame(['password' => 'secret'], $redacted);
     }
 }

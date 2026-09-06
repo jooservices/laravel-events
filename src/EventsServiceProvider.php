@@ -21,6 +21,7 @@ class EventsServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__ . '/../config/events.php', 'events');
         $this->app->bind(EventSerializerInterface::class, ArrayEventSerializer::class);
         $this->app->singleton(EventService::class);
+        $this->app->bind(EventPersisterInterface::class, EventService::class);
         $this->app->singleton(StoredEventQueryService::class);
         $this->app->singleton(EventLogQueryService::class);
     }

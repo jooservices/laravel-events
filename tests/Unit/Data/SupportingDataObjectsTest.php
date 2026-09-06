@@ -24,8 +24,8 @@ final class SupportingDataObjectsTest extends TestCase
 
         $data = EventDiffData::fromArray($values);
 
-        $this->assertSame($values, $data->values);
-        $this->assertSame($values, $data->toArray());
+        self::assertSame($values, $data->values);
+        self::assertSame($values, $data->toArray());
     }
 
     public function test_event_metadata_data_round_trips_values(): void
@@ -38,8 +38,8 @@ final class SupportingDataObjectsTest extends TestCase
 
         $data = EventMetadataData::fromArray($values);
 
-        $this->assertSame($values, $data->values);
-        $this->assertSame($values, $data->toArray());
+        self::assertSame($values, $data->values);
+        self::assertSame($values, $data->toArray());
     }
 
     public function test_event_envelope_data_accepts_snake_and_camel_keys(): void
@@ -59,12 +59,12 @@ final class SupportingDataObjectsTest extends TestCase
             'schemaVersion' => 'v2',
         ]);
 
-        $this->assertSame($eventId, $fromSnake->eventId);
-        $this->assertSame($eventName, $fromSnake->eventName);
-        $this->assertSame(2, $fromSnake->schemaVersion);
-        $this->assertSame($eventId, $fromCamel->eventId);
-        $this->assertSame('v2', $fromCamel->schemaVersion);
-        $this->assertSame($eventId, $fromSnake->toArray()['event_id']);
-        $this->assertSame($eventName, $fromSnake->toArray()['event_name']);
+        self::assertSame($eventId, $fromSnake->eventId);
+        self::assertSame($eventName, $fromSnake->eventName);
+        self::assertSame(2, $fromSnake->schemaVersion);
+        self::assertSame($eventId, $fromCamel->eventId);
+        self::assertSame('v2', $fromCamel->schemaVersion);
+        self::assertSame($eventId, $fromSnake->toArray()['event_id']);
+        self::assertSame($eventName, $fromSnake->toArray()['event_name']);
     }
 }

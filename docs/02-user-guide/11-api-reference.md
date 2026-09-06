@@ -158,7 +158,7 @@ Optional: `occurredAt(): ?\Carbon\CarbonInterface`, `metadata(): array`. Use tra
 
 ### EventLogAction
 
-Constants for recommended action names:
+String-backed enum for recommended action names (`EventLogAction::UPDATED->value`):
 
 - `CREATED`
 - `UPDATED`
@@ -169,7 +169,7 @@ Constants for recommended action names:
 - `SYNCHRONIZED`
 - `IMPORTED`
 
-`EventLogAction::all()` returns the full list.
+`EventLogAction::all()` returns the full list of string values.
 
 ### EventMetadata
 
@@ -186,7 +186,7 @@ Helpers: `trace()`, `source()`, `version()`, `tenant()`, `category()`, `correcti
 
 ### EventCategory
 
-Constants for the lightweight stored-event type convention:
+String-backed enum for the lightweight stored-event type convention (`EventCategory::DOMAIN->value`):
 
 - `DOMAIN`
 - `INTEGRATION`

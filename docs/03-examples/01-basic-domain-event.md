@@ -133,7 +133,7 @@ use JOOservices\LaravelEvents\EventLog\EventLogAction;
 
 public function getAction(): string
 {
-    return EventLogAction::STATUS_CHANGED;
+    return EventLogAction::STATUS_CHANGED->value;
 }
 ```
 

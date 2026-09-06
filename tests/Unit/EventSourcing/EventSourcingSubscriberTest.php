@@ -6,7 +6,7 @@ namespace JOOservices\LaravelEvents\Tests\Unit\EventSourcing;
 
 use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Auth\User;
-use JOOservices\LaravelEvents\EventService;
+use JOOservices\LaravelEvents\EventPersisterInterface;
 use JOOservices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
 use JOOservices\LaravelEvents\EventSourcing\EventSourcingSubscriber;
 use JOOservices\LaravelEvents\EventSourcing\Models\StoredEvent;
@@ -25,7 +25,7 @@ class EventSourcingSubscriberTest extends TestCase
     {
         config()->set('events.eventsourcing.enabled', true);
 
-        $eventService = Mockery::mock(EventService::class);
+        $eventService = Mockery::mock(EventPersisterInterface::class);
         $eventService->shouldReceive('storeEvent')
             ->once()
             ->with(Mockery::type(EventSourcingInterface::class), ['key' => 'value'], 'agg-1', null, null, [])
@@ -67,7 +67,7 @@ class EventSourcingSubscriberTest extends TestCase
             }
         };
 
-        $eventService = Mockery::mock(EventService::class);
+        $eventService = Mockery::mock(EventPersisterInterface::class);
         $eventService->shouldReceive('storeEvent')
             ->once()
             ->with($event, ['data' => true], null, null, null, []);
@@ -96,7 +96,7 @@ class EventSourcingSubscriberTest extends TestCase
             }
         };
 
-        $eventService = Mockery::mock(EventService::class);
+        $eventService = Mockery::mock(EventPersisterInterface::class);
         $eventService->shouldReceive('storeEvent')
             ->once()
             ->with($event, ['x' => 1], 'a1', 5, null, []);

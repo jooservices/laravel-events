@@ -10,7 +10,7 @@ use JOOservices\LaravelEvents\Data\EventEnvelopeData;
 use JOOservices\LaravelEvents\Data\StoredEventData;
 use JOOservices\LaravelEvents\Support\EventMetadata;
 
-class ArrayEventSerializer implements EventSerializerInterface
+final class ArrayEventSerializer implements EventSerializerInterface
 {
     public function serializeStoredEvent(
         object $event,
@@ -99,7 +99,15 @@ class ArrayEventSerializer implements EventSerializerInterface
             return null;
         }
 
-        $value = $envelope->{$property};
+        $value = match ($property) {
+            'eventId' => $envelope->eventId,
+            'eventName' => $envelope->eventName,
+            'eventCategory' => $envelope->eventCategory,
+            'aggregateType' => $envelope->aggregateType,
+            'correlationId' => $envelope->correlationId,
+            'causationId' => $envelope->causationId,
+            default => null,
+        };
 
         return is_string($value) ? $value : null;
     }
@@ -110,7 +118,11 @@ class ArrayEventSerializer implements EventSerializerInterface
             return null;
         }
 
-        $value = $envelope->{$property};
+        $value = match ($property) {
+            'schemaVersion' => $envelope->schemaVersion,
+            'eventVersion' => $envelope->eventVersion,
+            default => null,
+        };
 
         return is_string($value) || is_int($value) ? $value : null;
     }

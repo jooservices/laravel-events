@@ -56,7 +56,7 @@ class EventServiceTest extends TestCase
 
         $result = $service->storeEvent($event, $payload, $aggregateId);
 
-        $this->assertSame($stored, $result);
+        self::assertSame($stored, $result);
     }
 
     public function test_store_event_accepts_null_aggregate_id(): void
@@ -73,7 +73,7 @@ class EventServiceTest extends TestCase
 
         $service = new EventService($storedEventModel, Mockery::mock(EventLogEntry::class));
         $result = $service->storeEvent($event, $payload, null);
-        $this->assertInstanceOf(StoredEvent::class, $result);
+        self::assertInstanceOf(StoredEvent::class, $result);
     }
 
     public function test_log_change_creates_event_log_entry(): void
@@ -107,7 +107,7 @@ class EventServiceTest extends TestCase
             ['user_id' => 99],
         );
 
-        $this->assertSame($entry, $result);
+        self::assertSame($entry, $result);
     }
 
     public function test_store_event_stores_user_id_when_provided(): void
@@ -126,7 +126,7 @@ class EventServiceTest extends TestCase
 
     public function test_store_event_stores_null_user_id_when_not_provided_and_guest(): void
     {
-        $this->assertNull(auth()->id());
+        self::assertNull(auth()->id());
         $storedEventModel = Mockery::mock(StoredEvent::class)->makePartial();
         $storedEventModel->shouldReceive('newQuery')->andReturnSelf();
         $storedEventModel->shouldReceive('create')

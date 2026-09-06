@@ -11,7 +11,7 @@ class EventMetadataTest extends TestCase
 {
     public function test_trace_metadata_omits_null_values(): void
     {
-        $this->assertSame([
+        self::assertSame([
             'request_id' => 'req-1',
             'causation_id' => 'event-1',
         ], EventMetadata::trace('req-1', null, 'event-1'));
@@ -19,7 +19,7 @@ class EventMetadataTest extends TestCase
 
     public function test_version_metadata_accepts_int_or_string_values(): void
     {
-        $this->assertSame([
+        self::assertSame([
             'schema_version' => 2,
             'event_version' => '2026-04',
         ], EventMetadata::version(2, '2026-04'));
@@ -27,7 +27,7 @@ class EventMetadataTest extends TestCase
 
     public function test_correction_metadata_uses_documented_keys(): void
     {
-        $this->assertSame([
+        self::assertSame([
             'supersedes_event_id' => 'stored-1',
             'correction_reason' => 'customer_request',
         ], EventMetadata::correction(null, 'stored-1', null, 'customer_request'));
@@ -35,7 +35,7 @@ class EventMetadataTest extends TestCase
 
     public function test_merge_combines_metadata_and_removes_null_values(): void
     {
-        $this->assertSame([
+        self::assertSame([
             'request_id' => 'req-1',
             'source' => 'orders-service',
             'tenant_id' => 'tenant-1',
@@ -60,7 +60,7 @@ class EventMetadataTest extends TestCase
             ->tenantId('tenant-1')
             ->toArray();
 
-        $this->assertSame([
+        self::assertSame([
             'correlation_id' => 'corr-1',
             'causation_id' => 'cmd-1',
             'request_id' => 'req-1',
@@ -75,8 +75,8 @@ class EventMetadataTest extends TestCase
 
     public function test_category_metadata_omits_null_values(): void
     {
-        $this->assertSame(['event_category' => 'integration'], EventMetadata::category('integration'));
-        $this->assertSame([], EventMetadata::category());
+        self::assertSame(['event_category' => 'integration'], EventMetadata::category('integration'));
+        self::assertSame([], EventMetadata::category());
     }
 
     public function test_builder_source_without_channel_clears_previous_channel(): void
@@ -86,6 +86,6 @@ class EventMetadataTest extends TestCase
             ->source('orders')
             ->toArray();
 
-        $this->assertSame(['source' => 'orders'], $metadata);
+        self::assertSame(['source' => 'orders'], $metadata);
     }
 }

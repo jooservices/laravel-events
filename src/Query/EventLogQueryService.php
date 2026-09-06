@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
 use JOOservices\LaravelEvents\Data\EventLogData;
 use JOOservices\LaravelEvents\EventLog\Models\EventLogEntry;
 
-class EventLogQueryService
+final class EventLogQueryService
 {
     /** @var list<string> */
     private const ALLOWED_FILTERS = [
@@ -74,7 +74,6 @@ class EventLogQueryService
         QueryGuard::assertFilters($filters, self::ALLOWED_FILTERS);
 
         $query = $this->model->newQuery();
-        /** @var \Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model> $query */
         QueryExecutor::applyFilters($query, $filters);
 
         return QueryExecutor::fetchEventLogs($query, $limit, $from, $to);
