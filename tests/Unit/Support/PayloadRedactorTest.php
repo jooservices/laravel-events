@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace JOOservices\LaravelEvents\Tests\Unit\Support;
 
+use Faker\Factory as FakerFactory;
 use JOOservices\LaravelEvents\Support\PayloadRedactor;
 use JOOservices\LaravelEvents\Tests\TestCase;
 
@@ -11,17 +12,24 @@ class PayloadRedactorTest extends TestCase
 {
     public function test_redacts_simple_key(): void
     {
-        $redacted = (new PayloadRedactor())->redact(['password' => 'secret', 'name' => 'Jane']);
+        $faker = FakerFactory::create();
+        $name = $faker->firstName();
+        $secret = $faker->password();
 
-        self::assertSame(['password' => '[REDACTED]', 'name' => 'Jane'], $redacted);
+        $redacted = (new PayloadRedactor())->redact(['password' => $secret, 'name' => $name]);
+
+        self::assertSame(['password' => '[REDACTED]', 'name' => $name], $redacted);
     }
 
     public function test_redacts_nested_key(): void
     {
+        $faker = FakerFactory::create();
+        $token = $faker->sha256();
+
         $redacted = (new PayloadRedactor())->redact([
             'profile' => [
                 'tokens' => [
-                    'access_token' => 'abc',
+                    'access_token' => $token,
                 ],
             ],
         ]);
@@ -35,17 +43,22 @@ class PayloadRedactorTest extends TestCase
 
     public function test_redaction_keys_are_case_insensitive(): void
     {
-        $redacted = (new PayloadRedactor())->redact(['Authorization' => 'Bearer token']);
+        $faker = FakerFactory::create();
+        $token = 'Bearer ' . $faker->sha256();
+
+        $redacted = (new PayloadRedactor())->redact(['Authorization' => $token]);
 
         self::assertSame('[REDACTED]', $redacted['Authorization']);
     }
 
     public function test_redaction_can_be_disabled(): void
     {
+        $faker = FakerFactory::create();
+        $secret = $faker->password();
         config()->set('events.redaction.enabled', false);
 
-        $redacted = (new PayloadRedactor())->redact(['password' => 'secret']);
+        $redacted = (new PayloadRedactor())->redact(['password' => $secret]);
 
-        self::assertSame(['password' => 'secret'], $redacted);
+        self::assertSame(['password' => $secret], $redacted);
     }
 }

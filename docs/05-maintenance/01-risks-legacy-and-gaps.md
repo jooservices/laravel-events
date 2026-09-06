@@ -17,11 +17,12 @@
 - CI now enforces a 95% statement coverage threshold. The measured local
   baseline on 2026-05-09 after the DTO-parity audit fixes was 95.02%, so
   coverage headroom is currently narrow.
-- Quality-floor items addressed in the current quality PR: PHPStan `max` +
-  strict-rules/phpunit, PHPMD cleancode, Dockerfile/Makefile, backed enums,
-  `final` on concretes, optional PSR-20 clock on `EventService`, CaptainHook
-  uppercase subjects. Remaining polish: broader Faker adoption, optional PSR-3
-  logging hooks, unused bag DTOs (`EventDiffData` / `EventMetadataData`).
+- Quality-floor items addressed: PHPStan `max` + strict-rules/phpunit, PHPMD
+  cleancode, Dockerfile/Makefile, backed enums, `final` on concretes, optional
+  PSR-20 clock + PSR-3 logger on `EventService`, CaptainHook uppercase subjects,
+  direct `psr/clock` / `psr/log` requires. Unused bag DTOs removed
+  (`EventDiffData` / `EventMetadataData`); `diff` / `meta` / `metadata` remain
+  plain arrays on the record DTOs.
 - Dual-write integrity (SQL transaction + Mongo append) and queue actor capture
   remain application responsibilities; document `ShouldDispatchAfterCommit` and
   embed context on queued events. Outbox stays deferred.

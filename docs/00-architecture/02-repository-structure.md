@@ -11,10 +11,8 @@ laravel-events/
 │   │   └── InstallIndexesCommand.php
 │   ├── Data/
 │   │   ├── DocumentIdentity.php
-│   │   ├── EventDiffData.php
 │   │   ├── EventEnvelopeData.php
 │   │   ├── EventLogData.php
-│   │   ├── EventMetadataData.php
 │   │   └── StoredEventData.php
 │   ├── EventLog/
 │   │   ├── Concerns/
