@@ -73,14 +73,30 @@ class DiffHelperTest extends TestCase
         ], $result);
     }
 
-    public function test_diff_handles_empty_current(): void
+    public function test_diff_handles_empty_current_as_removals(): void
     {
         $prev = ['a' => 1, 'b' => 2];
         $current = [];
 
         $result = $this->helper->diff($prev, $current);
 
-        $this->assertSame([], $result);
+        $this->assertSame([
+            'a' => ['old' => 1, 'new' => null],
+            'b' => ['old' => 2, 'new' => null],
+        ], $result);
+    }
+
+    public function test_diff_includes_removed_keys_from_prev(): void
+    {
+        $prev = ['a' => 1, 'b' => 2, 'c' => 3];
+        $current = ['a' => 1, 'c' => 9];
+
+        $result = $this->helper->diff($prev, $current);
+
+        $this->assertSame([
+            'c' => ['old' => 3, 'new' => 9],
+            'b' => ['old' => 2, 'new' => null],
+        ], $result);
     }
 
     public function test_diff_treats_null_in_current_as_explicit_changed_value(): void

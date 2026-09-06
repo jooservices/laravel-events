@@ -112,7 +112,7 @@ event(new OrderCreated('ORD-001', [['sku' => 'X', 'qty' => 2]]));
 - `event_category`: optional top-level copy from metadata for lightweight event-type filtering
 - `schema_version`, `event_version`: optional top-level copies from metadata for easier filtering
 - `correlation_id`, `causation_id`: optional top-level copies from metadata for trace queries
-- `user_id`: from `auth()->id()` or passed to EventService
+- `user_id`: from explicit argument, metadata/context `user_id`, or `auth()->id()`
 - `occurred_at`: from `occurredAt()` or null
 - `created_at`: set by MongoDB/Eloquent
 

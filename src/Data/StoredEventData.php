@@ -10,6 +10,7 @@ use JOOservices\Dto\Attributes\MapTo;
 use JOOservices\Dto\Core\Context;
 use JOOservices\Dto\Core\Dto;
 use JOOservices\LaravelEvents\Exceptions\InvalidEventDataException;
+use JOOservices\LaravelEvents\Support\DateTimeParser;
 
 final class StoredEventData extends Dto
 {
@@ -33,10 +34,21 @@ final class StoredEventData extends Dto
         public readonly ?DateTimeInterface $occurredAt = null,
         public readonly array $metadata = [],
         public readonly ?EventEnvelopeData $envelope = null,
+        public readonly ?DocumentIdentity $identity = null,
     ) {
         if ($this->eventClass === '') {
             throw InvalidEventDataException::emptyEventClass();
         }
+    }
+
+    public function documentId(): mixed
+    {
+        return $this->identity?->id;
+    }
+
+    public function createdAt(): ?DateTimeInterface
+    {
+        return $this->identity?->createdAt;
     }
 
     /**
@@ -44,13 +56,12 @@ final class StoredEventData extends Dto
      */
     public static function fromArray(array $data, ?Context $ctx = null): static
     {
-        $normalized = self::normalizeInput($data);
-
-        return parent::fromArray($normalized, $ctx);
+        return parent::fromArray(self::normalizeInput($data), $ctx);
     }
 
     /**
      * Persist as a flat MongoDB document (envelope fields at the top level).
+     * Query identity fields are omitted so writes stay insert-safe.
      *
      * @return array{
      *     event_class: string,
@@ -102,25 +113,11 @@ final class StoredEventData extends Dto
 
         $payload = $values['payload'] ?? [];
         $metadata = $values['metadata'] ?? [];
-
         if (! is_array($payload) || ! is_array($metadata)) {
             throw InvalidEventDataException::invalidType('payload and metadata', 'arrays');
         }
 
-        $occurredAt = $values['occurred_at'] ?? $values['occurredAt'] ?? null;
-        if ($occurredAt !== null && ! $occurredAt instanceof DateTimeInterface) {
-            throw InvalidEventDataException::invalidType('occurred_at', 'a DateTimeInterface or null');
-        }
-
-        $envelope = $values['envelope'] ?? null;
-        if ($envelope instanceof EventEnvelopeData) {
-            $envelopeData = $envelope;
-        } elseif (is_array($envelope)) {
-            $envelopeData = EventEnvelopeData::fromArray($envelope);
-        } else {
-            $envelopeData = EventEnvelopeData::fromArray($values);
-        }
-
+        $occurredAt = self::optionalDateTime($values, 'occurred_at', 'occurredAt');
         $aggregateId = $values['aggregate_id'] ?? $values['aggregateId'] ?? null;
 
         return [
@@ -130,7 +127,32 @@ final class StoredEventData extends Dto
             'user_id' => $values['user_id'] ?? $values['userId'] ?? null,
             'occurred_at' => $occurredAt,
             'metadata' => $metadata,
-            'envelope' => $envelopeData,
+            'envelope' => self::resolveEnvelope($values),
+            'identity' => DocumentIdentity::fromStorageArray($values),
         ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $values
+     */
+    private static function resolveEnvelope(array $values): EventEnvelopeData
+    {
+        $envelope = $values['envelope'] ?? null;
+        if ($envelope instanceof EventEnvelopeData) {
+            return $envelope;
+        }
+        if (is_array($envelope)) {
+            return EventEnvelopeData::fromArray($envelope);
+        }
+
+        return EventEnvelopeData::fromArray($values);
+    }
+
+    /**
+     * @param  array<string, mixed>  $values
+     */
+    private static function optionalDateTime(array $values, string $snake, string $camel): ?DateTimeInterface
+    {
+        return DateTimeParser::optional($values[$snake] ?? $values[$camel] ?? null, $snake);
     }
 }

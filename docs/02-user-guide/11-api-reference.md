@@ -93,22 +93,24 @@ are normalized, redacted, timestamped, and batch inserted.
 ### StoredEventQueryService
 
 - `byAggregateId(string $aggregateId, int $limit = 50)`
-- `byEventName(string $eventName, int $limit = 50)`
+- `byEventName(string $eventName, int $limit = 50)` — filters top-level `event_name` (basename / metadata name)
+- `byEventClass(string $eventClass, int $limit = 50)` — filters `event_class` (FQCN)
+- `byEventId(string $eventId, int $limit = 50)`
 - `byEventCategory(string $eventCategory, int $limit = 50)`
-- `byCorrelationId(string $correlationId, int $limit = 50)`
-- `byCausationId(string $causationId, int $limit = 50)`
-- `between(DateTimeInterface $from, DateTimeInterface $to, int $limit = 50)`
-- `latest(int $limit = 50)`
+- `byCorrelationId(string $correlationId, int $limit = 50)` — matches `metadata.correlation_id` **or** top-level `correlation_id`
+- `byCausationId(string $causationId, int $limit = 50)` — matches `metadata.causation_id` **or** top-level `causation_id`
+- `between(DateTimeInterface $from, DateTimeInterface $to, int $limit = 50)` — requires `$from <= $to`
+- `latest(int $limit = 50, array $filters = [])` — allowlisted filter keys only; `correlation_id` / `causation_id` (and metadata aliases) match either top-level or nested field
 
 ### EventLogQueryService
 
 - `byEntity(string $entityType, string $entityId, int $limit = 50)`
 - `byCorrelationId(string $correlationId, int $limit = 50)`
 - `byCausationId(string $causationId, int $limit = 50)`
-- `between(DateTimeInterface $from, DateTimeInterface $to, int $limit = 50)`
-- `latest(int $limit = 50)`
+- `between(DateTimeInterface $from, DateTimeInterface $to, int $limit = 50)` — requires `$from <= $to`
+- `latest(int $limit = 50, array $filters = [])` — allowlisted filter keys only
 
-Limits must be between 1 and 500.
+Limits must be between 1 and 500. Query DTOs expose `documentId()` and `createdAt()` when hydrated from storage.
 
 ## Serialization
 
@@ -122,12 +124,16 @@ public function serializeStoredEvent(
     int|string|null $userId = null,
     ?\Carbon\CarbonInterface $occurredAt = null,
     array $metadata = [],
-): StoredEventData
+): StoredEventData;
+
+public function ensureEnvelope(StoredEventData $data): StoredEventData;
 ```
 
 The default implementation is `ArrayEventSerializer`. It preserves current array
-payload behavior and derives nullable envelope fields from metadata. Consumers
-can override the binding through Laravel's container.
+payload behavior, derives nullable envelope fields from metadata, and fills
+missing `event_id` / `event_name` for bulk records. Consumers can override the
+binding through Laravel's container (custom serializers must implement
+`ensureEnvelope`).
 
 ---
 
@@ -200,7 +206,7 @@ php artisan events:install-indexes
 php artisan events:install-indexes --drop [--force]
 ```
 
-- **Create:** Adds indexes for aggregate_id, aggregate_id+created_at, event_class, event_class+created_at, user_id, created_at (stored_events); entity_type+entity_id, entity_type+entity_id+created_at, action, action+created_at, user_id, created_at (event_logs). If TTL is configured, creates TTL index on `created_at`.
+- **Create:** Adds compound/access indexes for stored_events (`aggregate_id+created_at`, `event_class+created_at`, `event_name+created_at`, sparse unique `event_id`, category, correlation/causation, `user_id`, `created_at`/TTL) and event_logs (`entity_type+entity_id+created_at`, `action+created_at`, meta correlation/causation, `user_id`, `created_at`/TTL).
 - **Drop:** `--drop` drops indexes (data is not deleted). `--force` skips confirmation.
 
 ---

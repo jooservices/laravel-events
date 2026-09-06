@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace JOOservices\LaravelEvents\Tests\Integration;
 
+use DateTimeInterface;
 use Illuminate\Testing\PendingCommand;
 use JOOservices\LaravelEvents\Data\EventLogData;
 use JOOservices\LaravelEvents\Data\StoredEventData;
@@ -127,7 +128,7 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
 
         $this->assertSame('bulk-context', $stored?->metadata['correlation_id'] ?? null);
         $this->assertSame('context-user', $stored?->metadata['user_id'] ?? null);
-        $this->assertNull($stored?->user_id);
+        $this->assertSame('context-user', $stored?->user_id);
         $this->assertSame('bulk-context', $log?->meta['correlation_id'] ?? null);
         $this->assertSame('context-user', $log?->user_id);
     }
@@ -184,7 +185,11 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
         $eventQueries = app(EventLogQueryService::class);
 
         $this->assertSame('ORD-Q2', $storedQueries->byAggregateId('ORD-Q2')->first()?->aggregateId);
-        $this->assertSame(stdClass::class, $storedQueries->byEventName(stdClass::class)->first()?->eventClass);
+        $queried = $storedQueries->byAggregateId('ORD-Q2')->first();
+        $this->assertNotNull($queried->documentId());
+        $this->assertInstanceOf(DateTimeInterface::class, $queried->createdAt());
+        $this->assertSame(stdClass::class, $storedQueries->byEventClass(stdClass::class)->first()?->eventClass);
+        $this->assertSame(stdClass::class, $storedQueries->byEventName('stdClass')->first()?->eventClass);
         $this->assertSame('domain', $storedQueries->byEventCategory('domain')->first()?->envelope?->eventCategory);
         $this->assertSame(
             'corr-q2',
@@ -205,6 +210,35 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
         $this->assertSame('cmd-q2', $eventQueries->byCausationId('cmd-q2')->first()?->meta['causation_id'] ?? null);
         $this->assertGreaterThanOrEqual(1, $eventQueries->between($from, now())->count());
         $this->assertGreaterThanOrEqual(1, $eventQueries->latest(10)->count());
+    }
+
+    public function test_by_correlation_id_matches_top_level_envelope_without_metadata_copy(): void
+    {
+        StoredEvent::on('mongodb')->newQuery()->insert([
+            [
+                'event_class' => 'TopLevelCorr',
+                'aggregate_id' => 'corr-top-1',
+                'payload' => ['ok' => true],
+                'metadata' => [],
+                'correlation_id' => 'corr-top-only',
+                'causation_id' => 'cmd-top-only',
+                'event_id' => 'evt-top-corr',
+                'event_name' => 'TopLevelCorr',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+
+        $storedQueries = app(StoredEventQueryService::class);
+
+        $this->assertSame(
+            'corr-top-1',
+            $storedQueries->byCorrelationId('corr-top-only')->first()?->aggregateId,
+        );
+        $this->assertSame(
+            'corr-top-1',
+            $storedQueries->byCausationId('cmd-top-only')->first()?->aggregateId,
+        );
     }
 
     public function test_install_indexes_command_can_drop_existing_indexes(): void

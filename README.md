@@ -7,7 +7,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Packagist Version](https://img.shields.io/packagist/v/jooservices/laravel-events)](https://packagist.org/packages/jooservices/laravel-events)
 
-Lightweight Event Sourcing and Event Log persistence for Laravel with **MongoDB** storage. Store domain event payloads by aggregate and/or model change audit trails (prev/changed/diff) via Laravel's native event dispatcher.
+Lightweight domain-event and model-change persistence for Laravel with **MongoDB** storage. Store domain event payloads by aggregate and/or model change audit trails (prev/changed/diff) via Laravel's native event dispatcher.
+
+This is **not** a full event store: there is no stream version, optimistic concurrency, replay command, or outbox. Ordering is `created_at` (and optional `occurred_at`); treat “event sourcing” here as aggregate-oriented append + query helpers.
 
 Package name: `jooservices/laravel-events`
 
@@ -21,10 +23,10 @@ Package name: `jooservices/laravel-events`
 
 This package adds two persistence features on top of Laravel's event system:
 
-1. **Event Sourcing** — Events implementing `EventSourcingInterface` are stored in a `stored_events` MongoDB collection (payload, aggregate id, metadata, user, time). Use for aggregate history, replay-oriented records, or audit by aggregate.
+1. **Event Sourcing (lightweight)** — Events implementing `EventSourcingInterface` are stored in a `stored_events` MongoDB collection (payload, aggregate id, envelope, metadata, user, time). Use for aggregate history and audit by aggregate — not replay/outbox.
 2. **Event Log** — Events implementing `LoggableModelInterface` are stored in an `event_logs` collection with previous/changed state and a per-field diff. Use for audit trails and compliance.
 
-You dispatch events as usual; package subscribers persist them to MongoDB. No custom bus or queue required.
+You dispatch events as usual; package subscribers persist them to MongoDB **synchronously** when the event is dispatched (unless you use Laravel after-commit / queue features yourself — see Operations). No custom bus required.
 
 ## Scope
 
@@ -154,10 +156,10 @@ $domainEvents = app(StoredEventQueryService::class)->byEventCategory('domain');
 $audit = app(EventLogQueryService::class)->byEntity('orders', 'ORD-001');
 ```
 
-Query services return typed package data records and intentionally stay small.
+Query services return typed package data records (including storage `id` / `created_at` when present) and intentionally stay small.
 Build dashboards, projections, and reporting in your application.
 
-`JOOservices\...` is the canonical package namespace in `1.2.0`. The legacy `JOOservices\...` namespace remains available for backward compatibility.
+The public PHP namespace is `JOOservices\LaravelEvents` only (alternate casing removed in `1.5.0`).
 
 ## Redaction
 
@@ -166,7 +168,16 @@ Recursive redaction is enabled by default for common secret keys:
 ```php
 'redaction' => [
     'enabled' => true,
-    'keys' => ['password', 'token', 'authorization'],
+    'keys' => [
+        'password',
+        'password_hash',
+        'token',
+        'secret',
+        'client_secret',
+        'private_key',
+        'api_key',
+        'authorization',
+    ],
     'replacement' => '[REDACTED]',
 ],
 ```
@@ -230,11 +241,10 @@ Full documentation is in the **`./docs`** folder:
 ```bash
 composer test
 composer test:coverage
-composer lint       # Pint, PHPCS, PHPStan
-composer lint:all   # lint + PHPMD + PHP-CS-Fixer
+composer lint       # Pint, PHPCS, PHPStan, PHPMD, PHP-CS-Fixer
 composer lint:fix   # Pint fix + PHP-CS-Fixer fix
-composer check      # lint:all + test
-composer ci         # lint:all + test:coverage
+composer check      # lint + test
+composer ci         # lint + test:coverage
 ```
 
 ## Git Hooks

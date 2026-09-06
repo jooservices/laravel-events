@@ -72,7 +72,19 @@ final class EventEnvelopeData extends Dto
     {
         $value = $values[$snakeKey] ?? $values[$camelKey] ?? null;
 
-        return $value === null ? null : (string) $value;
+        if ($value === null) {
+            return null;
+        }
+
+        if (is_string($value)) {
+            return $value !== '' ? $value : null;
+        }
+
+        if (is_int($value) || is_float($value) || is_bool($value)) {
+            return (string) $value;
+        }
+
+        return null;
     }
 
     /**

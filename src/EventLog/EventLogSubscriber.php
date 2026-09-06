@@ -30,9 +30,20 @@ class EventLogSubscriber
     {
         $prev = $event->getPrev();
         $changed = $event->getChanged();
-        $current = array_merge($prev, $changed);
+        $action = $event instanceof HasLogAction ? $event->getAction() : EventLogAction::UPDATED;
+
+        // Deleted with empty changed: treat as full removal so every prev key appears in diff.
+        // Otherwise merge partial dirty attributes onto prev (documented Event Log contract).
+        $current = ($action === EventLogAction::DELETED && $changed === [])
+            ? []
+            : array_merge($prev, $changed);
         $diff = $this->diffHelper->diff($prev, $current);
-        $action = $event instanceof HasLogAction ? $event->getAction() : 'updated';
+
+        $meta = [];
+        $userId = auth()->id();
+        if ($userId !== null) {
+            $meta['user_id'] = $userId;
+        }
 
         $this->eventService->logChange(
             $event->getLoggableType(),
@@ -41,7 +52,7 @@ class EventLogSubscriber
             $prev,
             $changed,
             $diff,
-            ['user_id' => auth()->id()],
+            $meta,
         );
     }
 }

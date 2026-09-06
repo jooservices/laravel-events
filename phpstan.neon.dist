@@ -9,8 +9,11 @@ parameters:
     ignoreErrors:
         # Mockery: MockInterface passed where concrete type expected
         - '~Parameter #\d+ .+ expects .+, Mockery\\(MockInterface|LegacyMockInterface) given\.~'
-        # Mockery expectation fluent API
-        - '~Call to an undefined method Mockery\\.*~'
+        # Mockery expectation fluent API — reported on some CI/OS PHPStan runs, not all local setups
+        -
+            message: '~Call to an undefined method Mockery\\.*~'
+            path: tests/*
+            reportUnmatched: false
         # Anonymous event in tests: aggregateId() return type
         - '~never returns null so it can be removed from the return type~'
         # env() in tests is acceptable (config not cached)

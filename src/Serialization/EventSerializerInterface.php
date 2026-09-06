@@ -21,4 +21,9 @@ interface EventSerializerInterface
         ?CarbonInterface $occurredAt = null,
         array $metadata = [],
     ): StoredEventData;
+
+    /**
+     * Fill missing envelope fields (event_id, event_name, …) for bulk/direct records.
+     */
+    public function ensureEnvelope(StoredEventData $data): StoredEventData;
 }

@@ -57,7 +57,7 @@ class EventLogSubscriberTest extends TestCase
                 ['status' => 'pending'],
                 ['status' => 'completed'],
                 ['status' => ['old' => 'pending', 'new' => 'completed']],
-                Mockery::on(fn(array $meta) => array_key_exists('user_id', $meta)),
+                Mockery::on(fn(array $meta) => $meta === []),
             );
 
         $diffHelper = new DiffHelper();
@@ -77,7 +77,7 @@ class EventLogSubscriberTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function test_log_model_change_passes_null_user_id_when_guest(): void
+    public function test_log_model_change_omits_user_id_meta_when_guest(): void
     {
         $this->assertNull(auth()->id());
         $event = new class implements LoggableModelInterface {
@@ -114,7 +114,7 @@ class EventLogSubscriberTest extends TestCase
                 [],
                 ['name' => 'x'],
                 ['name' => ['old' => null, 'new' => 'x']],
-                ['user_id' => null],
+                [],
             );
 
         $subscriber = new EventLogSubscriber($eventService, new DiffHelper());
@@ -211,7 +211,59 @@ class EventLogSubscriberTest extends TestCase
                 [],
                 ['status' => 'pending'],
                 ['status' => ['old' => null, 'new' => 'pending']],
-                Mockery::on(fn(array $meta) => array_key_exists('user_id', $meta)),
+                Mockery::on(fn(array $meta) => $meta === []),
+            );
+
+        $subscriber = new EventLogSubscriber($eventService, new DiffHelper());
+        $subscriber->logModelChange($event);
+        $this->addToAssertionCount(1);
+    }
+
+    public function test_log_model_change_records_full_removal_diff_for_deleted_action(): void
+    {
+        $event = new class implements HasLogAction, LoggableModelInterface {
+            public function getLoggableType(): string
+            {
+                return 'Order';
+            }
+
+            public function getLoggableId(): string
+            {
+                return '42';
+            }
+
+            /** @return array<string, mixed> */
+            public function getPrev(): array
+            {
+                return ['status' => 'pending', 'total' => 10];
+            }
+
+            /** @return array<string, mixed> */
+            public function getChanged(): array
+            {
+                return [];
+            }
+
+            public function getAction(): string
+            {
+                return 'deleted';
+            }
+        };
+
+        $eventService = Mockery::mock(EventService::class);
+        $eventService->shouldReceive('logChange')
+            ->once()
+            ->with(
+                'Order',
+                '42',
+                'deleted',
+                ['status' => 'pending', 'total' => 10],
+                [],
+                [
+                    'status' => ['old' => 'pending', 'new' => null],
+                    'total' => ['old' => 10, 'new' => null],
+                ],
+                Mockery::on(fn(array $meta) => $meta === []),
             );
 
         $subscriber = new EventLogSubscriber($eventService, new DiffHelper());
