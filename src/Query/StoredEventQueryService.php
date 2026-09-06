@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
 use JOOservices\LaravelEvents\Data\StoredEventData;
 use JOOservices\LaravelEvents\EventSourcing\Models\StoredEvent;
 
-class StoredEventQueryService
+final class StoredEventQueryService
 {
     /** @var list<string> */
     private const ALLOWED_FILTERS = [
@@ -102,7 +102,6 @@ class StoredEventQueryService
         QueryGuard::assertFilters($filters, self::ALLOWED_FILTERS);
 
         $query = $this->model->newQuery();
-        /** @var \Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model> $query */
         QueryExecutor::applyFilters($query, $filters, QueryExecutor::STORED_EVENT_DUAL_PATHS);
 
         return QueryExecutor::fetchStoredEvents($query, $limit, $from, $to);

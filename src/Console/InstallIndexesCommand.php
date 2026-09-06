@@ -10,9 +10,10 @@ use MongoDB\Collection;
 use MongoDB\Laravel\Connection;
 use Throwable;
 
+use function is_string;
 use function str_contains;
 
-class InstallIndexesCommand extends Command
+final class InstallIndexesCommand extends Command
 {
     protected $signature = 'events:install-indexes
                             {--drop : Drop indexes instead of creating them}
@@ -22,7 +23,7 @@ class InstallIndexesCommand extends Command
 
     public function handle(): int
     {
-        $connectionName = config('events.connection', 'mongodb');
+        $connectionName = $this->stringConfig('events.connection', 'mongodb');
         $connection = DB::connection($connectionName);
 
         if (! $connection instanceof Connection) {
@@ -31,8 +32,8 @@ class InstallIndexesCommand extends Command
             return self::FAILURE;
         }
 
-        if ($this->option('drop')) {
-            if (! $this->option('force') && ! $this->confirm('Drop indexes? This does not delete data.')) {
+        if ($this->booleanOption('drop')) {
+            if (! $this->booleanOption('force') && ! $this->confirm('Drop indexes? This does not delete data.')) {
                 return self::SUCCESS;
             }
             $this->dropIndexes($connection);
@@ -49,7 +50,7 @@ class InstallIndexesCommand extends Command
 
     private function createStoredEventsIndexes(Connection $connection): void
     {
-        $collectionName = config('events.eventsourcing.collection', 'stored_events');
+        $collectionName = $this->stringConfig('events.eventsourcing.collection', 'stored_events');
         $collection = $connection->getCollection($collectionName);
 
         $collection->createIndex(['aggregate_id' => 1, 'created_at' => 1]);
@@ -71,7 +72,7 @@ class InstallIndexesCommand extends Command
 
     private function createEventLogsIndexes(Connection $connection): void
     {
-        $collectionName = config('events.event_log.collection', 'event_logs');
+        $collectionName = $this->stringConfig('events.event_log.collection', 'event_logs');
         $collection = $connection->getCollection($collectionName);
 
         $collection->createIndex(['entity_type' => 1, 'entity_id' => 1, 'created_at' => -1]);
@@ -112,8 +113,8 @@ class InstallIndexesCommand extends Command
 
     private function dropIndexes(Connection $connection): void
     {
-        $storedCollection = config('events.eventsourcing.collection', 'stored_events');
-        $logCollection = config('events.event_log.collection', 'event_logs');
+        $storedCollection = $this->stringConfig('events.eventsourcing.collection', 'stored_events');
+        $logCollection = $this->stringConfig('events.event_log.collection', 'event_logs');
 
         foreach ([$storedCollection, $logCollection] as $name) {
             try {
@@ -124,5 +125,17 @@ class InstallIndexesCommand extends Command
                 $this->warn("  [{$name}] drop failed: " . $e->getMessage());
             }
         }
+    }
+
+    private function stringConfig(string $key, string $default): string
+    {
+        $value = config($key, $default);
+
+        return is_string($value) && $value !== '' ? $value : $default;
+    }
+
+    private function booleanOption(string $name): bool
+    {
+        return filter_var($this->option($name), FILTER_VALIDATE_BOOLEAN);
     }
 }

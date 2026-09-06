@@ -8,7 +8,7 @@ use Illuminate\Foundation\Auth\User;
 use JOOservices\LaravelEvents\EventLog\Contracts\HasLogAction;
 use JOOservices\LaravelEvents\EventLog\Contracts\LoggableModelInterface;
 use JOOservices\LaravelEvents\EventLog\EventLogSubscriber;
-use JOOservices\LaravelEvents\EventService;
+use JOOservices\LaravelEvents\EventPersisterInterface;
 use JOOservices\LaravelEvents\Support\DiffHelper;
 use JOOservices\LaravelEvents\Tests\TestCase;
 use Mockery;
@@ -47,7 +47,7 @@ class EventLogSubscriberTest extends TestCase
             }
         };
 
-        $eventService = Mockery::mock(EventService::class);
+        $eventService = Mockery::mock(EventPersisterInterface::class);
         $eventService->shouldReceive('logChange')
             ->once()
             ->with(
@@ -69,7 +69,7 @@ class EventLogSubscriberTest extends TestCase
     public function test_subscribe_does_not_register_when_disabled(): void
     {
         config()->set('events.event_log.enabled', false);
-        $this->assertNotNull($this->app);
+        self::assertNotNull($this->app);
         $subscriber = $this->app->make(EventLogSubscriber::class);
         $dispatcher = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
         $dispatcher->shouldReceive('listen')->never();
@@ -79,7 +79,7 @@ class EventLogSubscriberTest extends TestCase
 
     public function test_log_model_change_omits_user_id_meta_when_guest(): void
     {
-        $this->assertNull(auth()->id());
+        self::assertNull(auth()->id());
         $event = new class implements LoggableModelInterface {
             public function getLoggableType(): string
             {
@@ -104,7 +104,7 @@ class EventLogSubscriberTest extends TestCase
             }
         };
 
-        $eventService = Mockery::mock(EventService::class);
+        $eventService = Mockery::mock(EventPersisterInterface::class);
         $eventService->shouldReceive('logChange')
             ->once()
             ->with(
@@ -152,7 +152,7 @@ class EventLogSubscriberTest extends TestCase
             }
         };
 
-        $eventService = Mockery::mock(EventService::class);
+        $eventService = Mockery::mock(EventPersisterInterface::class);
         $eventService->shouldReceive('logChange')
             ->once()
             ->with(
@@ -201,7 +201,7 @@ class EventLogSubscriberTest extends TestCase
             }
         };
 
-        $eventService = Mockery::mock(EventService::class);
+        $eventService = Mockery::mock(EventPersisterInterface::class);
         $eventService->shouldReceive('logChange')
             ->once()
             ->with(
@@ -250,7 +250,7 @@ class EventLogSubscriberTest extends TestCase
             }
         };
 
-        $eventService = Mockery::mock(EventService::class);
+        $eventService = Mockery::mock(EventPersisterInterface::class);
         $eventService->shouldReceive('logChange')
             ->once()
             ->with(

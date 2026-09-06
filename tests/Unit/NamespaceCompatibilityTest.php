@@ -18,19 +18,19 @@ class NamespaceCompatibilityTest extends TestCase
     {
         $class = EventService::class;
 
-        $this->assertTrue(class_exists($class));
-        $this->assertSame(
+        self::assertTrue(class_exists($class));
+        self::assertSame(
             EventService::class,
             (new ReflectionClass($class))->getName(),
         );
-        $this->assertStringStartsWith('JOOservices\\LaravelEvents\\', $class);
+        self::assertStringStartsWith('JOOservices\\LaravelEvents\\', $class);
     }
 
     public function test_canonical_interface_and_trait_namespaces_are_available(): void
     {
-        $this->assertTrue(interface_exists(EventSourcingInterface::class));
-        $this->assertTrue(interface_exists(LoggableModelInterface::class));
-        $this->assertTrue(trait_exists(HasEventSourcingDefaults::class));
-        $this->assertTrue(trait_exists(DefaultsToUpdatedAction::class));
+        self::assertTrue(interface_exists(EventSourcingInterface::class));
+        self::assertTrue(interface_exists(LoggableModelInterface::class));
+        self::assertTrue(trait_exists(HasEventSourcingDefaults::class));
+        self::assertTrue(trait_exists(DefaultsToUpdatedAction::class));
     }
 }

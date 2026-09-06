@@ -6,6 +6,7 @@ namespace JOOservices\LaravelEvents;
 
 use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use JOOservices\LaravelEvents\Data\EventLogData;
 use JOOservices\LaravelEvents\Data\StoredEventData;
 use JOOservices\LaravelEvents\EventLog\Models\EventLogEntry;
@@ -14,22 +15,18 @@ use JOOservices\LaravelEvents\Exceptions\InvalidConfigurationException;
 use JOOservices\LaravelEvents\Serialization\ArrayEventSerializer;
 use JOOservices\LaravelEvents\Serialization\EventSerializerInterface;
 use JOOservices\LaravelEvents\Support\PayloadRedactor;
+use Psr\Clock\ClockInterface;
 use Throwable;
 
-class EventService
+final class EventService implements EventPersisterInterface
 {
-    protected PayloadRedactor $redactor;
-
-    protected EventSerializerInterface $serializer;
-
     public function __construct(
-        protected StoredEvent $storedEventModel,
-        protected EventLogEntry $eventLogEntryModel,
-        ?PayloadRedactor $redactor = null,
-        ?EventSerializerInterface $serializer = null,
+        private readonly StoredEvent $storedEventModel,
+        private readonly EventLogEntry $eventLogEntryModel,
+        private readonly PayloadRedactor $redactor = new PayloadRedactor(),
+        private readonly EventSerializerInterface $serializer = new ArrayEventSerializer(),
+        private readonly ?ClockInterface $clock = null,
     ) {
-        $this->redactor = $redactor ?? new PayloadRedactor();
-        $this->serializer = $serializer ?? new ArrayEventSerializer();
     }
 
     /**
@@ -53,13 +50,16 @@ class EventService
             event: $event,
             payload: $payload,
             aggregateId: $aggregateId,
-            userId: $userId ?? $mergedMetadata['user_id'] ?? auth()->id(),
+            userId: $userId ?? $this->resolveUserId($mergedMetadata),
             occurredAt: $occurredAt,
             metadata: $mergedMetadata,
         );
         $attributes = $this->normalizeStoredEvent($data)->toArray();
 
-        return $this->storedEventModel->newQuery()->create($attributes);
+        /** @var StoredEvent $created */
+        $created = $this->storedEventModel->newQuery()->create($attributes);
+
+        return $created;
     }
 
     /**
@@ -82,7 +82,7 @@ class EventService
         int | string | null $userId = null,
     ): EventLogEntry {
         $mergedMeta = array_merge($this->getContext(), $meta);
-        $userId = $userId ?? $mergedMeta['user_id'] ?? auth()->id();
+        $userId = $userId ?? $this->resolveUserId($mergedMeta);
         $data = new EventLogData(
             entityType: $entityType,
             entityId: $entityId,
@@ -95,7 +95,10 @@ class EventService
         );
         $attributes = $this->normalizeEventLog($data)->toArray();
 
-        return $this->eventLogEntryModel->newQuery()->create($attributes);
+        /** @var EventLogEntry $created */
+        $created = $this->eventLogEntryModel->newQuery()->create($attributes);
+
+        return $created;
     }
 
     /** @param iterable<StoredEventData|array<string, mixed>> $events */
@@ -103,7 +106,7 @@ class EventService
     {
         $records = [];
         $context = $this->getContext();
-        $timestamp = Carbon::now();
+        $timestamp = $this->now();
 
         foreach ($events as $event) {
             $data = $event instanceof StoredEventData ? $event : StoredEventData::fromArray($event);
@@ -112,7 +115,7 @@ class EventService
                 eventClass: $data->eventClass,
                 payload: $data->payload,
                 aggregateId: $data->aggregateId,
-                userId: $data->userId ?? $metadata['user_id'] ?? auth()->id(),
+                userId: $data->userId ?? $this->resolveUserId($metadata),
                 occurredAt: $data->occurredAt,
                 metadata: $metadata,
                 envelope: $data->envelope,
@@ -133,7 +136,7 @@ class EventService
     {
         $records = [];
         $context = $this->getContext();
-        $timestamp = Carbon::now();
+        $timestamp = $this->now();
 
         foreach ($logs as $log) {
             $data = $log instanceof EventLogData ? $log : EventLogData::fromArray($log);
@@ -146,7 +149,7 @@ class EventService
                 changed: $data->changed,
                 diff: $data->diff,
                 meta: $meta,
-                userId: $data->userId ?? $meta['user_id'] ?? auth()->id(),
+                userId: $data->userId ?? $this->resolveUserId($meta),
             );
 
             $records[] = $this->withTimestamps($this->normalizeEventLog($enriched)->toArray(), $timestamp);
@@ -192,7 +195,7 @@ class EventService
      */
     private function withTimestamps(array $attributes, ?CarbonInterface $timestamp = null): array
     {
-        $timestamp ??= Carbon::now();
+        $timestamp ??= $this->now();
 
         if (! array_key_exists('created_at', $attributes)) {
             $attributes['created_at'] = $timestamp;
@@ -204,12 +207,51 @@ class EventService
         return $attributes;
     }
 
+    private function now(): CarbonInterface
+    {
+        if ($this->clock !== null) {
+            return Carbon::instance($this->clock->now());
+        }
+
+        return Carbon::now();
+    }
+
+    /**
+     * @param  array<string, mixed>  $context
+     */
+    private function resolveUserId(array $context): int | string | null
+    {
+        $fromContext = $context['user_id'] ?? null;
+        if (is_int($fromContext) || is_string($fromContext)) {
+            return $fromContext;
+        }
+
+        $authId = Auth::id();
+
+        return is_int($authId) || is_string($authId) ? $authId : null;
+    }
+
     /** @return array<string, mixed> */
     private function getContext(): array
     {
-        $provider = config('events.context_provider');
+        $provider = $this->resolveContextProvider();
         if ($provider === null) {
             return [];
+        }
+
+        $context = $provider();
+
+        return is_array($context) ? $this->stringKeyed($context) : [];
+    }
+
+    /**
+     * @return (callable(): mixed)|null
+     */
+    private function resolveContextProvider(): ?callable
+    {
+        $provider = config('events.context_provider');
+        if ($provider === null) {
+            return null;
         }
 
         if (is_string($provider) && $provider !== '') {
@@ -221,17 +263,22 @@ class EventService
         }
 
         if (! is_callable($provider)) {
-            return [];
+            $label = is_object($provider) ? $provider::class : get_debug_type($provider);
+
+            throw InvalidConfigurationException::nonCallableContextProvider($label);
         }
 
-        $context = $provider();
+        return $provider;
+    }
 
-        if (! is_array($context)) {
-            return [];
-        }
-
+    /**
+     * @param  array<mixed>  $values
+     * @return array<string, mixed>
+     */
+    private function stringKeyed(array $values): array
+    {
         $normalized = [];
-        foreach ($context as $key => $value) {
+        foreach ($values as $key => $value) {
             if (is_string($key)) {
                 $normalized[$key] = $value;
             }

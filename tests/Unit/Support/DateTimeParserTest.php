@@ -14,15 +14,15 @@ final class DateTimeParserTest extends TestCase
 {
     public function test_optional_returns_null_for_empty_values(): void
     {
-        $this->assertNull(DateTimeParser::optional(null, 'created_at'));
-        $this->assertNull(DateTimeParser::optional('', 'created_at'));
+        self::assertNull(DateTimeParser::optional(null, 'created_at'));
+        self::assertNull(DateTimeParser::optional('', 'created_at'));
     }
 
     public function test_optional_preserves_datetime_interface(): void
     {
         $value = new DateTimeImmutable('2026-05-01T12:00:00Z');
 
-        $this->assertSame($value, DateTimeParser::optional($value, 'created_at'));
+        self::assertSame($value, DateTimeParser::optional($value, 'created_at'));
     }
 
     public function test_optional_parses_eloquent_iso_string(): void
@@ -32,8 +32,8 @@ final class DateTimeParserTest extends TestCase
 
         $parsed = DateTimeParser::optional($iso, 'created_at');
 
-        $this->assertInstanceOf(DateTimeImmutable::class, $parsed);
-        $this->assertSame(
+        self::assertInstanceOf(DateTimeImmutable::class, $parsed);
+        self::assertSame(
             (new DateTimeImmutable($iso))->format(DateTimeImmutable::ATOM),
             $parsed->format(DateTimeImmutable::ATOM),
         );
@@ -43,8 +43,8 @@ final class DateTimeParserTest extends TestCase
     {
         $parsed = DateTimeParser::optional(1_714_564_800, 'occurred_at');
 
-        $this->assertInstanceOf(DateTimeImmutable::class, $parsed);
-        $this->assertSame(1_714_564_800, $parsed->getTimestamp());
+        self::assertInstanceOf(DateTimeImmutable::class, $parsed);
+        self::assertSame(1_714_564_800, $parsed->getTimestamp());
     }
 
     public function test_optional_parses_object_with_to_date_time(): void
@@ -63,20 +63,20 @@ final class DateTimeParserTest extends TestCase
 
         $parsed = DateTimeParser::optional($value, 'created_at');
 
-        $this->assertInstanceOf(DateTimeImmutable::class, $parsed);
-        $this->assertSame($source->getTimestamp(), $parsed->getTimestamp());
+        self::assertInstanceOf(DateTimeImmutable::class, $parsed);
+        self::assertSame($source->getTimestamp(), $parsed->getTimestamp());
     }
 
     public function test_optional_rejects_unparseable_values(): void
     {
-        $this->expectException(InvalidEventDataException::class);
+        self::expectException(InvalidEventDataException::class);
 
         DateTimeParser::optional(['not' => 'a date'], 'created_at');
     }
 
     public function test_optional_rejects_object_without_usable_to_date_time(): void
     {
-        $this->expectException(InvalidEventDataException::class);
+        self::expectException(InvalidEventDataException::class);
 
         DateTimeParser::optional(new class {
             public function toDateTime(): string

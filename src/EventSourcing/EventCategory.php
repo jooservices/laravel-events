@@ -4,24 +4,19 @@ declare(strict_types=1);
 
 namespace JOOservices\LaravelEvents\EventSourcing;
 
-final class EventCategory
+enum EventCategory: string
 {
-    public const DOMAIN = 'domain';
-
-    public const INTEGRATION = 'integration';
-
-    public const AUDIT = 'audit';
-
-    public const SYSTEM = 'system';
+    case DOMAIN = 'domain';
+    case INTEGRATION = 'integration';
+    case AUDIT = 'audit';
+    case SYSTEM = 'system';
 
     /** @return list<string> */
     public static function all(): array
     {
-        return [
-            self::DOMAIN,
-            self::INTEGRATION,
-            self::AUDIT,
-            self::SYSTEM,
-        ];
+        return array_map(
+            static fn(self $category): string => $category->value,
+            self::cases(),
+        );
     }
 }

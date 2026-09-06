@@ -1,5 +1,23 @@
 ## [Unreleased]
 
+### Changed
+
+- Raise PHPStan to `max` with `phpstan-strict-rules` and `phpstan-phpunit`
+- Enable PHPMD `cleancode` (StaticAccess / ElseExpression excluded for Laravel facades)
+- Convert `EventLogAction` / `EventCategory` to string-backed enums
+- Mark concrete package classes `final` (Eloquent models / service provider remain open for Testbench/Mockery); inject optional PSR-20 `ClockInterface` on `EventService`
+- Introduce `EventPersisterInterface` for subscriber DIP (mockable under `final` EventService)
+- CaptainHook commit subjects require an uppercase first letter
+- Non-callable `context_provider` values throw `InvalidConfigurationException`
+- Add Dockerfile / docker-compose / Makefile (PHP 8.5 + MongoDB) aligned with `dto`
+- Index set: drop redundant prefixes; add `event_name`, sparse unique `event_id`, top-level correlation/causation indexes
+- `EventSerializerInterface` requires `ensureEnvelope()`
+- Migrated event record types to `jooservices/dto` (`^3.2`) and package exceptions to `jooservices/exceptions` (`^4.0`)
+- Switched Pint preset from `laravel` to `per` (PER-CS 3.0)
+- Removed in-repo AI/editor skill trees (workspace-owned); thinned `AGENTS.md`
+- Added `SUPPORT.md`, `GOVERNANCE.md`, and `WORKFLOWS.md`
+- Aligned GitHub Actions with JOOservices baseline (`ci.yml` PR gate, `ci-post-merge.yml`, commitlint, CodeQL, workflow audit)
+
 ### Fixed
 
 - Invalid `context_provider` class-strings throw `InvalidConfigurationException` instead of a raw container error
@@ -15,21 +33,12 @@
 - Legacy TTL env parsing matches retention (positive int only); default redaction keys expanded
 - Runtime-truth docs: removed stale `lint:all` / legacy-namespace claims; architecture tree synced
 
-### Changed
-
-- Index set: drop redundant prefixes; add `event_name`, sparse unique `event_id`, top-level correlation/causation indexes
-- `EventSerializerInterface` requires `ensureEnvelope()`
-- Migrated event record types to `jooservices/dto` (`^3.2`) and package exceptions to `jooservices/exceptions` (`^4.0`)
-- Switched Pint preset from `laravel` to `per` (PER-CS 3.0)
-- Removed in-repo AI/editor skill trees (workspace-owned); thinned `AGENTS.md`
-- Added `SUPPORT.md`, `GOVERNANCE.md`, and `WORKFLOWS.md`
-- Aligned GitHub Actions with JOOservices baseline (`ci.yml` PR gate, `ci-post-merge.yml`, commitlint, CodeQL, workflow audit)
-
 ### Added
 
 - `InvalidEventDataException`, `InvalidQueryException`, and `InvalidConfigurationException` with structured context / error codes
 - `QueryGuard` / `QueryExecutor` shared query validation and mapping
 - `DateTimeParser` for Eloquent/Mongo date normalization on query hydration
+- Unit coverage for `QueryExecutor::applyFilters()` dual-path OR
 
 ## [1.5.0] - 2026-07-26
 

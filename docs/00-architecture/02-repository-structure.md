@@ -25,6 +25,7 @@ laravel-events/
 │   ├── EventSourcing/
 │   │   ├── Concerns/
 │   │   ├── Contracts/
+│   │   ├── EventCategory.php
 │   │   ├── EventSourcingSubscriber.php
 │   │   └── Models/
 │   ├── Exceptions/
@@ -42,6 +43,7 @@ laravel-events/
 │   │   ├── EventMetadata.php
 │   │   ├── EventMetadataBuilder.php
 │   │   └── PayloadRedactor.php
+│   ├── EventPersisterInterface.php
 │   ├── EventsServiceProvider.php
 │   └── EventService.php
 ├── tests/

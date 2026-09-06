@@ -13,7 +13,15 @@ composer check         # lint + test
 composer ci            # lint + test:coverage
 ```
 
-Prefer the `lint:*` commands in automation and docs:
+Prefer the `lint:*` commands in automation and docs. Host PHP 8.5 is fine when
+it matches; otherwise use Docker:
+
+```bash
+make build
+make install
+make lint
+make test
+```
 
 ```bash
 composer lint:pint

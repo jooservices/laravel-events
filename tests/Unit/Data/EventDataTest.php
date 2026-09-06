@@ -31,31 +31,31 @@ class EventDataTest extends TestCase
             'causation_id' => 'cmd-1',
         ]);
 
-        $this->assertNotNull($data->envelope);
-        $this->assertSame('OrderCreated', $data->eventClass);
-        $this->assertSame('ORD-1', $data->aggregateId);
-        $this->assertSame('evt-1', $data->envelope->eventId);
-        $this->assertSame('order.created', $data->envelope->eventName);
-        $this->assertSame('domain', $data->envelope->eventCategory);
-        $this->assertSame('orders', $data->envelope->aggregateType);
-        $this->assertSame(1, $data->envelope->schemaVersion);
-        $this->assertSame('v1', $data->envelope->eventVersion);
-        $this->assertSame('corr-1', $data->envelope->correlationId);
-        $this->assertSame('cmd-1', $data->envelope->causationId);
-        $this->assertSame('domain', $data->toArray()['event_category']);
-        $this->assertSame(['total' => 10], $data->toArray()['payload']);
+        self::assertNotNull($data->envelope);
+        self::assertSame('OrderCreated', $data->eventClass);
+        self::assertSame('ORD-1', $data->aggregateId);
+        self::assertSame('evt-1', $data->envelope->eventId);
+        self::assertSame('order.created', $data->envelope->eventName);
+        self::assertSame('domain', $data->envelope->eventCategory);
+        self::assertSame('orders', $data->envelope->aggregateType);
+        self::assertSame(1, $data->envelope->schemaVersion);
+        self::assertSame('v1', $data->envelope->eventVersion);
+        self::assertSame('corr-1', $data->envelope->correlationId);
+        self::assertSame('cmd-1', $data->envelope->causationId);
+        self::assertSame('domain', $data->toArray()['event_category']);
+        self::assertSame(['total' => 10], $data->toArray()['payload']);
     }
 
     public function test_stored_event_data_requires_event_class(): void
     {
-        $this->expectException(InvalidEventDataException::class);
+        self::expectException(InvalidEventDataException::class);
 
         StoredEventData::fromArray(['payload' => []]);
     }
 
     public function test_stored_event_data_requires_array_payload_and_metadata(): void
     {
-        $this->expectException(InvalidEventDataException::class);
+        self::expectException(InvalidEventDataException::class);
 
         StoredEventData::fromArray([
             'event_class' => 'OrderCreated',
@@ -72,7 +72,7 @@ class EventDataTest extends TestCase
             'payload' => [],
         ]);
 
-        $this->assertSame('123', $data->aggregateId);
+        self::assertSame('123', $data->aggregateId);
     }
 
     public function test_event_log_data_hydrates_and_serializes(): void
@@ -87,9 +87,9 @@ class EventDataTest extends TestCase
             'meta' => ['correlation_id' => 'corr-1'],
         ]);
 
-        $this->assertSame('orders', $data->entityType);
-        $this->assertSame('updated', $data->action);
-        $this->assertSame(['status' => 'paid'], $data->toArray()['changed']);
+        self::assertSame('orders', $data->entityType);
+        self::assertSame('updated', $data->action);
+        self::assertSame(['status' => 'paid'], $data->toArray()['changed']);
     }
 
     public function test_event_log_data_accepts_camel_case_aliases(): void
@@ -101,9 +101,9 @@ class EventDataTest extends TestCase
             'userId' => 'user-9',
         ]);
 
-        $this->assertSame('orders', $data->entityType);
-        $this->assertSame('99', $data->entityId);
-        $this->assertSame('user-9', $data->userId);
+        self::assertSame('orders', $data->entityType);
+        self::assertSame('99', $data->entityId);
+        self::assertSame('user-9', $data->userId);
     }
 
     public function test_query_identity_fields_hydrate_but_are_omitted_from_persistence_array(): void
@@ -123,14 +123,14 @@ class EventDataTest extends TestCase
             'created_at' => $createdAt,
         ]);
 
-        $this->assertSame('mongo-1', $stored->documentId());
-        $this->assertSame($createdAt, $stored->createdAt());
-        $this->assertArrayNotHasKey('id', $stored->toArray());
-        $this->assertArrayNotHasKey('created_at', $stored->toArray());
-        $this->assertSame('mongo-2', $log->documentId());
-        $this->assertSame($createdAt, $log->createdAt());
-        $this->assertArrayNotHasKey('id', $log->toArray());
-        $this->assertArrayNotHasKey('created_at', $log->toArray());
+        self::assertSame('mongo-1', $stored->documentId());
+        self::assertSame($createdAt, $stored->createdAt());
+        self::assertArrayNotHasKey('id', $stored->toArray());
+        self::assertArrayNotHasKey('created_at', $stored->toArray());
+        self::assertSame('mongo-2', $log->documentId());
+        self::assertSame($createdAt, $log->createdAt());
+        self::assertArrayNotHasKey('id', $log->toArray());
+        self::assertArrayNotHasKey('created_at', $log->toArray());
     }
 
     public function test_query_identity_accepts_eloquent_serialized_timestamp_strings(): void
@@ -150,13 +150,13 @@ class EventDataTest extends TestCase
             'created_at' => '2026-05-01T12:00:00.000000Z',
         ]);
 
-        $this->assertSame('mongo-str-1', $stored->documentId());
+        self::assertSame('mongo-str-1', $stored->documentId());
         $createdAt = $stored->createdAt();
-        $this->assertInstanceOf(DateTimeImmutable::class, $createdAt);
-        $this->assertSame('2026-05-01T12:00:00+00:00', $createdAt->format(DateTimeImmutable::ATOM));
-        $this->assertInstanceOf(DateTimeImmutable::class, $stored->occurredAt);
-        $this->assertSame('mongo-str-2', $log->documentId());
-        $this->assertInstanceOf(DateTimeImmutable::class, $log->createdAt());
+        self::assertInstanceOf(DateTimeImmutable::class, $createdAt);
+        self::assertSame('2026-05-01T12:00:00+00:00', $createdAt->format(DateTimeImmutable::ATOM));
+        self::assertInstanceOf(DateTimeImmutable::class, $stored->occurredAt);
+        self::assertSame('mongo-str-2', $log->documentId());
+        self::assertInstanceOf(DateTimeImmutable::class, $log->createdAt());
     }
 
     public function test_document_identity_from_array_parses_created_at_string(): void
@@ -166,13 +166,13 @@ class EventDataTest extends TestCase
             'created_at' => '2026-07-01T08:00:00Z',
         ]);
 
-        $this->assertSame('doc-1', $identity->id);
-        $this->assertInstanceOf(DateTimeImmutable::class, $identity->createdAt);
+        self::assertSame('doc-1', $identity->id);
+        self::assertInstanceOf(DateTimeImmutable::class, $identity->createdAt);
     }
 
     public function test_event_log_data_requires_required_fields(): void
     {
-        $this->expectException(InvalidEventDataException::class);
+        self::expectException(InvalidEventDataException::class);
 
         EventLogData::fromArray(['entity_type' => 'orders']);
     }

@@ -24,7 +24,7 @@ class DiffHelperTest extends TestCase
 
         $result = $this->helper->diff($prev, $current);
 
-        $this->assertSame([], $result);
+        self::assertSame([], $result);
     }
 
     public function test_diff_returns_changed_fields_with_old_and_new(): void
@@ -34,7 +34,7 @@ class DiffHelperTest extends TestCase
 
         $result = $this->helper->diff($prev, $current);
 
-        $this->assertSame(['b' => ['old' => 2, 'new' => 99]], $result);
+        self::assertSame(['b' => ['old' => 2, 'new' => 99]], $result);
     }
 
     public function test_diff_includes_new_keys_from_current(): void
@@ -44,7 +44,7 @@ class DiffHelperTest extends TestCase
 
         $result = $this->helper->diff($prev, $current);
 
-        $this->assertSame(['b' => ['old' => null, 'new' => 2]], $result);
+        self::assertSame(['b' => ['old' => null, 'new' => 2]], $result);
     }
 
     public function test_diff_handles_multiple_changes(): void
@@ -54,7 +54,7 @@ class DiffHelperTest extends TestCase
 
         $result = $this->helper->diff($prev, $current);
 
-        $this->assertSame([
+        self::assertSame([
             'name' => ['old' => 'Old', 'new' => 'New'],
             'count' => ['old' => 0, 'new' => 10],
         ], $result);
@@ -67,7 +67,7 @@ class DiffHelperTest extends TestCase
 
         $result = $this->helper->diff($prev, $current);
 
-        $this->assertSame([
+        self::assertSame([
             'a' => ['old' => null, 'new' => 1],
             'b' => ['old' => null, 'new' => 2],
         ], $result);
@@ -80,7 +80,7 @@ class DiffHelperTest extends TestCase
 
         $result = $this->helper->diff($prev, $current);
 
-        $this->assertSame([
+        self::assertSame([
             'a' => ['old' => 1, 'new' => null],
             'b' => ['old' => 2, 'new' => null],
         ], $result);
@@ -93,7 +93,7 @@ class DiffHelperTest extends TestCase
 
         $result = $this->helper->diff($prev, $current);
 
-        $this->assertSame([
+        self::assertSame([
             'c' => ['old' => 3, 'new' => 9],
             'b' => ['old' => 2, 'new' => null],
         ], $result);
@@ -106,6 +106,6 @@ class DiffHelperTest extends TestCase
 
         $result = $this->helper->diff($prev, $current);
 
-        $this->assertSame(['name' => ['old' => 'Old', 'new' => null]], $result);
+        self::assertSame(['name' => ['old' => 'Old', 'new' => null]], $result);
     }
 }

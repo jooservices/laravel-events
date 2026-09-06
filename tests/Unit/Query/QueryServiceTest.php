@@ -16,22 +16,22 @@ class QueryServiceTest extends TestCase
 {
     public function test_stored_event_query_service_rejects_invalid_limits(): void
     {
-        $this->expectException(InvalidQueryException::class);
+        self::expectException(InvalidQueryException::class);
 
         (new StoredEventQueryService(new StoredEvent()))->latest(0);
     }
 
     public function test_event_log_query_service_rejects_invalid_limits(): void
     {
-        $this->expectException(InvalidQueryException::class);
+        self::expectException(InvalidQueryException::class);
 
         (new EventLogQueryService(new EventLogEntry()))->latest(501);
     }
 
     public function test_stored_event_query_rejects_inverted_date_range(): void
     {
-        $this->expectException(InvalidQueryException::class);
-        $this->expectExceptionMessage('Query date range requires $from <= $to.');
+        self::expectException(InvalidQueryException::class);
+        self::expectExceptionMessage('Query date range requires $from <= $to.');
 
         (new StoredEventQueryService(new StoredEvent()))->between(
             new DateTimeImmutable('2026-05-02'),
@@ -41,15 +41,15 @@ class QueryServiceTest extends TestCase
 
     public function test_stored_event_query_rejects_disallowed_filters(): void
     {
-        $this->expectException(InvalidQueryException::class);
-        $this->expectExceptionMessage('Query filter key is not allowed.');
+        self::expectException(InvalidQueryException::class);
+        self::expectExceptionMessage('Query filter key is not allowed.');
 
         (new StoredEventQueryService(new StoredEvent()))->latest(10, ['payload.secret' => 'x']);
     }
 
     public function test_event_log_query_rejects_disallowed_filters(): void
     {
-        $this->expectException(InvalidQueryException::class);
+        self::expectException(InvalidQueryException::class);
 
         (new EventLogQueryService(new EventLogEntry()))->latest(10, ['prev.email' => 'x']);
     }
