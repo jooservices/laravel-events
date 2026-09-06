@@ -1,19 +1,25 @@
 # Laravel Events
 
-[![codecov](https://codecov.io/gh/jooservices/laravel-events/branch/master/graph/badge.svg)](https://codecov.io/gh/jooservices/laravel-events)
-[![CI](https://github.com/jooservices/laravel-events/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jooservices/laravel-events/actions/workflows/ci.yml)
+[![CI](https://github.com/jooservices/laravel-events/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/jooservices/laravel-events/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/jooservices/laravel-events/graph/badge.svg)](https://codecov.io/gh/jooservices/laravel-events)
+[![Quality gate status](https://sonarcloud.io/api/project_badges/measure?project=jooservices_laravel-events&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=jooservices_laravel-events)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/jooservices/laravel-events/badge)](https://securityscorecards.dev/viewer/?uri=github.com/jooservices/laravel-events)
 [![PHP Version](https://img.shields.io/badge/PHP-8.5%2B-blue.svg)](https://www.php.net/)
+[![Release](https://img.shields.io/badge/version-4.0.0-blue.svg)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Packagist Version](https://img.shields.io/packagist/v/jooservices/laravel-events)](https://packagist.org/packages/jooservices/laravel-events)
 
 Lightweight domain-event and model-change persistence for Laravel with **MongoDB** storage. Store domain event payloads by aggregate and/or model change audit trails (prev/changed/diff) via Laravel's native event dispatcher.
 
+> [!WARNING]
+> **`v4.0.0` includes breaking API changes from `1.x`** (backed enums, `final` concretes, removed bag DTOs, new indexes).
+> See [`UPGRADE-4.0.md`](UPGRADE-4.0.md) and the [changelog](CHANGELOG.md) before upgrading.
+
 This is **not** a full event store: there is no stream version, optimistic concurrency, replay command, or outbox. Ordering is `created_at` (and optional `occurred_at`); treat “event sourcing” here as aggregate-oriented append + query helpers.
 
 Package name: `jooservices/laravel-events`
 
-- **Laravel 12/13** · **PHP 8.5+**
+- **Laravel 12/13** · **PHP 8.5+** · **Current release: `4.0.0`**
 - **MongoDB** via [mongodb/laravel-mongodb](https://github.com/mongodb/laravel-mongodb)
 - **DTO / exceptions** via [jooservices/dto](https://github.com/jooservices/dto) and [jooservices/exceptions](https://github.com/jooservices/exceptions)
 
@@ -159,7 +165,7 @@ $audit = app(EventLogQueryService::class)->byEntity('orders', 'ORD-001');
 Query services return typed package data records (including storage `id` / `created_at` when present) and intentionally stay small.
 Build dashboards, projections, and reporting in your application.
 
-The public PHP namespace is `JOOservices\LaravelEvents` only (alternate casing removed in `1.5.0`).
+The public PHP namespace is `JOOservices\LaravelEvents` only (alternate casing removed in `1.5.0`). See [`UPGRADE-4.0.md`](UPGRADE-4.0.md) for `4.0.0` breaking changes (enums, `final`, indexes).
 
 ## Redaction
 
@@ -303,7 +309,7 @@ Configured workflows:
 - `OpenSSF Scorecard`: publish security posture results as SARIF
 - `Secret Scanning`: run Gitleaks on pushes, pull requests, and manual dispatches
 
-Coverage is archived as a workflow artifact. Codecov and SonarQube Cloud are optional and only run when repository secrets are configured, so README badges do not claim those services as mandatory package support.
+Coverage is archived as a workflow artifact. Codecov and SonarQube Cloud run when repository secrets are configured; README badges mirror `dto` / `client` (CI on `develop`, version → CHANGELOG, Sonar, Scorecard).
 
 ---
 

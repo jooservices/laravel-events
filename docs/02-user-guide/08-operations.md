@@ -18,7 +18,9 @@ The command creates indexes for common access patterns:
 | `event_logs` | `entity_type + entity_id + created_at`, `action + created_at`, `meta.correlation_id` / `causation_id`, `user_id`, `created_at` or TTL |
 
 Prefix-only single-field indexes that duplicated compound prefixes were removed
-to reduce write overhead. Re-run `events:install-indexes` after upgrading.
+to reduce write overhead. Re-run `events:install-indexes` after upgrading
+(required for `4.0.0` — new sparse unique `event_id`, `event_name`, and
+top-level correlation/causation indexes).
 
 
 Add application-specific indexes only when you have measured query patterns, especially for metadata keys such as `metadata.tenant_id` or `meta.request_id`.
