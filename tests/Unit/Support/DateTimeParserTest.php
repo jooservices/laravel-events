@@ -47,10 +47,42 @@ final class DateTimeParserTest extends TestCase
         $this->assertSame(1_714_564_800, $parsed->getTimestamp());
     }
 
+    public function test_optional_parses_object_with_to_date_time(): void
+    {
+        $source = new DateTimeImmutable('2026-06-01T00:00:00Z');
+        $value = new class ($source) {
+            public function __construct(private DateTimeImmutable $inner)
+            {
+            }
+
+            public function toDateTime(): DateTimeImmutable
+            {
+                return $this->inner;
+            }
+        };
+
+        $parsed = DateTimeParser::optional($value, 'created_at');
+
+        $this->assertInstanceOf(DateTimeImmutable::class, $parsed);
+        $this->assertSame($source->getTimestamp(), $parsed->getTimestamp());
+    }
+
     public function test_optional_rejects_unparseable_values(): void
     {
         $this->expectException(InvalidEventDataException::class);
 
         DateTimeParser::optional(['not' => 'a date'], 'created_at');
+    }
+
+    public function test_optional_rejects_object_without_usable_to_date_time(): void
+    {
+        $this->expectException(InvalidEventDataException::class);
+
+        DateTimeParser::optional(new class {
+            public function toDateTime(): string
+            {
+                return 'nope';
+            }
+        }, 'created_at');
     }
 }

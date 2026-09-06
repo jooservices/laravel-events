@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace JOOservices\LaravelEvents\Tests\Unit\Data;
 
 use DateTimeImmutable;
+use JOOservices\LaravelEvents\Data\DocumentIdentity;
 use JOOservices\LaravelEvents\Data\EventLogData;
 use JOOservices\LaravelEvents\Data\StoredEventData;
 use JOOservices\LaravelEvents\Exceptions\InvalidEventDataException;
@@ -156,6 +157,17 @@ class EventDataTest extends TestCase
         $this->assertInstanceOf(DateTimeImmutable::class, $stored->occurredAt);
         $this->assertSame('mongo-str-2', $log->documentId());
         $this->assertInstanceOf(DateTimeImmutable::class, $log->createdAt());
+    }
+
+    public function test_document_identity_from_array_parses_created_at_string(): void
+    {
+        $identity = DocumentIdentity::fromArray([
+            '_id' => 'doc-1',
+            'created_at' => '2026-07-01T08:00:00Z',
+        ]);
+
+        $this->assertSame('doc-1', $identity->id);
+        $this->assertInstanceOf(DateTimeImmutable::class, $identity->createdAt);
     }
 
     public function test_event_log_data_requires_required_fields(): void

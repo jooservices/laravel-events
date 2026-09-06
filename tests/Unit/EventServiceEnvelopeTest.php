@@ -157,4 +157,29 @@ class EventServiceEnvelopeTest extends TestCase
         $service->logChange('Order', '1', 'updated', [], [], [], []);
         $this->addToAssertionCount(1);
     }
+
+    public function test_context_provider_ignores_non_array_and_non_callable_values(): void
+    {
+        config()->set('events.context_provider', static fn(): string => 'not-an-array');
+
+        $storedEventModel = Mockery::mock(StoredEvent::class)->makePartial();
+        $storedEventModel->shouldReceive('newQuery')->andReturnSelf();
+        $storedEventModel->shouldReceive('create')
+            ->once()
+            ->with(Mockery::on(static fn(array $arg): bool => ($arg['metadata'] ?? null) === []))
+            ->andReturn(new StoredEvent());
+
+        $service = new EventService($storedEventModel, Mockery::mock(EventLogEntry::class));
+        $service->storeEvent(new stdClass(), []);
+        $this->addToAssertionCount(1);
+
+        config()->set('events.context_provider', 42);
+        $storedEventModel->shouldReceive('newQuery')->andReturnSelf();
+        $storedEventModel->shouldReceive('create')
+            ->once()
+            ->with(Mockery::on(static fn(array $arg): bool => ($arg['metadata'] ?? null) === []))
+            ->andReturn(new StoredEvent());
+        $service->storeEvent(new stdClass(), []);
+        $this->addToAssertionCount(1);
+    }
 }
