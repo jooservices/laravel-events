@@ -218,4 +218,56 @@ class EventLogSubscriberTest extends TestCase
         $subscriber->logModelChange($event);
         $this->addToAssertionCount(1);
     }
+
+    public function test_log_model_change_records_full_removal_diff_for_deleted_action(): void
+    {
+        $event = new class implements HasLogAction, LoggableModelInterface {
+            public function getLoggableType(): string
+            {
+                return 'Order';
+            }
+
+            public function getLoggableId(): string
+            {
+                return '42';
+            }
+
+            /** @return array<string, mixed> */
+            public function getPrev(): array
+            {
+                return ['status' => 'pending', 'total' => 10];
+            }
+
+            /** @return array<string, mixed> */
+            public function getChanged(): array
+            {
+                return [];
+            }
+
+            public function getAction(): string
+            {
+                return 'deleted';
+            }
+        };
+
+        $eventService = Mockery::mock(EventService::class);
+        $eventService->shouldReceive('logChange')
+            ->once()
+            ->with(
+                'Order',
+                '42',
+                'deleted',
+                ['status' => 'pending', 'total' => 10],
+                [],
+                [
+                    'status' => ['old' => 'pending', 'new' => null],
+                    'total' => ['old' => 10, 'new' => null],
+                ],
+                Mockery::on(fn(array $meta) => array_key_exists('user_id', $meta)),
+            );
+
+        $subscriber = new EventLogSubscriber($eventService, new DiffHelper());
+        $subscriber->logModelChange($event);
+        $this->addToAssertionCount(1);
+    }
 }

@@ -127,7 +127,7 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
 
         $this->assertSame('bulk-context', $stored?->metadata['correlation_id'] ?? null);
         $this->assertSame('context-user', $stored?->metadata['user_id'] ?? null);
-        $this->assertNull($stored?->user_id);
+        $this->assertSame('context-user', $stored?->user_id);
         $this->assertSame('bulk-context', $log?->meta['correlation_id'] ?? null);
         $this->assertSame('context-user', $log?->user_id);
     }
@@ -184,7 +184,8 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
         $eventQueries = app(EventLogQueryService::class);
 
         $this->assertSame('ORD-Q2', $storedQueries->byAggregateId('ORD-Q2')->first()?->aggregateId);
-        $this->assertSame(stdClass::class, $storedQueries->byEventName(stdClass::class)->first()?->eventClass);
+        $this->assertSame(stdClass::class, $storedQueries->byEventClass(stdClass::class)->first()?->eventClass);
+        $this->assertSame(stdClass::class, $storedQueries->byEventName('stdClass')->first()?->eventClass);
         $this->assertSame('domain', $storedQueries->byEventCategory('domain')->first()?->envelope?->eventCategory);
         $this->assertSame(
             'corr-q2',

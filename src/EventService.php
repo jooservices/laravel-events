@@ -46,13 +46,14 @@ class EventService
         ?CarbonInterface $occurredAt = null,
         array $metadata = [],
     ): StoredEvent {
+        $mergedMetadata = array_merge($this->getContext(), $metadata);
         $data = $this->serializer->serializeStoredEvent(
             event: $event,
             payload: $payload,
             aggregateId: $aggregateId,
-            userId: $userId ?? auth()->id(),
+            userId: $userId ?? $mergedMetadata['user_id'] ?? auth()->id(),
             occurredAt: $occurredAt,
-            metadata: array_merge($this->getContext(), $metadata),
+            metadata: $mergedMetadata,
         );
         $attributes = $this->normalizeStoredEvent($data)->toArray();
 
@@ -78,7 +79,8 @@ class EventService
         array $meta = [],
         int | string | null $userId = null,
     ): EventLogEntry {
-        $userId = $userId ?? $meta['user_id'] ?? auth()->id();
+        $mergedMeta = array_merge($this->getContext(), $meta);
+        $userId = $userId ?? $mergedMeta['user_id'] ?? auth()->id();
         $data = new EventLogData(
             entityType: $entityType,
             entityId: $entityId,
@@ -86,7 +88,7 @@ class EventService
             prev: $prev,
             changed: $changed,
             diff: $diff,
-            meta: array_merge($this->getContext(), $meta),
+            meta: $mergedMeta,
             userId: $userId,
         );
         $attributes = $this->normalizeEventLog($data)->toArray();
@@ -104,15 +106,15 @@ class EventService
         foreach ($events as $event) {
             $data = $event instanceof StoredEventData ? $event : StoredEventData::fromArray($event);
             $metadata = array_merge($context, $data->metadata);
-            $enriched = new StoredEventData(
+            $enriched = $this->serializer->ensureEnvelope(new StoredEventData(
                 eventClass: $data->eventClass,
                 payload: $data->payload,
                 aggregateId: $data->aggregateId,
-                userId: $data->userId ?? auth()->id(),
+                userId: $data->userId ?? $metadata['user_id'] ?? auth()->id(),
                 occurredAt: $data->occurredAt,
                 metadata: $metadata,
                 envelope: $data->envelope,
-            );
+            ));
 
             $records[] = $this->withTimestamps($this->normalizeStoredEvent($enriched)->toArray(), $timestamp);
         }

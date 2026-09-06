@@ -1,7 +1,19 @@
 ## [Unreleased]
 
+### Fixed
+
+- `StoredEventQueryService::byEventName()` now filters `event_name` (not FQCN); added `byEventClass()` and `byEventId()`
+- DiffHelper records removals; deleted EventLog actions with empty `changed` store a full removal diff
+- Bulk `recordManyStoredEvents()` runs `ensureEnvelope()` (always generates `event_id` / `event_name`)
+- Stored-event `user_id` column now takes metadata/context `user_id` like event logs
+- Query DTOs hydrate storage identity via `DocumentIdentity` (`documentId()` / `createdAt()`); `between()` rejects inverted ranges; `latest()` allowlists filters
+- Legacy TTL env parsing matches retention (positive int only); default redaction keys expanded
+- Runtime-truth docs: removed stale `lint:all` / legacy-namespace claims; architecture tree synced
+
 ### Changed
 
+- Index set: drop redundant prefixes; add `event_name`, sparse unique `event_id`, top-level correlation/causation indexes
+- `EventSerializerInterface` requires `ensureEnvelope()`
 - Migrated event record types to `jooservices/dto` (`^3.2`) and package exceptions to `jooservices/exceptions` (`^4.0`)
 - Switched Pint preset from `laravel` to `per` (PER-CS 3.0)
 - Removed in-repo AI/editor skill trees (workspace-owned); thinned `AGENTS.md`
@@ -11,6 +23,7 @@
 ### Added
 
 - `InvalidEventDataException` and `InvalidQueryException` with structured context / error codes
+- `QueryGuard` shared limit / range / filter validation
 
 ## [1.5.0] - 2026-07-26
 

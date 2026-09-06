@@ -53,4 +53,15 @@ class ArrayEventSerializerTest extends TestCase
         $this->assertNotSame('', $data->envelope->eventId);
         $this->assertStringStartsWith('class@anonymous', (string) $data->envelope->eventName);
     }
+
+    public function test_ensure_envelope_fills_missing_event_id_and_name_for_bulk_records(): void
+    {
+        $data = (new ArrayEventSerializer())->ensureEnvelope(
+            new \JOOservices\LaravelEvents\Data\StoredEventData('App\\OrderCreated', ['id' => 1]),
+        );
+
+        $this->assertNotNull($data->envelope);
+        $this->assertNotNull($data->envelope->eventId);
+        $this->assertSame('OrderCreated', $data->envelope->eventName);
+    }
 }

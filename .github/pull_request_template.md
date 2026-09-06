@@ -31,6 +31,6 @@ Describe the main risk and how to roll the change back if needed.
 - [ ] I used real MongoDB integration flow for persisted event/audit data.
 - [ ] I considered security impact and redaction/PII concerns.
 - [ ] I ran the required quality gates and they passed with zero warnings or notices.
-- [ ] `composer lint:all`
+- [ ] `composer lint`
 - [ ] `composer test`
 - [ ] `composer check`

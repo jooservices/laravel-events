@@ -15,7 +15,7 @@ the file is `config/events.php`.
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | `connection` | string | `'mongodb'` | MongoDB connection name from `config/database.php` |
-| `context_provider` | callable\|null | `null` | Callable returning an array merged into EventSourcing `metadata` and EventLog `meta` (e.g. request_id, correlation_id, source, channel) |
+| `context_provider` | invokable class\|null | `null` | Config-cache-safe invokable class returning an array merged into EventSourcing `metadata` and EventLog `meta`. Closures break `config:cache`. |
 | `redaction.enabled` | bool | `true` | Enable recursive masking before persistence |
 | `redaction.keys` | string[] | common secret keys | Case-insensitive keys to mask |
 | `redaction.replacement` | string | `'[REDACTED]'` | Replacement value |
@@ -48,26 +48,47 @@ environment variables.
 
 ## Context Provider
 
-Set `context_provider` to a callable that returns an array. That array is merged into:
-
-- EventSourcing: `metadata` when storing an event
-- EventLog: `meta` when storing a change
-
-Example (e.g. in `AppServiceProvider`):
+Set `context_provider` to an **invokable class** (or other config:cache-safe
+callable). Closures in published `config/events.php` break
+`php artisan config:cache`. Prefer:
 
 ```php
+// app/Support/EventsContextProvider.php
+namespace App\Support;
+
 use JOOservices\LaravelEvents\Support\EventMetadata;
 
-config([
-    'events.context_provider' => function () {
+final class EventsContextProvider
+{
+    /** @return array<string, mixed> */
+    public function __invoke(): array
+    {
         return EventMetadata::merge(
             EventMetadata::trace(request()->header('X-Request-ID')),
             EventMetadata::source(config('app.name'), request()->route() ? 'web' : 'cli'),
+            ['user_id' => auth()->id()],
         );
-    },
-]);
+    }
+}
 ```
 
-Return `[]` or set to `null` to disable.
+```php
+// config/events.php
+'context_provider' => App\Support\EventsContextProvider::class,
+```
+
+Return `[]` from the provider or set `context_provider` to `null` to disable.
 
 See [Metadata, Versioning, and Corrections](../02-user-guide/03-metadata-correlation-causation.md) for recommended keys.
+
+## Transaction and queue caveats
+
+Subscribers persist to MongoDB when Laravel dispatches the event:
+
+- Prefer `Illuminate\Contracts\Events\ShouldDispatchAfterCommit` (or dispatch
+  after your SQL transaction commits) so a rolled-back DB transaction does not
+  leave orphan Mongo rows.
+- If the event implements `ShouldQueue`, capture `user_id`, `correlation_id`,
+  and request metadata **on the event at dispatch time** (or via a
+  context_provider that does not rely on `auth()` / `request()` in the worker).
+  Worker processes are guests with no HTTP request.

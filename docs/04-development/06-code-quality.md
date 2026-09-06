@@ -6,8 +6,6 @@ quality commands. Before final handoff, run:
 ```bash
 composer validate --strict
 composer lint
-composer lint:all
-composer lint:cs
 composer test
 composer test:coverage
 composer check

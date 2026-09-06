@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace JOOservices\LaravelEvents\Tests\Unit\Data;
 
+use DateTimeImmutable;
 use JOOservices\LaravelEvents\Data\EventLogData;
 use JOOservices\LaravelEvents\Data\StoredEventData;
 use JOOservices\LaravelEvents\Exceptions\InvalidEventDataException;
@@ -88,6 +89,47 @@ class EventDataTest extends TestCase
         $this->assertSame('orders', $data->entityType);
         $this->assertSame('updated', $data->action);
         $this->assertSame(['status' => 'paid'], $data->toArray()['changed']);
+    }
+
+    public function test_event_log_data_accepts_camel_case_aliases(): void
+    {
+        $data = EventLogData::fromArray([
+            'entityType' => 'orders',
+            'entityId' => 99,
+            'action' => 'updated',
+            'userId' => 'user-9',
+        ]);
+
+        $this->assertSame('orders', $data->entityType);
+        $this->assertSame('99', $data->entityId);
+        $this->assertSame('user-9', $data->userId);
+    }
+
+    public function test_query_identity_fields_hydrate_but_are_omitted_from_persistence_array(): void
+    {
+        $createdAt = new DateTimeImmutable('2026-05-01T12:00:00Z');
+        $stored = StoredEventData::fromArray([
+            'event_class' => 'OrderCreated',
+            'payload' => [],
+            '_id' => 'mongo-1',
+            'created_at' => $createdAt,
+        ]);
+        $log = EventLogData::fromArray([
+            'entity_type' => 'orders',
+            'entity_id' => '1',
+            'action' => 'updated',
+            '_id' => 'mongo-2',
+            'created_at' => $createdAt,
+        ]);
+
+        $this->assertSame('mongo-1', $stored->documentId());
+        $this->assertSame($createdAt, $stored->createdAt());
+        $this->assertArrayNotHasKey('id', $stored->toArray());
+        $this->assertArrayNotHasKey('created_at', $stored->toArray());
+        $this->assertSame('mongo-2', $log->documentId());
+        $this->assertSame($createdAt, $log->createdAt());
+        $this->assertArrayNotHasKey('id', $log->toArray());
+        $this->assertArrayNotHasKey('created_at', $log->toArray());
     }
 
     public function test_event_log_data_requires_required_fields(): void

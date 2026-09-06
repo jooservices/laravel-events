@@ -84,4 +84,31 @@ class EventServiceEnvelopeTest extends TestCase
         ]);
         $this->addToAssertionCount(1);
     }
+
+    public function test_record_many_stored_events_generates_envelope_when_missing(): void
+    {
+        $storedEventModel = Mockery::mock(StoredEvent::class)->makePartial();
+        $storedEventModel->shouldReceive('newQuery')->andReturnSelf();
+        $storedEventModel->shouldReceive('insert')
+            ->once()
+            ->with(Mockery::on(function (array $records) {
+                $record = $records[0] ?? [];
+
+                return is_string($record['event_id'] ?? null)
+                    && ($record['event_id'] ?? '') !== ''
+                    && ($record['event_name'] ?? null) === 'BulkEvent'
+                    && ($record['user_id'] ?? null) === 'context-user';
+            }));
+
+        config()->set('events.context_provider', fn(): array => ['user_id' => 'context-user']);
+
+        $service = new EventService($storedEventModel, Mockery::mock(EventLogEntry::class));
+        $service->recordManyStoredEvents([
+            [
+                'event_class' => 'BulkEvent',
+                'payload' => ['id' => 1],
+            ],
+        ]);
+        $this->addToAssertionCount(1);
+    }
 }

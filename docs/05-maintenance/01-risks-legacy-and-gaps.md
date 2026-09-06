@@ -17,6 +17,13 @@
 - CI now enforces a 95% statement coverage threshold. The measured local
   baseline on 2026-05-09 after the DTO-parity audit fixes was 95.02%, so
   coverage headroom is currently narrow.
+- Quality-floor follow-ups (not blocking this correctness pass): PHPStan `max`
+  + strict-rules, PHPMD cleancode, Dockerfile/Makefile parity with `dto`,
+  backed enums for `EventLogAction` / `EventCategory`, PSR-20 clock injection,
+  `final` + `private readonly` on concretes, Faker across remaining unit tests.
+- Dual-write integrity (SQL transaction + Mongo append) and queue actor capture
+  remain application responsibilities; document `ShouldDispatchAfterCommit` and
+  embed context on queued events. Outbox stays deferred.
 
 ## Advanced scale roadmap
 

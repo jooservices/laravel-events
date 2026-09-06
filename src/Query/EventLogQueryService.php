@@ -8,10 +8,19 @@ use DateTimeInterface;
 use Illuminate\Support\Collection;
 use JOOservices\LaravelEvents\Data\EventLogData;
 use JOOservices\LaravelEvents\EventLog\Models\EventLogEntry;
-use JOOservices\LaravelEvents\Exceptions\InvalidQueryException;
 
 class EventLogQueryService
 {
+    /** @var list<string> */
+    private const ALLOWED_FILTERS = [
+        'entity_type',
+        'entity_id',
+        'action',
+        'user_id',
+        'meta.correlation_id',
+        'meta.causation_id',
+    ];
+
     public function __construct(private readonly EventLogEntry $model)
     {
     }
@@ -37,6 +46,8 @@ class EventLogQueryService
     /** @return Collection<int, EventLogData> */
     public function between(DateTimeInterface $from, DateTimeInterface $to, int $limit = 50): Collection
     {
+        QueryGuard::assertDateRange($from, $to);
+
         return $this->run($limit, [], $from, $to);
     }
 
@@ -59,7 +70,8 @@ class EventLogQueryService
         ?DateTimeInterface $from = null,
         ?DateTimeInterface $to = null,
     ): Collection {
-        $this->assertLimit($limit);
+        QueryGuard::assertLimit($limit);
+        QueryGuard::assertFilters($filters, self::ALLOWED_FILTERS);
 
         $query = $this->model->newQuery();
         foreach ($filters as $key => $value) {
@@ -77,12 +89,5 @@ class EventLogQueryService
             ->get()
             ->map(fn(EventLogEntry $entry): EventLogData => EventLogData::fromArray($entry->toArray()))
             ->values();
-    }
-
-    private function assertLimit(int $limit): void
-    {
-        if ($limit < 1 || $limit > 500) {
-            throw InvalidQueryException::limitOutOfRange($limit);
-        }
     }
 }

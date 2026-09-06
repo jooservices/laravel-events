@@ -5,13 +5,12 @@ This guide describes the repository workflow for contributors to `jooservices/la
 ## Command Map
 
 ```bash
-composer lint          # Pint, PHPCS, PHPStan
-composer lint:all      # lint + PHPMD + PHP-CS-Fixer
+composer lint          # Pint, PHPCS, PHPStan, PHPMD, PHP-CS-Fixer
 composer lint:fix      # Pint fix + PHP-CS-Fixer fix
 composer test          # PHPUnit
 composer test:coverage # PHPUnit coverage reports in build/coverage
-composer check         # lint:all + test
-composer ci            # lint:all + test:coverage
+composer check         # lint + test
+composer ci            # lint + test:coverage
 ```
 
 Prefer the `lint:*` commands in automation and docs:

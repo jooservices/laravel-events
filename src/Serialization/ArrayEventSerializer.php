@@ -20,25 +20,52 @@ class ArrayEventSerializer implements EventSerializerInterface
         ?CarbonInterface $occurredAt = null,
         array $metadata = [],
     ): StoredEventData {
-        return new StoredEventData(
+        return $this->ensureEnvelope(new StoredEventData(
             eventClass: $event::class,
             payload: $payload,
             aggregateId: $aggregateId,
             userId: $userId,
             occurredAt: $occurredAt,
             metadata: $metadata,
+            envelope: EventEnvelopeData::fromArray($metadata),
+        ));
+    }
+
+    public function ensureEnvelope(StoredEventData $data): StoredEventData
+    {
+        $metadata = $data->metadata;
+        $existing = $data->envelope;
+
+        return new StoredEventData(
+            eventClass: $data->eventClass,
+            payload: $data->payload,
+            aggregateId: $data->aggregateId,
+            userId: $data->userId,
+            occurredAt: $data->occurredAt,
+            metadata: $metadata,
             envelope: new EventEnvelopeData(
-                eventId: $this->stringMetadata($metadata, EventMetadata::EVENT_ID)
-                    ?? (string) Str::uuid(),
-                eventName: $this->stringMetadata($metadata, EventMetadata::EVENT_NAME)
-                    ?? $this->shortClassName($event::class),
-                eventCategory: $this->stringMetadata($metadata, EventMetadata::EVENT_CATEGORY),
-                aggregateType: $this->stringMetadata($metadata, EventMetadata::AGGREGATE_TYPE),
-                schemaVersion: $this->stringOrIntMetadata($metadata, EventMetadata::SCHEMA_VERSION),
-                eventVersion: $this->stringOrIntMetadata($metadata, EventMetadata::EVENT_VERSION),
-                correlationId: $this->stringMetadata($metadata, EventMetadata::CORRELATION_ID),
-                causationId: $this->stringMetadata($metadata, EventMetadata::CAUSATION_ID),
+                eventId: $this->firstNonEmptyString(
+                    $existing instanceof EventEnvelopeData ? $existing->eventId : null,
+                    $this->stringMetadata($metadata, EventMetadata::EVENT_ID),
+                ) ?? (string) Str::uuid(),
+                eventName: $this->firstNonEmptyString(
+                    $existing instanceof EventEnvelopeData ? $existing->eventName : null,
+                    $this->stringMetadata($metadata, EventMetadata::EVENT_NAME),
+                ) ?? $this->shortClassName($data->eventClass),
+                eventCategory: ($existing instanceof EventEnvelopeData ? $existing->eventCategory : null)
+                    ?? $this->stringMetadata($metadata, EventMetadata::EVENT_CATEGORY),
+                aggregateType: ($existing instanceof EventEnvelopeData ? $existing->aggregateType : null)
+                    ?? $this->stringMetadata($metadata, EventMetadata::AGGREGATE_TYPE),
+                schemaVersion: ($existing instanceof EventEnvelopeData ? $existing->schemaVersion : null)
+                    ?? $this->stringOrIntMetadata($metadata, EventMetadata::SCHEMA_VERSION),
+                eventVersion: ($existing instanceof EventEnvelopeData ? $existing->eventVersion : null)
+                    ?? $this->stringOrIntMetadata($metadata, EventMetadata::EVENT_VERSION),
+                correlationId: ($existing instanceof EventEnvelopeData ? $existing->correlationId : null)
+                    ?? $this->stringMetadata($metadata, EventMetadata::CORRELATION_ID),
+                causationId: ($existing instanceof EventEnvelopeData ? $existing->causationId : null)
+                    ?? $this->stringMetadata($metadata, EventMetadata::CAUSATION_ID),
             ),
+            identity: $data->identity,
         );
     }
 
@@ -47,6 +74,17 @@ class ArrayEventSerializer implements EventSerializerInterface
         $position = strrpos($class, '\\');
 
         return $position === false ? $class : substr($class, $position + 1);
+    }
+
+    private function firstNonEmptyString(?string ...$candidates): ?string
+    {
+        foreach ($candidates as $candidate) {
+            if ($candidate !== null && $candidate !== '') {
+                return $candidate;
+            }
+        }
+
+        return null;
     }
 
     /** @param array<string, mixed> $metadata */
