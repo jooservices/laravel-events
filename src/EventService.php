@@ -16,6 +16,7 @@ use JOOservices\LaravelEvents\Serialization\ArrayEventSerializer;
 use JOOservices\LaravelEvents\Serialization\EventSerializerInterface;
 use JOOservices\LaravelEvents\Support\PayloadRedactor;
 use Psr\Clock\ClockInterface;
+use Psr\Log\LoggerInterface;
 use Throwable;
 
 final class EventService implements EventPersisterInterface
@@ -26,6 +27,7 @@ final class EventService implements EventPersisterInterface
         private readonly PayloadRedactor $redactor = new PayloadRedactor(),
         private readonly EventSerializerInterface $serializer = new ArrayEventSerializer(),
         private readonly ?ClockInterface $clock = null,
+        private readonly ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -58,6 +60,12 @@ final class EventService implements EventPersisterInterface
 
         /** @var StoredEvent $created */
         $created = $this->storedEventModel->newQuery()->create($attributes);
+
+        $this->logger?->debug('laravel-events.stored_event.persisted', [
+            'event_class' => $data->eventClass,
+            'aggregate_id' => $data->aggregateId,
+            'event_id' => $data->envelope?->eventId,
+        ]);
 
         return $created;
     }
@@ -97,6 +105,12 @@ final class EventService implements EventPersisterInterface
 
         /** @var EventLogEntry $created */
         $created = $this->eventLogEntryModel->newQuery()->create($attributes);
+
+        $this->logger?->debug('laravel-events.event_log.persisted', [
+            'entity_type' => $data->entityType,
+            'entity_id' => $data->entityId,
+            'action' => $data->action,
+        ]);
 
         return $created;
     }

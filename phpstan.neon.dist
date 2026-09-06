@@ -13,8 +13,8 @@ parameters:
     checkMissingCallableSignature: true
     reportUnmatchedIgnoredErrors: false
     ignoreErrors:
-        # Mockery: MockInterface passed where concrete type expected
-        - '~Parameter #\d+ .+ expects .+, Mockery\\(MockInterface|LegacyMockInterface) given\.~'
+        # Mockery: MockInterface passed where concrete type expected (positional or named)
+        - '~Parameter (#\d+|\$\w+) .+ expects .+, Mockery\\(MockInterface|LegacyMockInterface) given\.~'
         # Mockery expectation fluent API — reported on some CI/OS PHPStan runs, not all local setups
         -
             message: '~Call to an undefined method Mockery\\.*~'

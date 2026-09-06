@@ -1,7 +1,13 @@
 ## [Unreleased]
 
+### Removed
+
+- Unused bag DTOs `EventDiffData` and `EventMetadataData` (`diff` / `meta` / `metadata` stay as arrays on record DTOs)
+
 ### Changed
 
+- Direct Composer requires for `psr/clock` and `psr/log`
+- Broader Faker usage in unit tests for free-form values
 - Raise PHPStan to `max` with `phpstan-strict-rules` and `phpstan-phpunit`
 - Enable PHPMD `cleancode` (StaticAccess / ElseExpression excluded for Laravel facades)
 - Convert `EventLogAction` / `EventCategory` to string-backed enums
@@ -35,6 +41,7 @@
 
 ### Added
 
+- Optional PSR-3 `LoggerInterface` on `EventService` (debug logs after successful persist)
 - `InvalidEventDataException`, `InvalidQueryException`, and `InvalidConfigurationException` with structured context / error codes
 - `QueryGuard` / `QueryExecutor` shared query validation and mapping
 - `DateTimeParser` for Eloquent/Mongo date normalization on query hydration
