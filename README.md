@@ -6,73 +6,44 @@
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/jooservices/laravel-events/badge)](https://securityscorecards.dev/viewer/?uri=github.com/jooservices/laravel-events)
 [![PHP Version](https://img.shields.io/badge/PHP-8.5%2B-blue.svg)](https://www.php.net/)
 [![GitHub Release](https://img.shields.io/github/v/release/jooservices/laravel-events?display_name=tag)](https://github.com/jooservices/laravel-events/releases)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Packagist Version](https://img.shields.io/packagist/v/jooservices/laravel-events)](https://packagist.org/packages/jooservices/laravel-events)
 [![Total Downloads](https://img.shields.io/packagist/dt/jooservices/laravel-events)](https://packagist.org/packages/jooservices/laravel-events)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Lightweight domain-event and model-change persistence for Laravel with **MongoDB** storage. Store domain event payloads by aggregate and/or model change audit trails (prev/changed/diff) via Laravel's native event dispatcher.
+`jooservices/laravel-events` provides Laravel event sourcing and event-log persistence using MongoDB.
 
 > [!WARNING]
-> **`v4.0.0` includes breaking API changes from `1.x`** (backed enums, `final` concretes, removed bag DTOs, new indexes).
-> See [`UPGRADE-4.0.md`](UPGRADE-4.0.md) and the [changelog](CHANGELOG.md) before upgrading.
+> **`v4.0.0` includes breaking API changes from `1.x`.** Review [UPGRADE-4.0.md](UPGRADE-4.0.md) and the [changelog](CHANGELOG.md) before upgrading. The current release is `4.0.0`.
 
-This is **not** a full event store: there is no stream version, optimistic concurrency, replay command, or outbox. Ordering is `created_at` (and optional `occurred_at`); treat “event sourcing” here as aggregate-oriented append + query helpers.
+## Features
 
-Package name: `jooservices/laravel-events`
+- Persist domain events by aggregate in MongoDB's `stored_events` collection.
+- Persist model-change audit records, including previous values and field diffs, in the `event_logs` collection.
+- Dispatch events through Laravel's native event dispatcher; the package subscribers handle persistence.
+- Publish package configuration and install recommended MongoDB indexes with Artisan commands.
 
-- **Laravel 12/13** · **PHP 8.5+** · **Current release: `4.0.0`**
-- **MongoDB** via [mongodb/laravel-mongodb](https://github.com/mongodb/laravel-mongodb)
-- **DTO / exceptions** via [jooservices/dto](https://github.com/jooservices/dto) and [jooservices/exceptions](https://github.com/jooservices/exceptions)
+## Requirements
 
----
+- PHP `^8.5`
+- Laravel `^12.0` or `^13.0`
+- A MongoDB server and the PHP MongoDB extension
+- `mongodb/laravel-mongodb` `^5.7`
 
-## Introduction
+## Installation
 
-This package adds two persistence features on top of Laravel's event system:
-
-1. **Event Sourcing (lightweight)** — Events implementing `EventSourcingInterface` are stored in a `stored_events` MongoDB collection (payload, aggregate id, envelope, metadata, user, time). Use for aggregate history and audit by aggregate — not replay/outbox.
-2. **Event Log** — Events implementing `LoggableModelInterface` are stored in an `event_logs` collection with previous/changed state and a per-field diff. Use for audit trails and compliance.
-
-You dispatch events as usual; package subscribers persist them to MongoDB **synchronously** when the event is dispatched (unless you use Laravel after-commit / queue features yourself — see Operations). No custom bus required.
-
-## Scope
-
-Use this package when you need a reusable Laravel-standard base library for persisting event records or audit logs.
-
-This package does **not**:
-
-- replace Laravel's event dispatcher
-- provide a projection/read-model framework
-- provide a business analytics or reporting layer
-- provide dashboards, projections, or analytics/reporting workflows
-- provide AI agents, AI data fetching, or an AI runtime
-
-## When to Use
-
-| Need | Use |
-|------|-----|
-| Persist domain events by aggregate for historical inspection or replay-aware workflows | Event Sourcing |
-| Persist model/entity changes with previous/current values and field diff | Event Log |
-| Need both domain history and field-level audit | Use both, with separate focused events |
-| Need dashboards, projections, analytics, or AI retrieval | Build that in the application layer |
-
----
-
-## Quick Start
-
-### Install
+Install the package with Composer:
 
 ```bash
-composer require jooservices/laravel-events
+composer require jooservices/laravel-events:^4.0
 ```
 
-### Publish config (optional)
+The service provider is registered through Laravel package discovery. To customize the package settings, publish its configuration:
 
 ```bash
 php artisan vendor:publish --tag=laravel-events-config
 ```
 
-### Environment
+Configure a `mongodb` connection in `config/database.php`. The default package configuration reads these optional environment variables:
 
 ```env
 MONGODB_URI=mongodb://127.0.0.1:27017
@@ -81,21 +52,17 @@ EVENTS_EVENTSOURCING_ENABLED=true
 EVENTS_EVENT_LOG_ENABLED=true
 ```
 
-Ensure a `mongodb` connection exists in `config/database.php` (see [mongodb/laravel-mongodb](https://github.com/mongodb/laravel-mongodb)).
-
-### Indexes
+Create the recommended indexes after configuring MongoDB:
 
 ```bash
 php artisan events:install-indexes
 ```
 
----
+## Quick start
 
-## Basic Usage
+### Event sourcing
 
-### Event Sourcing
-
-Implement `EventSourcingInterface` and dispatch:
+Implement `EventSourcingInterface` and dispatch the event through Laravel:
 
 ```php
 use JOOservices\LaravelEvents\EventSourcing\Contracts\EventSourcingInterface;
@@ -118,20 +85,14 @@ class OrderCreated implements EventSourcingInterface
 event(new OrderCreated('ORD-001', [['sku' => 'X', 'qty' => 2]]));
 ```
 
-Events are stored in the `stored_events` collection. Optional: `occurredAt(): ?\Carbon\CarbonInterface`, `metadata(): array`. Use the `HasEventSourcingDefaults` trait to implement only `payload()` and `aggregateId()`.
+### Event log
 
-Recommended metadata keys include `request_id`, `correlation_id`, `causation_id`, `source`, `channel`, `reason_code`, `schema_version`, `event_version`, `event_category`, and optional `tenant_id`. The `EventMetadata` helper exposes constants and small factory methods for those conventions.
-
-Use `event_category` for a lightweight event type convention when you need broad categories such as `domain`, `integration`, `audit`, or `system` without introducing a full event taxonomy framework.
-
-### Event Log (Audit)
-
-Implement `LoggableModelInterface` (and optionally `HasLogAction`) and dispatch with prev/changed state. Use the `DefaultsToUpdatedAction` trait when the action is always `updated`:
+Implement `LoggableModelInterface` to record a model's previous and changed state. `DefaultsToUpdatedAction` supplies the `updated` action:
 
 ```php
 use JOOservices\LaravelEvents\EventLog\Concerns\DefaultsToUpdatedAction;
-use JOOservices\LaravelEvents\EventLog\Contracts\LoggableModelInterface;
 use JOOservices\LaravelEvents\EventLog\Contracts\HasLogAction;
+use JOOservices\LaravelEvents\EventLog\Contracts\LoggableModelInterface;
 
 class OrderUpdated implements LoggableModelInterface, HasLogAction
 {
@@ -146,174 +107,64 @@ class OrderUpdated implements LoggableModelInterface, HasLogAction
 }
 ```
 
-Changes are stored in `event_logs` with a computed diff. Query by `entity_type` + `entity_id`.
+## Design notes
 
-Recommended action names are available from `JOOservices\LaravelEvents\EventLog\EventLogAction`: `created`, `updated`, `deleted`, `restored`, `status_changed`, `corrected`, `synchronized`, and `imported`.
+This package persists event records; it is not a full event store. It does not provide stream version checks, an outbox, projections, or a replay command. Persisted records use `created_at` and may include `occurred_at` when supplied by an event.
 
----
+The two storage features are independent: use event sourcing for aggregate event history and the event log for model-change audit trails. Package subscribers persist dispatched events synchronously. For events tied to a database transaction, Laravel's `ShouldDispatchAfterCommit` can defer dispatch until commit.
 
-## Querying
+The package recursively redacts common secret fields by default. This is defensive masking and does not replace keeping secrets out of dispatched events. Optional MongoDB TTL retention is configured with `EVENTS_STORED_EVENTS_RETENTION_DAYS` and `EVENTS_EVENT_LOGS_RETENTION_DAYS`; MongoDB applies TTL deletion asynchronously.
+
+Query services are available through Laravel's container:
 
 ```php
 use JOOservices\LaravelEvents\Query\EventLogQueryService;
 use JOOservices\LaravelEvents\Query\StoredEventQueryService;
 
 $events = app(StoredEventQueryService::class)->byAggregateId('ORD-001');
-$domainEvents = app(StoredEventQueryService::class)->byEventCategory('domain');
 $audit = app(EventLogQueryService::class)->byEntity('orders', 'ORD-001');
 ```
 
-Query services return typed package data records (including storage `id` / `created_at` when present) and intentionally stay small.
-Build dashboards, projections, and reporting in your application.
-
-The public PHP namespace is `JOOservices\LaravelEvents` only (alternate casing removed in `1.5.0`). See [`UPGRADE-4.0.md`](UPGRADE-4.0.md) for `4.0.0` breaking changes (enums, `final`, indexes).
-
-## Redaction
-
-Recursive redaction is enabled by default for common secret keys:
-
-```php
-'redaction' => [
-    'enabled' => true,
-    'keys' => [
-        'password',
-        'password_hash',
-        'token',
-        'secret',
-        'client_secret',
-        'private_key',
-        'api_key',
-        'authorization',
-    ],
-    'replacement' => '[REDACTED]',
-],
-```
-
-This masks stored event payload/metadata and event log `prev`, `changed`,
-`diff`, and `meta`. It is defensive masking, not a replacement for avoiding
-secrets in dispatched events.
-
-## Retention
-
-Optional MongoDB TTL indexes are configured with:
-
-```env
-EVENTS_STORED_EVENTS_RETENTION_DAYS=
-EVENTS_EVENT_LOGS_RETENTION_DAYS=365
-```
-
-Run `php artisan events:install-indexes` after changing retention settings.
-MongoDB TTL deletion is asynchronous.
-
-## Bulk Records
-
-```php
-use JOOservices\LaravelEvents\Data\StoredEventData;
-use JOOservices\LaravelEvents\EventService;
-
-app(EventService::class)->recordManyStoredEvents([
-    new StoredEventData('OrderImported', ['order_id' => 'ORD-001'], 'ORD-001'),
-]);
-```
-
-Bulk APIs normalize and redact each record before MongoDB batch insert.
-
----
+See the user guide for metadata, redaction, retention, query filters, and bulk recording details.
 
 ## Documentation
 
-Full documentation is in the **`./docs`** folder:
+- [Documentation index](docs/README.md)
+- [Installation and configuration](docs/01-getting-started/01-installation.md)
+- [First event](docs/01-getting-started/04-first-event.md)
+- [Installing indexes](docs/01-getting-started/05-index-installation.md)
+- [Event sourcing](docs/02-user-guide/01-event-sourcing.md)
+- [Event log](docs/02-user-guide/02-event-log.md)
+- [Decision guide](docs/02-user-guide/10-best-practices.md)
+- [Operations](docs/02-user-guide/08-operations.md)
+- [API reference](docs/02-user-guide/11-api-reference.md)
+- [Examples](docs/03-examples/01-basic-domain-event.md)
+- [Upgrade guide](UPGRADE-4.0.md)
+- [Changelog](CHANGELOG.md)
+- [Workflow details](WORKFLOWS.md)
 
-| Document | Description |
-|----------|-------------|
-| [docs/README.md](docs/README.md) | Documentation index |
-| [Architecture](docs/00-architecture/01-project-overview.md) | Design, data flow, diagrams |
-| [Code structure](docs/00-architecture/02-repository-structure.md) | Package layout and namespaces |
-| [Installation](docs/01-getting-started/01-installation.md) | Requirements and setup |
-| [Configuration](docs/01-getting-started/02-configuration.md) | Config and context provider |
-| [Decision Guide](docs/02-user-guide/10-best-practices.md) | Event Sourcing vs Event Log |
-| [Event Sourcing](docs/02-user-guide/01-event-sourcing.md) | Stored events and aggregates |
-| [Event Log](docs/02-user-guide/02-event-log.md) | Audit trail and diff |
-| [Metadata](docs/02-user-guide/03-metadata-correlation-causation.md) | Metadata keys, versioning, corrections |
-| [Operations](docs/02-user-guide/08-operations.md) | Indexes, query patterns, retention, production safety |
-| [AI Integration](docs/04-development/13-optional-ai-integration.md) | Optional app-layer AI export examples |
-| [Development](docs/04-development/01-setup.md) | Composer commands, CI, release, and contributor workflow |
-| [Samples](docs/03-examples/01-basic-domain-event.md) | Complete code examples |
-| [API Reference](docs/02-user-guide/11-api-reference.md) | EventService, interfaces, commands |
+## Development
 
----
-
-## Testing & Linting
+Run the development commands with PHP `8.5` and Composer dependencies installed. The `make` targets use the repository's Docker Compose environment:
 
 ```bash
-composer test
-composer test:coverage
-composer lint       # Pint, PHPCS, PHPStan, PHPMD, PHP-CS-Fixer
-composer lint:fix   # Pint fix + PHP-CS-Fixer fix
-composer check      # lint + test
-composer ci         # lint + test:coverage
+make build
+make install
+make lint
+make test
+make ci
 ```
 
-## Git Hooks
+Run `composer validate --strict` before using the Composer scripts `lint`, `lint:fix`, `test`, `test:coverage`, `coverage:check`, `check`, and `ci`. Composer install and update also install the configured CaptainHook hooks. See the [development setup](docs/04-development/01-setup.md) and [contributing guide](CONTRIBUTING.md) for local details.
 
-Composer installs Git hooks automatically on dependency install and update:
+## Community
 
-```bash
-composer install
-composer update
-```
-
-The hooks are managed by CaptainHook and enforce:
-
-- `commit-msg`: Conventional Commits, for example `fix: Correct event metadata merge`
-- `pre-commit`: PHP syntax linting, staged secret scanning with gitleaks, Pint, PHPCS, PHPStan, PHPMD, and PHP-CS-Fixer
-- `pre-push`: gitleaks history scan when available, then `composer test`
-
-If hooks need to be reinstalled manually:
-
-```bash
-vendor/bin/captainhook install --force --skip-existing
-```
-
-Install `gitleaks` locally to pass the pre-commit secret scan:
-
-```bash
-brew install gitleaks
-```
-
-## AI Contributor Support
-
-AI contributor guidance is intentionally documentation-only:
-
-- [AGENTS.md](AGENTS.md)
-- [CLAUDE.md](CLAUDE.md)
-- [AI Skills Map](ai/skills/README.md)
-- [AI Skills Usage](ai/skills/USAGE.md)
-- [Optional AI Integration](docs/04-development/13-optional-ai-integration.md)
-
-The package does not include AI runtime code, AI data fetching, authorization, redaction, or tool execution.
-
-## DTO-Style Records
-
-The package uses small typed data records for normalized stored event and audit
-log data. It follows `jooservices/dto` as a maturity baseline for repository
-quality and docs structure, without depending on DTO domain internals.
-
-## GitHub Actions
-
-Configured workflows:
-
-- `CI`: Composer metadata validation, Composer audit, Pint, PHPCS, PHPStan, PHPMD, PHP-CS-Fixer, PHPUnit coverage with a MongoDB service, a 95% minimum statement coverage gate, guarded Codecov upload, guarded SonarQube Cloud analysis, and non-blocking dependency review for pull requests
-- `Release`: validate version tags, create GitHub releases, and trigger Packagist updates when Packagist secrets are configured
-- `PR Labeler`: apply labels based on changed files
-- `Semantic PR Title`: enforce Conventional Commit-style PR titles
-- `OpenSSF Scorecard`: publish security posture results as SARIF
-- `Secret Scanning`: run Gitleaks on pushes, pull requests, and manual dispatches
-
-Coverage is archived as a workflow artifact. Codecov and SonarQube Cloud run when repository secrets are configured; README badges mirror `dto` / `client` (CI on `develop`, version → CHANGELOG, Sonar, Scorecard).
-
----
+- [Contributing guide](CONTRIBUTING.md)
+- [Security policy](SECURITY.md)
+- [Support](SUPPORT.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Governance](GOVERNANCE.md)
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+MIT — see [LICENSE](LICENSE).
