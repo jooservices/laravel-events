@@ -68,7 +68,7 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
 
         Event::dispatch($event);
 
-        $stored = StoredEvent::on('mongodb')->orderBy('_id', 'desc')->first();
+        $stored = $this->latestStoredEvent();
         self::assertNotNull($stored, 'StoredEvent should exist in MongoDB');
         self::assertSame($event::class, $stored->event_class);
         self::assertSame('ORD-999', $stored->aggregate_id);
@@ -112,7 +112,7 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
 
         Event::dispatch($loggableEvent);
 
-        $entry = EventLogEntry::on('mongodb')->orderBy('_id', 'desc')->first();
+        $entry = $this->latestEventLogEntry();
         self::assertNotNull($entry, 'EventLogEntry should exist in MongoDB');
         self::assertSame('Order', $entry->entity_type);
         self::assertSame('42', $entry->entity_id);
@@ -153,7 +153,7 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
 
         Event::dispatch($event);
 
-        $stored = StoredEvent::on('mongodb')->orderBy('_id', 'desc')->first();
+        $stored = $this->latestStoredEvent();
         self::assertNotNull($stored);
         self::assertSame(100, $stored->user_id);
     }
@@ -190,9 +190,25 @@ class RealMongoDBStorageTest extends MongoDBIntegrationTestCase
 
         Event::dispatch($loggableEvent);
 
-        $entry = EventLogEntry::on('mongodb')->orderBy('_id', 'desc')->first();
+        $entry = $this->latestEventLogEntry();
         self::assertNotNull($entry);
         self::assertSame(200, $entry->user_id);
+    }
+
+    private function latestStoredEvent(): ?StoredEvent
+    {
+        $query = StoredEvent::on('mongodb');
+        $query->getQuery()->orderBy('_id', 'desc');
+
+        return $query->first();
+    }
+
+    private function latestEventLogEntry(): ?EventLogEntry
+    {
+        $query = EventLogEntry::on('mongodb');
+        $query->getQuery()->orderBy('_id', 'desc');
+
+        return $query->first();
     }
 
     /** @param array<string, mixed> $evidence */

@@ -32,9 +32,6 @@ class EventServiceTest extends TestCase
         $aggregateId = 'agg-123';
 
         $stored = new StoredEvent();
-        $stored->event_class = get_class($event);
-        $stored->aggregate_id = $aggregateId;
-        $stored->payload = $payload;
 
         $storedEventModel = Mockery::mock(StoredEvent::class)->makePartial();
         $storedEventModel->shouldReceive('newQuery')->andReturnSelf();
