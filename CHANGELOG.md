@@ -6,6 +6,11 @@ versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- Support `jooservices/dto` v4 alongside v3; the local PHP image installs `ext-mbstring` for v4.
+- Refresh the locked dependencies with patched releases; Composer audit reports no advisories.
+
 ## [4.0.0] - 2026-09-06
 
 Major quality and correctness release for Laravel 12/13 + MongoDB event

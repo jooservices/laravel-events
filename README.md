@@ -27,6 +27,7 @@
 - PHP `^8.5`
 - Laravel `^12.0` or `^13.0`
 - A MongoDB server and the PHP MongoDB extension
+- `jooservices/dto` `^3.2 || ^4.0` (`ext-mbstring` required with DTO v4)
 - `mongodb/laravel-mongodb` `^5.7`
 
 ## Installation

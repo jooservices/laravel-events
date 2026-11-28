@@ -8,9 +8,10 @@ RUN apt-get update \
         libicu-dev \
         libssl-dev \
         libzip-dev \
+        libonig-dev \
         pkg-config \
         $PHPIZE_DEPS \
-    && docker-php-ext-install -j$(nproc) intl \
+    && docker-php-ext-install -j$(nproc) intl mbstring \
     && pecl install mongodb pcov \
     && docker-php-ext-enable mongodb pcov \
     && apt-get purge -y --auto-remove $PHPIZE_DEPS \
