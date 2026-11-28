@@ -104,8 +104,11 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
             new EventLogData('bulk', '2', 'created', changed: ['id' => 2]),
         ]);
 
-        self::assertSame(2, StoredEvent::on('mongodb')->whereIn('aggregate_id', ['bulk-1', 'bulk-2'])->count());
-        self::assertSame(2, EventLogEntry::on('mongodb')->where('entity_type', 'bulk')->count());
+        $storedCount = StoredEvent::on('mongodb')->getQuery()
+            ->whereIn('aggregate_id', ['bulk-1', 'bulk-2'])
+            ->count();
+        self::assertSame(2, $storedCount);
+        self::assertSame(2, EventLogEntry::on('mongodb')->getQuery()->where('entity_type', 'bulk')->count());
     }
 
     public function test_bulk_record_support_merges_context_and_user_attribution(): void
@@ -126,11 +129,13 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
         $stored = StoredEvent::on('mongodb')->where('aggregate_id', 'bulk-context-1')->first();
         $log = EventLogEntry::on('mongodb')->where('entity_type', 'bulk-context')->first();
 
-        self::assertSame('bulk-context', $stored?->metadata['correlation_id'] ?? null);
-        self::assertSame('context-user', $stored?->metadata['user_id'] ?? null);
-        self::assertSame('context-user', $stored?->user_id);
-        self::assertSame('bulk-context', $log?->meta['correlation_id'] ?? null);
-        self::assertSame('context-user', $log?->user_id);
+        self::assertNotNull($stored);
+        self::assertNotNull($log);
+        self::assertSame('bulk-context', $stored->metadata['correlation_id'] ?? null);
+        self::assertSame('context-user', $stored->metadata['user_id'] ?? null);
+        self::assertSame('context-user', $stored->user_id);
+        self::assertSame('bulk-context', $log->meta['correlation_id'] ?? null);
+        self::assertSame('context-user', $log->user_id);
     }
 
     public function test_install_indexes_command_creates_ttl_indexes_when_configured(): void
@@ -214,7 +219,7 @@ class ScopedFeatureStorageTest extends MongoDBIntegrationTestCase
 
     public function test_by_correlation_id_matches_top_level_envelope_without_metadata_copy(): void
     {
-        StoredEvent::on('mongodb')->newQuery()->insert([
+        StoredEvent::on('mongodb')->getQuery()->insert([
             [
                 'event_class' => 'TopLevelCorr',
                 'aggregate_id' => 'corr-top-1',
