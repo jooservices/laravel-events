@@ -31,7 +31,7 @@
     },
     "require": {
         "php": "^8.5",
-        "jooservices/dto": "^3.2",
+        "jooservices/dto": "^3.2 || ^4.0",
         "jooservices/exceptions": "^4.0",
         "laravel/framework": "^12.0|^13.0",
         "mongodb/laravel-mongodb": "^5.7",
